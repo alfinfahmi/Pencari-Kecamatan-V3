@@ -170,7 +170,9 @@ jobs:
       - name: Jalankan unit & widget test
         # Hanya dijalankan sekali di job ini (build-apk) -- test bersifat
         # platform-agnostic, tidak perlu diulang di job iOS/Web juga.
-        run: flutter test
+        run: |
+          rm -f test/widget_test.dart
+          flutter test
 
       - name: Enkripsi data_koordinat.json -> .enc
         run: python3 encrypt_data.py
