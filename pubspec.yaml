@@ -1,0 +1,104 @@
+name: pencari_kecamatan
+description: "Koordinat Kec. Tashil — LF Ma'had 'Aly Lirboyo & MHM Kediri"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Penyimpanan lokal offline (favorit, riwayat, titik kustom, status aktivasi)
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.2
+
+  # Hash serial number (SHA-256), bukan disimpan sebagai teks polos
+  crypto: ^3.0.3
+
+  # Dekripsi data_koordinat.enc (AES-256-CBC) di mobile/desktop
+  encrypt: ^5.0.3
+
+  # Salin ke clipboard & share file export/import
+  share_plus: ^10.1.2
+
+  # Buka Google Maps / Waze
+  url_launcher: ^6.3.0
+
+  # Backend Supabase untuk crowdsourcing koreksi data & panel moderasi
+  supabase_flutter: ^2.6.0
+
+  # Ekspor jadwal waktu shalat ke PDF
+  pdf: ^3.10.7
+  printing: ^5.11.1
+
+  # Notifikasi adzan terjadwal
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
+
+  # Lokasi GPS perangkat (opsional, untuk menambah titik kustom cepat)
+  geolocator: ^11.0.0
+
+  # Kompas kiblat live — heading dari sensor magnetometer perangkat
+  flutter_compass: ^0.8.0
+
+  # Format angka/tanggal Indonesia
+  intl: ^0.19.0
+
+  # Tipografi sesuai design system Stitch (Hanken Grotesk + JetBrains Mono)
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.8
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/
+    - assets/data/web/
+    - assets/data/web/provinsi/
+    - assets/images/
+
+# Konfigurasi ikon aplikasi. Jalankan setelah pub get:
+#   flutter pub run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "assets/images/app_icon_background.png"
+  adaptive_icon_foreground: "assets/images/app_icon_foreground.png"
+  web:
+    generate: true
+    image_path: "assets/images/app_icon.png"
+    background_color: "#0D5C3A"
+    theme_color: "#0D5C3A"
+  windows:
+    generate: true
+    image_path: "assets/images/app_icon.png"
+  macos:
+    generate: true
+    image_path: "assets/images/app_icon.png"
+
+# Konfigurasi splash screen native. Jalankan setelah pub get:
+#   flutter pub run flutter_native_splash:create
+flutter_native_splash:
+  color: "#0D5C3A"
+  image: assets/images/splash_logo.png
+  color_dark: "#0E1712"
+  image_dark: assets/images/splash_logo.png
+  android_12:
+    color: "#0D5C3A"
+    image: assets/images/splash_logo.png
+    color_dark: "#0E1712"
+    image_dark: assets/images/splash_logo.png
+  web: false

@@ -1,0 +1,30 @@
+{
+  "referensi": [
+    {
+      "id": "ref_01",
+      "kecamatan": "Ka'bah (Masjidil Haram, Makkah)",
+      "kabupaten": "Masjidil Haram",
+      "provinsi": "Arab Saudi",
+      "lat": 21.4225167,
+      "lng": 39.8261972,
+      "lat_dms": "21° 25' 21.06\" U",
+      "lng_dms": "39° 49' 34.31\" T",
+      "elevasi_m": 299,
+      "zona_waktu": "Waktu Arab Saudi (AST)",
+      "utc_offset": 3
+    },
+    {
+      "id": "ref_02",
+      "kecamatan": "Pondok Pesantren Lirboyo",
+      "kabupaten": "Kota Kediri",
+      "provinsi": "Jawa Timur",
+      "lat": -7.818758333,
+      "lng": 111.9931583,
+      "lat_dms": "07° 49' 07.53\" S",
+      "lng_dms": "111° 59' 35.37\" T",
+      "elevasi_m": 76,
+      "zona_waktu": "WIB",
+      "utc_offset": 7
+    }
+  ]
+}

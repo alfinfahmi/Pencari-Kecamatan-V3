@@ -1,0 +1,235 @@
+{
+  "version": "v7",
+  "updated_at": "2026-08-22T15:10:33Z",
+  "total_kecamatan": 7274,
+  "provinsi": [
+    {
+      "nama": "Aceh",
+      "slug": "aceh",
+      "file": "provinsi/aceh.json",
+      "jumlah": 290
+    },
+    {
+      "nama": "Bali",
+      "slug": "bali",
+      "file": "provinsi/bali.json",
+      "jumlah": 57
+    },
+    {
+      "nama": "Banten",
+      "slug": "banten",
+      "file": "provinsi/banten.json",
+      "jumlah": 155
+    },
+    {
+      "nama": "Bengkulu",
+      "slug": "bengkulu",
+      "file": "provinsi/bengkulu.json",
+      "jumlah": 129
+    },
+    {
+      "nama": "Daerah Istimewa Yogyakarta",
+      "slug": "daerah-istimewa-yogyakarta",
+      "file": "provinsi/daerah-istimewa-yogyakarta.json",
+      "jumlah": 78
+    },
+    {
+      "nama": "Daerah Khusus Ibukota Jakarta",
+      "slug": "daerah-khusus-ibukota-jakarta",
+      "file": "provinsi/daerah-khusus-ibukota-jakarta.json",
+      "jumlah": 44
+    },
+    {
+      "nama": "Gorontalo",
+      "slug": "gorontalo",
+      "file": "provinsi/gorontalo.json",
+      "jumlah": 77
+    },
+    {
+      "nama": "Jambi",
+      "slug": "jambi",
+      "file": "provinsi/jambi.json",
+      "jumlah": 144
+    },
+    {
+      "nama": "Jawa Barat",
+      "slug": "jawa-barat",
+      "file": "provinsi/jawa-barat.json",
+      "jumlah": 627
+    },
+    {
+      "nama": "Jawa Tengah",
+      "slug": "jawa-tengah",
+      "file": "provinsi/jawa-tengah.json",
+      "jumlah": 576
+    },
+    {
+      "nama": "Jawa Timur",
+      "slug": "jawa-timur",
+      "file": "provinsi/jawa-timur.json",
+      "jumlah": 665
+    },
+    {
+      "nama": "Kalimantan Barat",
+      "slug": "kalimantan-barat",
+      "file": "provinsi/kalimantan-barat.json",
+      "jumlah": 174
+    },
+    {
+      "nama": "Kalimantan Selatan",
+      "slug": "kalimantan-selatan",
+      "file": "provinsi/kalimantan-selatan.json",
+      "jumlah": 156
+    },
+    {
+      "nama": "Kalimantan Tengah",
+      "slug": "kalimantan-tengah",
+      "file": "provinsi/kalimantan-tengah.json",
+      "jumlah": 136
+    },
+    {
+      "nama": "Kalimantan Timur",
+      "slug": "kalimantan-timur",
+      "file": "provinsi/kalimantan-timur.json",
+      "jumlah": 105
+    },
+    {
+      "nama": "Kalimantan Utara",
+      "slug": "kalimantan-utara",
+      "file": "provinsi/kalimantan-utara.json",
+      "jumlah": 55
+    },
+    {
+      "nama": "Kepulauan Bangka Belitung",
+      "slug": "kepulauan-bangka-belitung",
+      "file": "provinsi/kepulauan-bangka-belitung.json",
+      "jumlah": 47
+    },
+    {
+      "nama": "Kepulauan Riau",
+      "slug": "kepulauan-riau",
+      "file": "provinsi/kepulauan-riau.json",
+      "jumlah": 80
+    },
+    {
+      "nama": "Lampung",
+      "slug": "lampung",
+      "file": "provinsi/lampung.json",
+      "jumlah": 229
+    },
+    {
+      "nama": "Maluku",
+      "slug": "maluku",
+      "file": "provinsi/maluku.json",
+      "jumlah": 119
+    },
+    {
+      "nama": "Maluku Utara",
+      "slug": "maluku-utara",
+      "file": "provinsi/maluku-utara.json",
+      "jumlah": 118
+    },
+    {
+      "nama": "Nusa Tenggara Barat",
+      "slug": "nusa-tenggara-barat",
+      "file": "provinsi/nusa-tenggara-barat.json",
+      "jumlah": 116
+    },
+    {
+      "nama": "Nusa Tenggara Timur",
+      "slug": "nusa-tenggara-timur",
+      "file": "provinsi/nusa-tenggara-timur.json",
+      "jumlah": 314
+    },
+    {
+      "nama": "Papua",
+      "slug": "papua",
+      "file": "provinsi/papua.json",
+      "jumlah": 105
+    },
+    {
+      "nama": "Papua Barat",
+      "slug": "papua-barat",
+      "file": "provinsi/papua-barat.json",
+      "jumlah": 91
+    },
+    {
+      "nama": "Papua Barat Daya",
+      "slug": "papua-barat-daya",
+      "file": "provinsi/papua-barat-daya.json",
+      "jumlah": 133
+    },
+    {
+      "nama": "Papua Pegunungan",
+      "slug": "papua-pegunungan",
+      "file": "provinsi/papua-pegunungan.json",
+      "jumlah": 252
+    },
+    {
+      "nama": "Papua Selatan",
+      "slug": "papua-selatan",
+      "file": "provinsi/papua-selatan.json",
+      "jumlah": 82
+    },
+    {
+      "nama": "Papua Tengah",
+      "slug": "papua-tengah",
+      "file": "provinsi/papua-tengah.json",
+      "jumlah": 130
+    },
+    {
+      "nama": "Riau",
+      "slug": "riau",
+      "file": "provinsi/riau.json",
+      "jumlah": 172
+    },
+    {
+      "nama": "Sulawesi Barat",
+      "slug": "sulawesi-barat",
+      "file": "provinsi/sulawesi-barat.json",
+      "jumlah": 69
+    },
+    {
+      "nama": "Sulawesi Selatan",
+      "slug": "sulawesi-selatan",
+      "file": "provinsi/sulawesi-selatan.json",
+      "jumlah": 306
+    },
+    {
+      "nama": "Sulawesi Tengah",
+      "slug": "sulawesi-tengah",
+      "file": "provinsi/sulawesi-tengah.json",
+      "jumlah": 177
+    },
+    {
+      "nama": "Sulawesi Tenggara",
+      "slug": "sulawesi-tenggara",
+      "file": "provinsi/sulawesi-tenggara.json",
+      "jumlah": 221
+    },
+    {
+      "nama": "Sulawesi Utara",
+      "slug": "sulawesi-utara",
+      "file": "provinsi/sulawesi-utara.json",
+      "jumlah": 170
+    },
+    {
+      "nama": "Sumatera Barat",
+      "slug": "sumatera-barat",
+      "file": "provinsi/sumatera-barat.json",
+      "jumlah": 179
+    },
+    {
+      "nama": "Sumatera Selatan",
+      "slug": "sumatera-selatan",
+      "file": "provinsi/sumatera-selatan.json",
+      "jumlah": 241
+    },
+    {
+      "nama": "Sumatera Utara",
+      "slug": "sumatera-utara",
+      "file": "provinsi/sumatera-utara.json",
+      "jumlah": 455
+    }
+  ]
+}
