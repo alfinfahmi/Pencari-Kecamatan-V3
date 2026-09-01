@@ -156,6 +156,69 @@ jobs:
 
           PYEOF
 
+      - name: Aktifkan core library desugaring (dibutuhkan flutter_local_notifications)
+        # flutter_local_notifications mensyaratkan core library desugaring
+        # aktif di modul app -- tanpa ini, build APK gagal di tahap
+        # checkReleaseAarMetadata dengan pesan "requires core library
+        # desugaring to be enabled". Lihat:
+        # https://developer.android.com/studio/write/java8-support.html
+        run: |
+          python3 << 'PYEOF'
+          import pathlib, re
+
+          DESUGAR_VERSION = "2.0.4"
+
+          def patch_kts(text):
+              if "isCoreLibraryDesugaringEnabled" in text:
+                  return text
+              if re.search(r'compileOptions\s*\{', text):
+                  text = re.sub(r'(compileOptions\s*\{)',
+                                 r'\1\n        isCoreLibraryDesugaringEnabled = true',
+                                 text, count=1)
+              else:
+                  text = re.sub(r'(android\s*\{)',
+                                 r'\1\n    compileOptions {\n        isCoreLibraryDesugaringEnabled = true\n    }',
+                                 text, count=1)
+              dep_line = f'    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:{DESUGAR_VERSION}")'
+              if re.search(r'\ndependencies\s*\{', text):
+                  text = re.sub(r'(\ndependencies\s*\{)', r'\1\n' + dep_line, text, count=1)
+              else:
+                  text = text.rstrip() + f'\n\ndependencies {{\n{dep_line}\n}}\n'
+              return text
+
+          def patch_groovy(text):
+              if "coreLibraryDesugaringEnabled" in text:
+                  return text
+              if re.search(r'compileOptions\s*\{', text):
+                  text = re.sub(r'(compileOptions\s*\{)',
+                                 r'\1\n        coreLibraryDesugaringEnabled true',
+                                 text, count=1)
+              else:
+                  text = re.sub(r'(android\s*\{)',
+                                 r'\1\n    compileOptions {\n        coreLibraryDesugaringEnabled true\n    }',
+                                 text, count=1)
+              dep_line = f"    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:{DESUGAR_VERSION}'"
+              if re.search(r'\ndependencies\s*\{', text):
+                  text = re.sub(r'(\ndependencies\s*\{)', r'\1\n' + dep_line, text, count=1)
+              else:
+                  text = text.rstrip() + f'\n\ndependencies {{\n{dep_line}\n}}\n'
+              return text
+
+          kts = pathlib.Path("android/app/build.gradle.kts")
+          groovy = pathlib.Path("android/app/build.gradle")
+
+          if kts.exists():
+              text = kts.read_text()
+              kts.write_text(patch_kts(text))
+              print("android/app/build.gradle.kts: desugaring berhasil diaktifkan.")
+          elif groovy.exists():
+              text = groovy.read_text()
+              groovy.write_text(patch_groovy(text))
+              print("android/app/build.gradle: desugaring berhasil diaktifkan.")
+          else:
+              print("PERINGATAN: tidak ditemukan android/app/build.gradle(.kts)!")
+          PYEOF
+
       - name: Ambil dependency
         run: flutter pub get
 
@@ -170,6 +233,13 @@ jobs:
       - name: Jalankan unit & widget test
         # Hanya dijalankan sekali di job ini (build-apk) -- test bersifat
         # platform-agnostic, tidak perlu diulang di job iOS/Web juga.
+        #
+        # CATATAN: `flutter create` (step "Generate folder platform...")
+        # ternyata ikut menulis ulang test/widget_test.dart (boilerplate
+        # default counter-app Flutter) meski file itu tidak ada di repo
+        # kita -- hapus dulu di sini sebelum test dijalankan, supaya
+        # `flutter test` tidak mencoba menjalankan file yang mereferensikan
+        # class `MyApp` yang tidak pernah kita punya.
         run: |
           rm -f test/widget_test.dart
           flutter test
