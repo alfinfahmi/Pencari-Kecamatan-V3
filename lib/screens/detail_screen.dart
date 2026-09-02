@@ -9,6 +9,7 @@ import '../services/hijri_service.dart';
 import '../services/prayer_settings_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
+import '../widgets/home_button.dart';
 import '../widgets/qibla_compass.dart';
 import '../widgets/prayer_time_table.dart';
 import 'add_point_screen.dart';
@@ -144,6 +145,7 @@ class _DetailScreenState extends State<DetailScreen> {
           null => '',
         }),
         actions: [
+          const HomeButton(),
           IconButton(
             icon: const Icon(Icons.copy_rounded),
             tooltip: 'Salin Semua Data',
