@@ -28,6 +28,21 @@ class CustomPointService {
     return all.where((p) => p.kecamatanId == kecamatanId).toList();
   }
 
+  /// Cari titik kustom berdasarkan nama/lokasi induk -- dipakai supaya
+  /// titik yang sudah ditambahkan pengguna ikut muncul di pencarian utama
+  /// (sebelumnya tersimpan tapi tidak bisa ditemukan lagi lewat mana pun).
+  Future<List<CustomPointModel>> search(String query) async {
+    final q = query.toLowerCase().trim();
+    if (q.isEmpty) return [];
+    final all = await getAll();
+    return all.where((p) {
+      return p.nama.toLowerCase().contains(q) ||
+          p.kecamatanNama.toLowerCase().contains(q) ||
+          (p.kabupatenNama?.toLowerCase().contains(q) ?? false) ||
+          p.provinsiNama.toLowerCase().contains(q);
+    }).toList();
+  }
+
   Future<void> add(CustomPointModel point) async {
     final box = await _box();
     await box.put(point.id, point);
@@ -60,7 +75,7 @@ class CustomPointService {
 
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: 'Backup titik kustom — Koordinat Kec. Tashil',
+      text: 'Backup titik kustom — Aplikasi Falak',
     );
   }
 
