@@ -161,10 +161,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 // menu sekaligus.
                 if (_tab == _Tab.pencarian && !_sudahMencari)
                   SliverToBoxAdapter(child: const HomePrayerWidget()),
-                if (_tab == _Tab.pencarian && !_sudahMencari)
-                  SliverToBoxAdapter(child: _buildHeroSearch(isDark)),
-                if (_tab == _Tab.pencarian && _sudahMencari)
-                  SliverToBoxAdapter(child: _buildSearchBarRingkas(isDark)),
+                if (_tab == _Tab.pencarian)
+                  SliverToBoxAdapter(child: _buildSearchCard(isDark)),
                 SliverToBoxAdapter(child: _buildTabBar()),
                 const SliverToBoxAdapter(child: SizedBox(height: 4)),
                 ..._buildListSlivers(),
@@ -182,41 +180,21 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Versi ringkas search bar (1 baris saja, tanpa judul/subjudul/chip
   /// saran) -- dipakai saat hasil pencarian sedang tampil, supaya kartu
   /// hasil (terutama saat dibuka) punya ruang layar yang cukup.
-  Widget _buildSearchBarRingkas(bool isDark) {
+  /// SATU widget search bar untuk kedua mode (hero besar / ringkas saat
+  /// mencari) -- strukturnya SELALU SAMA (Container > Column > judul +
+  /// Row(TextField) + chip saran), cuma bagian judul & chip yang
+  /// disembunyikan pakai Visibility(maintainState: true) saat sedang
+  /// mencari, BUKAN diganti dengan widget yang berbeda strukturnya.
+  ///
+  /// Ini sengaja dihindari: kalau TextField dipindah ke widget yang
+  /// berbeda bentuk pohonnya (seperti sebelumnya: kartu besar vs bar
+  /// ringkas terpisah), Flutter akan MEMBONGKAR & MEMBUAT ULANG elemen
+  /// TextField-nya saat berpindah mode -- itulah yang menyebabkan
+  /// keyboard tertutup sendiri tiap kali mulai mengetik huruf pertama.
+  Widget _buildSearchCard(bool isDark) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(14, 10, 14, 6),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              focusNode: _searchFocus,
-              onChanged: _onSearchChanged,
-              onSubmitted: _onSearchChanged,
-              decoration: InputDecoration(
-                hintText: 'Cari Kecamatan, Kabupaten...',
-                prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  onPressed: () {
-                    _searchController.clear();
-                    _onSearchChanged('');
-                  },
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                isDense: true,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeroSearch(bool isDark) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(14, 8, 14, 4),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      margin: EdgeInsets.fromLTRB(14, _sudahMencari ? 10 : 8, 14, _sudahMencari ? 6 : 4),
+      padding: EdgeInsets.fromLTRB(16, _sudahMencari ? 10 : 12, 16, _sudahMencari ? 10 : 14),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(18),
@@ -225,9 +203,20 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Pencarian Koordinat Geografis',
-              style: AppTypography.headlineMd(color: AppColors.emerald).copyWith(fontSize: 15)),
-          const SizedBox(height: 10),
+          Visibility(
+            visible: !_sudahMencari,
+            maintainState: true,
+            maintainAnimation: true,
+            maintainSize: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Pencarian Koordinat Geografis',
+                    style: AppTypography.headlineMd(color: AppColors.emerald).copyWith(fontSize: 15)),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
           Row(
             children: [
               Expanded(
@@ -249,52 +238,75 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                         : null,
                     contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                    isDense: true,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              InkWell(
-                borderRadius: BorderRadius.circular(9999),
-                onTap: () {
-                  _onSearchChanged(_searchController.text);
-                  _searchFocus.unfocus();
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(13),
-                  decoration: const BoxDecoration(color: AppColors.emerald, shape: BoxShape.circle),
-                  child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+              Visibility(
+                visible: !_sudahMencari,
+                maintainState: true,
+                maintainAnimation: true,
+                maintainSize: false,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(width: 8),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(9999),
+                      onTap: () {
+                        _onSearchChanged(_searchController.text);
+                        _searchFocus.unfocus();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(13),
+                        decoration: const BoxDecoration(color: AppColors.emerald, shape: BoxShape.circle),
+                        child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 32,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: _saranPencarian.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (context, i) {
-                final saran = _saranPencarian[i];
-                return InkWell(
-                  onTap: () => _cariSaran(saran),
-                  borderRadius: BorderRadius.circular(9999),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.04),
-                      borderRadius: BorderRadius.circular(9999),
-                    ),
-                    child: Text(saran, style: AppTypography.bodyMd(color: Colors.grey.shade600).copyWith(fontSize: 12)),
+          Visibility(
+            visible: !_sudahMencari,
+            maintainState: true,
+            maintainAnimation: true,
+            maintainSize: false,
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 32,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _saranPencarian.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, i) {
+                      final saran = _saranPencarian[i];
+                      return InkWell(
+                        onTap: () => _cariSaran(saran),
+                        borderRadius: BorderRadius.circular(9999),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.04),
+                            borderRadius: BorderRadius.circular(9999),
+                          ),
+                          child: Text(saran, style: AppTypography.bodyMd(color: Colors.grey.shade600).copyWith(fontSize: 12)),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
 
   Widget _buildTabBar() {
     Widget tabButton(_Tab tab, String label, IconData icon) {
