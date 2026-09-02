@@ -8,6 +8,7 @@ import '../services/adzan_notification_service.dart';
 import '../services/prayer_settings_service.dart';
 import '../theme/app_theme.dart';
 import '../screens/detail_screen.dart';
+import 'location_picker_sheet.dart';
 
 enum _StatusWidget { memuat, butuhIzin, gpsMati, error, siap }
 
@@ -182,13 +183,13 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
     return (sekarang: entries[aktifIndex], berikutnya: berikutnya);
   }
 
+  /// Sentinel object untuk membedakan "pengguna pilih GPS" dari "pengguna
+  /// pilih suatu KecamatanModel" dari sheet yang sama.
   Future<void> _gantiLokasi() async {
-    final terpilih = await showModalBottomSheet<KecamatanModel>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => _PilihLokasiSheet(),
-    );
-    if (terpilih != null) {
+    final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi untuk Widget Home');
+    if (terpilih == kPilihGpsSentinel) {
+      await _kembaliKeGps();
+    } else if (terpilih is KecamatanModel) {
       await _homeLocationService.setOverrideId(terpilih.id);
       _pakaiGps = false;
       await _hitungUntuk(terpilih);
@@ -212,11 +213,11 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(14, 10, 14, 4),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(14, 8, 14, 2),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: AppColors.emerald,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: _buildIsi(isDark),
     );
@@ -262,77 +263,38 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
         return InkWell(
           onTap: _bukaJadwalLengkap,
           borderRadius: BorderRadius.circular(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Icon(_pakaiGps ? Icons.my_location_rounded : Icons.location_on_rounded,
-                      size: 13, color: Colors.white70),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      _lokasi!.kecamatan,
+              Icon(_pakaiGps ? Icons.my_location_rounded : Icons.location_on_rounded,
+                  size: 13, color: Colors.white70),
+              const SizedBox(width: 4),
+              // Nama waktu + jam sedang berlangsung (mis. "Dhuha 05:56")
+              Text(hasil.sekarang.nama,
+                  style: AppTypography.bodyLg(color: Colors.white).copyWith(fontWeight: FontWeight.w700, fontSize: 14)),
+              const SizedBox(width: 5),
+              Text(fmt(hasil.sekarang.waktuDaerah),
+                  style: AppTypography.dataDisplay(color: AppColors.goldLight, fontSize: 13)),
+              if (hasil.berikutnya != null) ...[
+                const SizedBox(width: 8),
+                Icon(Icons.arrow_forward_rounded, size: 12, color: Colors.white38),
+                const SizedBox(width: 8),
+                Text(hasil.berikutnya!.nama,
+                    style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 12.5)),
+                const SizedBox(width: 5),
+                Text(fmt(hasil.berikutnya!.waktuDaerah),
+                    style: AppTypography.dataDisplay(color: Colors.white54, fontSize: 12)),
+              ],
+              const Spacer(),
+              InkWell(
+                onTap: _gantiLokasi,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  child: Text(_lokasi!.kecamatan.length > 10 ? 'Ganti' : _lokasi!.kecamatan,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 11.5),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: _gantiLokasi,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      child: Text('Ganti Lokasi', style: TextStyle(color: Colors.white, fontSize: 11, decoration: TextDecoration.underline)),
-                    ),
-                  ),
-                  if (!_pakaiGps) ...[
-                    const SizedBox(width: 4),
-                    InkWell(
-                      onTap: _kembaliKeGps,
-                      child: const Icon(Icons.gps_fixed_rounded, size: 15, color: Colors.white70),
-                    ),
-                  ],
-                ],
+                      style: const TextStyle(color: Colors.white70, fontSize: 11, decoration: TextDecoration.underline)),
+                ),
               ),
-              const SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('SEDANG BERLANGSUNG', style: AppTypography.labelCaps(color: AppColors.goldLight).copyWith(fontSize: 10)),
-                        const SizedBox(height: 2),
-                        Text(hasil.sekarang.nama,
-                            style: AppTypography.headlineMd(color: Colors.white).copyWith(fontSize: 20)),
-                        Text(fmt(hasil.sekarang.waktuDaerah),
-                            style: AppTypography.dataDisplay(color: Colors.white, fontSize: 15)),
-                      ],
-                    ),
-                  ),
-                  if (hasil.berikutnya != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text('BERIKUTNYA', style: AppTypography.labelCaps(color: Colors.white54).copyWith(fontSize: 9.5)),
-                        const SizedBox(height: 2),
-                        Text(hasil.berikutnya!.nama,
-                            style: AppTypography.bodyLg(color: Colors.white).copyWith(fontWeight: FontWeight.w600)),
-                        Text(fmt(hasil.berikutnya!.waktuDaerah),
-                            style: AppTypography.dataDisplay(color: Colors.white70, fontSize: 13)),
-                      ],
-                    ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Lihat jadwal satu hari penuh', style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10.5)),
-                  const SizedBox(width: 3),
-                  Icon(Icons.chevron_right_rounded, size: 14, color: Colors.white.withOpacity(0.6)),
-                ],
-              ),
+              const Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white54),
             ],
           ),
         );
@@ -372,68 +334,3 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
   }
 }
 
-/// Bottom sheet sederhana untuk memilih lokasi override secara manual.
-class _PilihLokasiSheet extends StatefulWidget {
-  @override
-  State<_PilihLokasiSheet> createState() => _PilihLokasiSheetState();
-}
-
-class _PilihLokasiSheetState extends State<_PilihLokasiSheet> {
-  final _controller = TextEditingController();
-  List<KecamatanModel> _hasil = [];
-
-  Future<void> _cari(String query) async {
-    if (query.trim().isEmpty) {
-      setState(() => _hasil = []);
-      return;
-    }
-    final hasil = await AppDataService.instance.search(query, limit: 20);
-    setState(() => _hasil = hasil);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.4,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) {
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Pilih Lokasi untuk Widget Home', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _controller,
-                  autofocus: true,
-                  onChanged: _cari,
-                  decoration: const InputDecoration(hintText: 'Cari kecamatan...', prefixIcon: Icon(Icons.search_rounded)),
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: _hasil.length,
-                    itemBuilder: (context, i) {
-                      final item = _hasil[i];
-                      return ListTile(
-                        title: Text(item.kecamatan),
-                        subtitle: Text('${item.kabupaten ?? '-'}, ${item.provinsi}'),
-                        onTap: () => Navigator.of(context).pop(item),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}

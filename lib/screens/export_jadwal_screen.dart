@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -9,6 +10,7 @@ import '../services/hijri_service.dart';
 import '../services/prayer_settings_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home_button.dart';
+import '../widgets/location_picker_sheet.dart';
 
 enum _ModeRentang { masehi, hijriah }
 enum _TampilanTanggal { masehi, hijriah, keduanya }
@@ -33,6 +35,8 @@ class ExportJadwalScreen extends StatefulWidget {
 
 class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
   final _prayerSettings = PrayerSettingsService();
+  late KecamatanModel _lokasi = widget.data;
+  bool _loadingGps = false;
 
   _ModeRentang _mode = _ModeRentang.masehi;
   _TampilanTanggal _tampilan = _TampilanTanggal.keduanya;
@@ -44,6 +48,72 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
   int _hTahunSelesai = 1448, _hBulanSelesai = 1, _hTanggalSelesai = 7;
 
   bool _memproses = false;
+
+  Future<void> _gantiLokasi() async {
+    final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi untuk Ekspor');
+    if (terpilih == kPilihGpsSentinel) {
+      await _pakaiGpsLangsung();
+    } else if (terpilih is KecamatanModel) {
+      setState(() => _lokasi = terpilih);
+    }
+  }
+
+  Future<void> _pakaiGpsLangsung() async {
+    setState(() => _loadingGps = true);
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Izin lokasi ditolak')),
+          );
+        }
+        return;
+      }
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Aktifkan layanan lokasi (GPS) di perangkat Anda')),
+          );
+        }
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition();
+      final utcOffsetJam = DateTime.now().timeZoneOffset.inHours;
+      final namaZona = switch (utcOffsetJam) {
+        7 => 'WIB',
+        8 => 'WITA',
+        9 => 'WIT',
+        _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
+      };
+
+      setState(() {
+        _lokasi = KecamatanModel(
+          id: 'gps_lokasi_saat_ini',
+          kecamatan: 'Lokasi Anda Saat Ini',
+          kabupaten: null,
+          provinsi: '(berdasarkan GPS)',
+          lat: pos.latitude,
+          lng: pos.longitude,
+          latDms: null,
+          lngDms: null,
+          elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
+          zonaWaktu: namaZona,
+          utcOffset: utcOffsetJam,
+        );
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil lokasi GPS: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _loadingGps = false);
+    }
+  }
 
   Future<void> _pilihTanggalMasehi(bool mulai) async {
     final hasil = await showDatePicker(
@@ -67,15 +137,15 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
     final awal = HijriService.tentukanAwalBulan(
       tahunH: tahunH,
       bulanH: bulanH,
-      lat: widget.data.lat,
-      lng: widget.data.lng,
-      utcOffset: widget.data.utcOffset ?? 7,
+      lat: _lokasi.lat,
+      lng: _lokasi.lng,
+      utcOffset: _lokasi.utcOffset ?? 7,
     );
     return awal.tanggal1.add(Duration(days: tanggalH - 1));
   }
 
   Future<void> _buatPdf() async {
-    final data = widget.data;
+    final data = _lokasi;
     if (data.utcOffset == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Zona waktu tidak tersedia untuk lokasi ini.')),
@@ -224,14 +294,37 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ekspor Jadwal Shalat'), actions: const [HomeButton()]),
+      appBar: AppBar(title: const Text('Ekspor Jadwal Shalat'), actions: [HomeButton()]),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text(widget.data.kecamatan, style: AppTypography.headlineMd()),
-            Text('${widget.data.kabupaten ?? '-'}, ${widget.data.provinsi}',
-                style: AppTypography.bodyMd(color: Colors.grey.shade600)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_lokasi.kecamatan, style: AppTypography.headlineMd()),
+                      Text('${_lokasi.kabupaten ?? '-'}, ${_lokasi.provinsi}',
+                          style: AppTypography.bodyMd(color: Colors.grey.shade600)),
+                    ],
+                  ),
+                ),
+                if (_loadingGps)
+                  const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                  )
+                else
+                  TextButton.icon(
+                    onPressed: _gantiLokasi,
+                    icon: const Icon(Icons.edit_location_alt_outlined, size: 17),
+                    label: const Text('Ganti Lokasi'),
+                  ),
+              ],
+            ),
             const SizedBox(height: 20),
 
             const Text('Mode Rentang Tanggal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
