@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/qibla_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/qibla_compass.dart';
+import '../widgets/home_button.dart';
 
 class CompassFullscreenScreen extends StatelessWidget {
   final double bearingDerajat;
@@ -21,6 +22,7 @@ class CompassFullscreenScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text('Kompas Kiblat'),
+        actions: const [HomeButton()],
       ),
       body: SafeArea(
         child: Column(
