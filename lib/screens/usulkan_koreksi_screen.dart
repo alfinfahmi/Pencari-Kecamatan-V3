@@ -4,6 +4,7 @@ import '../models/kecamatan_model.dart';
 import '../models/koreksi_model.dart';
 import '../services/supabase_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/home_button.dart';
 import 'auth_screen.dart';
 
 class UsulkanKoreksiScreen extends StatefulWidget {
@@ -129,7 +130,7 @@ class _UsulkanKoreksiScreenState extends State<UsulkanKoreksiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Usulkan Koreksi Data')),
+      appBar: AppBar(title: const Text('Usulkan Koreksi Data'), actions: const [HomeButton()]),
       body: SafeArea(
         child: Column(
           children: [
