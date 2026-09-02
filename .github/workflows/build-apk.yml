@@ -1,4 +1,4 @@
-name: Build APK & iOS
+name: Build APK & Web
 
 # Jalankan otomatis setiap push ke branch main, ATAU dipicu manual lewat
 # tab "Actions" di GitHub (tombol "Run workflow").
@@ -63,7 +63,7 @@ jobs:
               for line in text.splitlines():
                   if "android:label" in line:
                       print(line)
-              text2 = re.sub(r'android:label="[^"]*"', 'android:label="Koordinat Kec. Tashil"', text, count=1)
+              text2 = re.sub(r'android:label="[^"]*"', 'android:label="Aplikasi Falak"', text, count=1)
               p.write_text(text2)
               print("--- SESUDAH ---")
               for line in text2.splitlines():
@@ -258,98 +258,23 @@ jobs:
           retention-days: 30
 
   # ==========================================
-  # JOB 2: BUILD IOS (macOS Runner)
+  # (Job build-ios DIHAPUS dari sini)
   # ==========================================
-  build-ios:
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout kode
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          cache: true
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install pycryptodome
-        run: pip install pycryptodome
-
-      - name: Generate folder platform iOS & Android (jika belum ada)
-        # PENTING: --org HARUS sama dengan job Android (com.lflirboyo), kalau
-        # tidak, bundle identifier iOS & applicationId Android akan berbeda
-        # tanpa sengaja (identitas aplikasi jadi tidak konsisten lintas platform).
-        #
-        # Folder android/ JUGA WAJIB ada di sini meski job ini hanya build
-        # iOS -- flutter_launcher_icons dikonfigurasi android+ios sekaligus
-        # di pubspec.yaml, dan CRASH kalau salah satu folder platform hilang.
-        run: |
-          if [ ! -d "ios" ]; then
-            flutter create --platforms=ios --org com.lflirboyo .
-          fi
-          if [ ! -d "android" ]; then
-            flutter create --platforms=android --org com.lflirboyo .
-          fi
-
-      - name: Tambahkan izin lokasi ke Info.plist (wajib untuk geolocator & flutter_compass)
-        # TANPA key ini, aplikasi iOS akan CRASH (bukan gagal build, tapi
-        # crash saat dipakai pengguna) ketika fitur kompas kiblat atau
-        # "Ambil dari GPS Perangkat" meminta izin lokasi.
-        run: |
-          python3 << 'PYEOF'
-          import pathlib
-
-          p = pathlib.Path("ios/Runner/Info.plist")
-          text = p.read_text()
-
-          KEY_BLOCK = (
-              "\t<key>NSLocationWhenInUseUsageDescription</key>\n"
-              "\t<string>Dipakai untuk kompas kiblat dan menambah titik koordinat dari lokasi Anda</string>\n"
-          )
-
-          if "NSLocationWhenInUseUsageDescription" in text:
-              print("Info.plist: izin lokasi sudah ada, dilewati.")
-          else:
-              text = text.replace("<dict>", "<dict>\n" + KEY_BLOCK, 1)
-              p.write_text(text)
-              print("Info.plist: izin lokasi berhasil ditambahkan.")
-          PYEOF
-
-      - name: Ambil dependency
-        run: flutter pub get
-
-      - name: Generate ikon aplikasi & splash screen native
-        run: |
-          flutter pub run flutter_launcher_icons
-          flutter pub run flutter_native_splash:create
-
-      - name: Generate Hive TypeAdapter (build_runner)
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-
-      - name: Enkripsi data_koordinat.json -> .enc
-        run: python3 encrypt_data.py
-
-      - name: Build iOS (Release, Unsigned)
-        run: flutter build ios --release --no-codesign
-
-      - name: Upload iOS Payload/Runner sebagai artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pencari-kecamatan-ios
-          path: build/ios/iphoneos/Runner.app
-          retention-days: 30
+  # Build iOS untuk PERANGKAT FISIK (bukan simulator) SELALU butuh
+  # Development Team/Provisioning Profile Apple yang valid -- ini
+  # keterbatasan mendasar platform Apple, BUKAN sesuatu yang bisa
+  # diakali lewat script CI, bahkan dengan flag --no-codesign sekalipun
+  # (flag itu cuma melewati tahap SIGNING akhir, bukan seluruh proses
+  # build yang tetap butuh info tim developer untuk device build).
+  #
+  # Kalau nanti punya akun Apple Developer ($99/tahun) dan mau build
+  # IPA sungguhan, job ini bisa ditambahkan kembali dengan konfigurasi
+  # signing yang sesuai (via fastlane match, App Store Connect API key,
+  # atau upload sertifikat/provisioning profile sebagai GitHub Secret).
+  #
+  # Untuk kebutuhan pakai di iPhone TANPA akun Developer, gunakan versi
+  # Web/PWA dari job build-web di bawah ini (buka di Safari -> Add to
+  # Home Screen).
 
   # ==========================================
   # JOB 3: BUILD & DEPLOY WEB (GitHub Pages)
@@ -407,7 +332,7 @@ jobs:
           p = pathlib.Path("web/index.html")
           if p.exists():
               text = p.read_text()
-              text = re.sub(r'<title>[^<]*</title>', '<title>Koordinat Kec. Tashil</title>', text)
+              text = re.sub(r'<title>[^<]*</title>', '<title>Aplikasi Falak</title>', text)
               text = re.sub(
                   r'<meta name="description" content="[^"]*">',
                   '<meta name="description" content="Pencarian koordinat presisi seluruh kecamatan Indonesia -- Lajnah Falakiyah Ma\'had \'Aly Lirboyo.">',
@@ -415,7 +340,7 @@ jobs:
               )
               text = re.sub(
                   r'<meta name="apple-mobile-web-app-title" content="[^"]*">',
-                  '<meta name="apple-mobile-web-app-title" content="Koordinat Kec. Tashil">',
+                  '<meta name="apple-mobile-web-app-title" content="Aplikasi Falak">',
                   text,
               )
               p.write_text(text)
@@ -426,7 +351,7 @@ jobs:
           p2 = pathlib.Path("web/manifest.json")
           if p2.exists():
               data = json.loads(p2.read_text())
-              data["name"] = "Koordinat Kec. Tashil"
+              data["name"] = "Aplikasi Falak"
               data["short_name"] = "Koordinat Tashil"
               data["description"] = "Pencarian koordinat presisi seluruh kecamatan Indonesia -- Lajnah Falakiyah Ma'had 'Aly Lirboyo."
               data["background_color"] = "#0D5C3A"
