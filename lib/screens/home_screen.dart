@@ -151,12 +151,51 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          if (_tab == _Tab.pencarian) const HomePrayerWidget(),
-          if (_tab == _Tab.pencarian) _buildHeroSearch(isDark),
+          // Widget waktu shalat & hero pencarian disembunyikan saat sedang
+          // menampilkan hasil pencarian -- keduanya makan banyak ruang
+          // layar, membuat kartu hasil (setelah dibuka) jadi terlalu sempit
+          // untuk menampilkan koordinat & tombol menu sekaligus.
+          if (_tab == _Tab.pencarian && !_sudahMencari) const HomePrayerWidget(),
+          if (_tab == _Tab.pencarian && !_sudahMencari) _buildHeroSearch(isDark),
+          if (_tab == _Tab.pencarian && _sudahMencari) _buildSearchBarRingkas(isDark),
           _buildTabBar(),
           const SizedBox(height: 4),
           Expanded(child: _buildList()),
           const WatermarkFooter(),
+        ],
+      ),
+    );
+  }
+
+  /// Versi ringkas search bar (1 baris saja, tanpa judul/subjudul/chip
+  /// saran) -- dipakai saat hasil pencarian sedang tampil, supaya kartu
+  /// hasil (terutama saat dibuka) punya ruang layar yang cukup.
+  Widget _buildSearchBarRingkas(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 10, 14, 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              focusNode: _searchFocus,
+              onChanged: _onSearchChanged,
+              onSubmitted: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Cari Kecamatan, Kabupaten...',
+                prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () {
+                    _searchController.clear();
+                    _onSearchChanged('');
+                  },
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                isDense: true,
+              ),
+            ),
+          ),
         ],
       ),
     );
