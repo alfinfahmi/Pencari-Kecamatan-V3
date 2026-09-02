@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/adzan_notification_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/home_button.dart';
 
 class AdzanSettingsScreen extends StatefulWidget {
   const AdzanSettingsScreen({super.key});
@@ -56,7 +57,7 @@ class _AdzanSettingsScreenState extends State<AdzanSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifikasi Adzan')),
+      appBar: AppBar(title: const Text('Notifikasi Adzan'), actions: const [HomeButton()]),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
