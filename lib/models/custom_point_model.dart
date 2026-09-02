@@ -1,100 +1,96 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import '../models/custom_point_model.dart';
+import 'package:hive/hive.dart';
 
-/// CRUD titik kustom (desa/dusun/masjid/lainnya) + ekspor/impor manual
-/// sebagai file .json, sesuai kesepakatan final (backup lintas perangkat
-/// tanpa server, tetap 100% offline).
-class CustomPointService {
-  static const _boxName = 'custom_points';
+part 'custom_point_model.g.dart';
 
-  Future<Box<CustomPointModel>> _box() async {
-    if (!Hive.isBoxOpen(_boxName)) {
-      return Hive.openBox<CustomPointModel>(_boxName);
-    }
-    return Hive.box<CustomPointModel>(_boxName);
-  }
+/// Tipe titik kustom yang bisa ditambahkan pengguna.
+enum TitikTipe { desa, dusun, masjid, lainnya }
 
-  Future<List<CustomPointModel>> getAll() async {
-    final box = await _box();
-    return box.values.toList();
-  }
+/// Titik koordinat tambahan buatan pengguna (desa/dusun/masjid/lainnya),
+/// selalu terhubung ke satu kecamatan resmi dari data_koordinat.json
+/// (hierarki Kecamatan -> Kabupaten -> Provinsi tidak boleh lepas).
+///
+/// Disimpan terpisah dari data referensi (read-only) di box Hive sendiri,
+/// sesuai kesepakatan final.
+@HiveType(typeId: 1)
+class CustomPointModel extends HiveObject {
+  @HiveField(0)
+  String id;
 
-  Future<List<CustomPointModel>> getByKecamatan(String kecamatanId) async {
-    final all = await getAll();
-    return all.where((p) => p.kecamatanId == kecamatanId).toList();
-  }
+  @HiveField(1)
+  String nama;
 
-  /// Cari titik kustom berdasarkan nama/lokasi induk -- dipakai supaya
-  /// titik yang sudah ditambahkan pengguna ikut muncul di pencarian utama
-  /// (sebelumnya tersimpan tapi tidak bisa ditemukan lagi lewat mana pun).
-  Future<List<CustomPointModel>> search(String query) async {
-    final q = query.toLowerCase().trim();
-    if (q.isEmpty) return [];
-    final all = await getAll();
-    return all.where((p) {
-      return p.nama.toLowerCase().contains(q) ||
-          p.kecamatanNama.toLowerCase().contains(q) ||
-          (p.kabupatenNama?.toLowerCase().contains(q) ?? false) ||
-          p.provinsiNama.toLowerCase().contains(q);
-    }).toList();
-  }
+  @HiveField(2)
+  String tipe; // simpan sebagai string agar mudah di-export ke JSON
 
-  Future<void> add(CustomPointModel point) async {
-    final box = await _box();
-    await box.put(point.id, point);
-  }
+  @HiveField(3)
+  String kecamatanId; // FK ke KecamatanModel.id pada data referensi
 
-  Future<void> delete(String id) async {
-    final box = await _box();
-    await box.delete(id);
-  }
+  @HiveField(4)
+  String kecamatanNama;
 
-  Future<void> update(CustomPointModel point) async {
-    final box = await _box();
-    await box.put(point.id, point);
-  }
+  @HiveField(5)
+  String? kabupatenNama;
 
-  /// Ekspor seluruh titik kustom ke file JSON, lalu buka share sheet
-  /// (WhatsApp/email/simpan manual) — tanpa server, sesuai kesepakatan.
-  Future<void> exportToFile() async {
-    final all = await getAll();
-    final jsonList = all.map((p) => p.toJson()).toList();
-    final payload = {
-      'exported_at': DateTime.now().toIso8601String(),
-      'jumlah_titik': jsonList.length,
-      'titik_kustom': jsonList,
-    };
+  @HiveField(6)
+  String provinsiNama;
 
-    final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/titik_kustom_export.json');
-    await file.writeAsString(json.encode(payload));
+  @HiveField(7)
+  double lat;
 
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      text: 'Backup titik kustom — Aplikasi Falak',
-    );
-  }
+  @HiveField(8)
+  double lng;
 
-  /// Impor file JSON hasil ekspor. Menambahkan (bukan menimpa) titik yang
-  /// sudah ada di perangkat, berdasarkan id.
-  Future<int> importFromFile(File file) async {
-    final content = await file.readAsString();
-    final Map<String, dynamic> payload = json.decode(content) as Map<String, dynamic>;
-    final List list = payload['titik_kustom'] as List;
+  @HiveField(9)
+  int? elevasiM;
 
-    final box = await _box();
-    int added = 0;
-    for (final item in list) {
-      final point = CustomPointModel.fromJson(item as Map<String, dynamic>);
-      if (!box.containsKey(point.id)) {
-        await box.put(point.id, point);
-        added++;
-      }
-    }
-    return added;
-  }
+  @HiveField(10)
+  String? catatan;
+
+  @HiveField(11)
+  String tanggalDibuat; // ISO 8601
+
+  CustomPointModel({
+    required this.id,
+    required this.nama,
+    required this.tipe,
+    required this.kecamatanId,
+    required this.kecamatanNama,
+    required this.kabupatenNama,
+    required this.provinsiNama,
+    required this.lat,
+    required this.lng,
+    this.elevasiM,
+    this.catatan,
+    required this.tanggalDibuat,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'nama': nama,
+        'tipe': tipe,
+        'kecamatan_id': kecamatanId,
+        'kecamatan_nama': kecamatanNama,
+        'kabupaten_nama': kabupatenNama,
+        'provinsi_nama': provinsiNama,
+        'lat': lat,
+        'lng': lng,
+        'elevasi_m': elevasiM,
+        'catatan': catatan,
+        'tanggal_dibuat': tanggalDibuat,
+      };
+
+  factory CustomPointModel.fromJson(Map<String, dynamic> json) => CustomPointModel(
+        id: json['id'] as String,
+        nama: json['nama'] as String,
+        tipe: json['tipe'] as String,
+        kecamatanId: json['kecamatan_id'] as String,
+        kecamatanNama: json['kecamatan_nama'] as String,
+        kabupatenNama: json['kabupaten_nama'] as String?,
+        provinsiNama: json['provinsi_nama'] as String,
+        lat: (json['lat'] as num).toDouble(),
+        lng: (json['lng'] as num).toDouble(),
+        elevasiM: json['elevasi_m'] as int?,
+        catatan: json['catatan'] as String?,
+        tanggalDibuat: json['tanggal_dibuat'] as String,
+      );
 }
