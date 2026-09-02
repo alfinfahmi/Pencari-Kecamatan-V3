@@ -221,12 +221,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 // banyak ruang layar, membuat kartu hasil (setelah dibuka)
                 // jadi terlalu sempit untuk menampilkan koordinat & tombol
                 // menu sekaligus.
+                //
+                // PENTING: setiap sliver di sini WAJIB punya `key` unik.
+                // Tanpa key, Flutter mencocokkan widget dalam List
+                // berdasarkan POSISI/INDEKS, bukan identitas. Karena
+                // HomePrayerWidget dihilangkan total (bukan cuma
+                // disembunyikan) begitu mulai mengetik, posisi search bar
+                // bergeser dari indeks ke-2 jadi ke-1 -- tanpa key, Flutter
+                // mengira search bar di posisi baru itu widget yang
+                // berbeda, lalu membongkar-ulang TextField-nya (kehilangan
+                // fokus/keyboard tertutup). Key membuat Flutter tetap
+                // mengenali search bar sebagai elemen yang SAMA meski
+                // posisinya bergeser.
                 if (_tab == _Tab.pencarian && !_sudahMencari)
-                  SliverToBoxAdapter(child: const HomePrayerWidget()),
+                  SliverToBoxAdapter(key: const ValueKey('prayer_widget'), child: const HomePrayerWidget()),
                 if (_tab == _Tab.pencarian)
-                  SliverToBoxAdapter(child: _buildSearchCard(isDark)),
-                SliverToBoxAdapter(child: _buildTabBar()),
-                const SliverToBoxAdapter(child: SizedBox(height: 4)),
+                  SliverToBoxAdapter(key: const ValueKey('search_card'), child: _buildSearchCard(isDark)),
+                SliverToBoxAdapter(key: const ValueKey('tab_bar'), child: _buildTabBar()),
+                const SliverToBoxAdapter(key: ValueKey('spacer'), child: SizedBox(height: 4)),
                 ..._buildListSlivers(),
               ],
             ),
