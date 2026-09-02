@@ -3,6 +3,7 @@ import '../models/koreksi_model.dart';
 import '../services/supabase_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
+import '../widgets/home_button.dart';
 
 class ModerationPanelScreen extends StatefulWidget {
   const ModerationPanelScreen({super.key});
@@ -87,7 +88,7 @@ class _ModerationPanelScreenState extends State<ModerationPanelScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Panel Moderasi'),
-        actions: [IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _muat)],
+        actions: [const HomeButton(), IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _muat)],
       ),
       body: SafeArea(
         child: Column(

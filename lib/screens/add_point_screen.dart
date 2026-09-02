@@ -5,6 +5,7 @@ import '../models/kecamatan_model.dart';
 import '../services/custom_point_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
+import '../widgets/home_button.dart';
 
 class AddPointScreen extends StatefulWidget {
   final KecamatanModel induk;
@@ -101,7 +102,7 @@ class _AddPointScreenState extends State<AddPointScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Titik Kustom')),
+      appBar: AppBar(title: const Text('Tambah Titik Kustom'), actions: const [HomeButton()]),
       body: SafeArea(
         child: Column(
           children: [

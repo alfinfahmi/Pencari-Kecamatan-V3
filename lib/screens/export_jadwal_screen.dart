@@ -8,6 +8,7 @@ import '../services/hisab_service.dart';
 import '../services/hijri_service.dart';
 import '../services/prayer_settings_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/home_button.dart';
 
 enum _ModeRentang { masehi, hijriah }
 enum _TampilanTanggal { masehi, hijriah, keduanya }
@@ -223,7 +224,7 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ekspor Jadwal Shalat')),
+      appBar: AppBar(title: const Text('Ekspor Jadwal Shalat'), actions: const [HomeButton()]),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
