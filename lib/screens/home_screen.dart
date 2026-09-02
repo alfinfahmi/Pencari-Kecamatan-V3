@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const Icon(Icons.explore_rounded, size: 22),
             const SizedBox(width: 8),
-            const Expanded(child: Text('Koordinat Kec. Tashil', overflow: TextOverflow.ellipsis)),
+            const Expanded(child: Text('Aplikasi Falak', overflow: TextOverflow.ellipsis)),
           ],
         ),
         actions: [
@@ -151,16 +151,28 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          // Widget waktu shalat & hero pencarian disembunyikan saat sedang
-          // menampilkan hasil pencarian -- keduanya makan banyak ruang
-          // layar, membuat kartu hasil (setelah dibuka) jadi terlalu sempit
-          // untuk menampilkan koordinat & tombol menu sekaligus.
-          if (_tab == _Tab.pencarian && !_sudahMencari) const HomePrayerWidget(),
-          if (_tab == _Tab.pencarian && !_sudahMencari) _buildHeroSearch(isDark),
-          if (_tab == _Tab.pencarian && _sudahMencari) _buildSearchBarRingkas(isDark),
-          _buildTabBar(),
-          const SizedBox(height: 4),
-          Expanded(child: _buildList()),
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                // Widget waktu shalat & hero pencarian disembunyikan saat
+                // sedang menampilkan hasil pencarian -- keduanya makan
+                // banyak ruang layar, membuat kartu hasil (setelah dibuka)
+                // jadi terlalu sempit untuk menampilkan koordinat & tombol
+                // menu sekaligus.
+                if (_tab == _Tab.pencarian && !_sudahMencari)
+                  SliverToBoxAdapter(child: const HomePrayerWidget()),
+                if (_tab == _Tab.pencarian && !_sudahMencari)
+                  SliverToBoxAdapter(child: _buildHeroSearch(isDark)),
+                if (_tab == _Tab.pencarian && _sudahMencari)
+                  SliverToBoxAdapter(child: _buildSearchBarRingkas(isDark)),
+                SliverToBoxAdapter(child: _buildTabBar()),
+                const SliverToBoxAdapter(child: SizedBox(height: 4)),
+                ..._buildListSlivers(),
+              ],
+            ),
+          ),
+          // Watermark SENGAJA di luar CustomScrollView -- tetap terlihat
+          // permanen di bawah layar, tidak ikut ter-scroll bersama konten.
           const WatermarkFooter(),
         ],
       ),
@@ -203,23 +215,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHeroSearch(bool isDark) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(14, 14, 14, 6),
-      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: isDark ? Colors.white12 : Colors.black.withOpacity(0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Pencarian Koordinat\nGeografis', style: AppTypography.headlineLg(color: AppColors.emerald)),
-          const SizedBox(height: 6),
-          Text(
-            'Cari data astronomi presisi untuk wilayah mana pun di Indonesia.',
-            style: AppTypography.bodyMd(color: Colors.grey.shade600),
-          ),
-          const SizedBox(height: 14),
+          Text('Pencarian Koordinat Geografis',
+              style: AppTypography.headlineMd(color: AppColors.emerald).copyWith(fontSize: 15)),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -329,61 +337,85 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildList() {
+  /// Mengembalikan daftar SLIVER (bukan Widget biasa) untuk disisipkan
+  /// langsung ke `CustomScrollView.slivers` -- supaya hasil pencarian ikut
+  /// jadi bagian dari SATU area scroll bersama widget shalat/pencarian/tab
+  /// di atasnya (bukan area scroll terpisah yang membatasi ruang).
+  List<Widget> _buildListSlivers() {
     if (_tab == _Tab.pencarian) {
       if (_searching) {
-        return const Center(child: CircularProgressIndicator());
+        return [_sliverMuat()];
       }
-      return _listView(_results, tampilkanHeader: _sudahMencari);
+      return _sliverDaftarLokasi(_results, tampilkanHeader: _sudahMencari);
     }
 
     final future = _tab == _Tab.favorit
         ? _favService.getFavoriteIds().then(_resolveIds)
         : _favService.getHistoryIds().then(_resolveIds);
 
-    return FutureBuilder<List<KecamatanModel>>(
-      future: future,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final items = snapshot.data!;
-        if (items.isEmpty) {
-          return Center(
-            child: Text(
+    return [
+      FutureBuilder<List<KecamatanModel>>(
+        future: future,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return _sliverMuat();
+          final items = snapshot.data!;
+          if (items.isEmpty) {
+            return _sliverPesan(
               _tab == _Tab.favorit ? 'Belum ada lokasi favorit' : 'Belum ada riwayat pencarian',
-              style: TextStyle(color: Colors.grey.shade500),
+            );
+          }
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => KecamatanCard(
+                data: items[index],
+                isFavorite: _favoriteIds.contains(items[index].id),
+                onToggleFavorite: () => _toggleFavorite(items[index].id),
+                awalTerbuka: index == 0,
+              ),
+              childCount: items.length,
             ),
           );
-        }
-        return _listView(items);
-      },
+        },
+      ),
+    ];
+  }
+
+  Widget _sliverMuat() {
+    return const SliverToBoxAdapter(
+      child: SizedBox(height: 160, child: Center(child: CircularProgressIndicator())),
     );
   }
 
-  Widget _listView(List<KecamatanModel> items, {bool tampilkanHeader = false}) {
-    if (items.isEmpty) {
-      return Center(
-        child: Text('Tidak ditemukan', style: TextStyle(color: Colors.grey.shade500)),
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.only(top: 4, bottom: 12),
-      itemCount: items.length + (tampilkanHeader ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (tampilkanHeader) {
-          if (index == 0) return _headerHasilPencarian(items.length);
-          index -= 1;
-        }
-        final item = items[index];
-        return KecamatanCard(
-          data: item,
-          isFavorite: _favoriteIds.contains(item.id),
-          onToggleFavorite: () => _toggleFavorite(item.id),
-          awalTerbuka: index == 0,
-        );
-      },
+  Widget _sliverPesan(String pesan) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 160,
+        child: Center(child: Text(pesan, style: TextStyle(color: Colors.grey.shade500))),
+      ),
     );
+  }
+
+  List<Widget> _sliverDaftarLokasi(List<KecamatanModel> items, {bool tampilkanHeader = false}) {
+    if (items.isEmpty) {
+      return [_sliverPesan('Tidak ditemukan')];
+    }
+    return [
+      if (tampilkanHeader) SliverToBoxAdapter(child: _headerHasilPencarian(items.length)),
+      SliverPadding(
+        padding: const EdgeInsets.only(top: 4, bottom: 12),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => KecamatanCard(
+              data: items[index],
+              isFavorite: _favoriteIds.contains(items[index].id),
+              onToggleFavorite: () => _toggleFavorite(items[index].id),
+              awalTerbuka: index == 0,
+            ),
+            childCount: items.length,
+          ),
+        ),
+      ),
+    ];
   }
 
   Widget _headerHasilPencarian(int jumlah) {
