@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../main.dart' show themeModeNotifier;
 import '../models/kecamatan_model.dart';
+import '../models/custom_point_model.dart';
 import '../services/app_data_service.dart';
 import '../services/favorite_service.dart';
+import '../services/custom_point_service.dart';
 import '../services/supabase_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/kecamatan_card.dart';
@@ -26,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _searchController = TextEditingController();
   final _searchFocus = FocusNode();
   final _favService = FavoriteService();
+  final _customPointService = CustomPointService();
   final _data = AppDataService.instance;
 
   List<KecamatanModel> _results = [];
@@ -68,13 +71,38 @@ class _HomeScreenState extends State<HomeScreen> {
       (r) => r.searchIndex.contains(query.toLowerCase()),
     );
     final kecamatanMatch = await _data.search(query);
+    final titikKustomMatch = await _cariTitikKustom(query);
 
     if (requestId != _searchRequestId || !mounted) return;
 
     setState(() {
-      _results = [...referensiMatch, ...kecamatanMatch];
+      _results = [...referensiMatch, ...kecamatanMatch, ...titikKustomMatch];
       _searching = false;
     });
+  }
+
+  /// Ubah titik kustom (CustomPointModel) jadi KecamatanModel sintetis
+  /// supaya bisa dipakai KecamatanCard yang sama -- mewarisi zona waktu &
+  /// UTC offset dari kecamatan induknya (titik kustom sendiri tidak
+  /// menyimpan itu, karena selalu terikat ke kecamatan resmi).
+  Future<List<KecamatanModel>> _cariTitikKustom(String query) async {
+    final hasil = await _customPointService.search(query);
+    return hasil.map((p) {
+      final induk = _data.findById(p.kecamatanId);
+      return KecamatanModel(
+        id: 'custom_${p.id}',
+        kecamatan: '${p.nama} (Titik Kustom)',
+        kabupaten: p.kabupatenNama,
+        provinsi: p.provinsiNama,
+        lat: p.lat,
+        lng: p.lng,
+        latDms: null,
+        lngDms: null,
+        elevasiM: p.elevasiM,
+        zonaWaktu: induk?.zonaWaktu,
+        utcOffset: induk?.utcOffset,
+      );
+    }).toList();
   }
 
   void _cariSaran(String saran) {
@@ -89,8 +117,42 @@ class _HomeScreenState extends State<HomeScreen> {
     await _loadFavorites();
   }
 
+  /// Selain ID kecamatan resmi (lewat AppDataService), juga tangani ID
+  /// titik kustom (prefix "custom_") -- supaya favorit/riwayat pada titik
+  /// kustom tidak "hilang" begitu saja karena AppDataService tidak
+  /// mengenalnya.
   Future<List<KecamatanModel>> _resolveIds(List<String> ids) async {
-    return ids.map((id) => _data.findById(id)).whereType<KecamatanModel>().toList();
+    final hasil = <KecamatanModel>[];
+    for (final id in ids) {
+      if (id.startsWith('custom_')) {
+        final pointId = id.substring('custom_'.length);
+        final semuaTitik = await _customPointService.getAll();
+        CustomPointModel? match;
+        for (final p in semuaTitik) {
+          if (p.id == pointId) { match = p; break; }
+        }
+        if (match != null) {
+          final induk = _data.findById(match.kecamatanId);
+          hasil.add(KecamatanModel(
+            id: id,
+            kecamatan: '${match.nama} (Titik Kustom)',
+            kabupaten: match.kabupatenNama,
+            provinsi: match.provinsiNama,
+            lat: match.lat,
+            lng: match.lng,
+            latDms: null,
+            lngDms: null,
+            elevasiM: match.elevasiM,
+            zonaWaktu: induk?.zonaWaktu,
+            utcOffset: induk?.utcOffset,
+          ));
+        }
+      } else {
+        final match = _data.findById(id);
+        if (match != null) hasil.add(match);
+      }
+    }
+    return hasil;
   }
 
   @override
