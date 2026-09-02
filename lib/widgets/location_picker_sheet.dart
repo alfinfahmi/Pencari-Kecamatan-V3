@@ -49,76 +49,77 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    // Tinggi TETAP (bukan DraggableScrollableSheet yang ukurannya dinamis)
+    // -- DraggableScrollableSheet punya riwayat masalah dikenal: saat
+    // keyboard muncul/berubah tinggi, ia bisa memicu rebuild total pada
+    // konten di dalamnya, yang membuat fokus TextField hilang setiap kali
+    // (gejala: keyboard langsung tertutup tiap ketik satu huruf). Struktur
+    // tetap ini menghilangkan seluruh sumber masalah tersebut.
+    final tinggiLayar = MediaQuery.of(context).size.height;
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.4,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) {
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.judul, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: () => Navigator.of(context).pop(kPilihGpsSentinel),
-                  icon: const Icon(Icons.my_location_rounded, size: 18),
-                  label: const Text('Gunakan Lokasi GPS Perangkat'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.emerald,
-                    side: const BorderSide(color: AppColors.emerald),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    minimumSize: const Size(double.infinity, 0),
-                  ),
+      child: SizedBox(
+        height: tinggiLayar * 0.7,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(widget.judul, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).pop(kPilihGpsSentinel),
+                icon: const Icon(Icons.my_location_rounded, size: 18),
+                label: const Text('Gunakan Lokasi GPS Perangkat'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.emerald,
+                  side: const BorderSide(color: AppColors.emerald),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  minimumSize: const Size(double.infinity, 0),
                 ),
-                const SizedBox(height: 14),
-                Row(
-                  children: const [
-                    Expanded(child: Divider()),
-                    Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text('atau cari alamat', style: TextStyle(fontSize: 11, color: Colors.grey))),
-                    Expanded(child: Divider()),
-                  ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: const [
+                  Expanded(child: Divider()),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text('atau cari alamat', style: TextStyle(fontSize: 11, color: Colors.grey))),
+                  Expanded(child: Divider()),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _controller,
+                autofocus: false,
+                onChanged: _cari,
+                decoration: InputDecoration(
+                  hintText: 'Cari kecamatan, kabupaten...',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _mencari
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                        )
+                      : null,
                 ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _controller,
-                  autofocus: false,
-                  onChanged: _cari,
-                  decoration: InputDecoration(
-                    hintText: 'Cari kecamatan, kabupaten...',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: _mencari
-                        ? const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
-                          )
-                        : null,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _hasil.length,
+                  itemBuilder: (context, i) {
+                    final item = _hasil[i];
+                    return ListTile(
+                      leading: const Icon(Icons.location_on_outlined),
+                      title: Text(item.kecamatan),
+                      subtitle: Text('${item.kabupaten ?? '-'}, ${item.provinsi}'),
+                      onTap: () => Navigator.of(context).pop(item),
+                    );
+                  },
                 ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: _hasil.length,
-                    itemBuilder: (context, i) {
-                      final item = _hasil[i];
-                      return ListTile(
-                        leading: const Icon(Icons.location_on_outlined),
-                        title: Text(item.kecamatan),
-                        subtitle: Text('${item.kabupaten ?? '-'}, ${item.provinsi}'),
-                        onTap: () => Navigator.of(context).pop(item),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
