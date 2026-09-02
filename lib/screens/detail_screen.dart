@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/app_data_service.dart';
 import '../services/qibla_service.dart';
@@ -10,6 +11,7 @@ import '../services/prayer_settings_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
 import '../widgets/home_button.dart';
+import '../widgets/location_picker_sheet.dart';
 import '../widgets/qibla_compass.dart';
 import '../widgets/prayer_time_table.dart';
 import 'add_point_screen.dart';
@@ -37,11 +39,76 @@ class _DetailScreenState extends State<DetailScreen> {
   List<WaktuShalatEntry>? _waktuShalat;
   bool _loadingShalat = true;
   DateTime _tanggalDipilih = DateTime.now();
+  late KecamatanModel _lokasiWaktuShalat = widget.data;
 
   @override
   void initState() {
     super.initState();
     _hitungWaktuShalat();
+  }
+
+  /// Ganti lokasi acuan KHUSUS untuk bagian Waktu Shalat (tidak mengubah
+  /// identitas halaman/lokasi utama di Rincian Geografis & Arah Kiblat --
+  /// mirip cara kerja tombol serupa di layar Ekspor Jadwal Shalat).
+  Future<void> _gantiLokasiWaktuShalat() async {
+    final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi untuk Waktu Shalat');
+    if (terpilih == kPilihGpsSentinel) {
+      await _pakaiGpsUntukWaktuShalat();
+    } else if (terpilih is KecamatanModel) {
+      setState(() => _lokasiWaktuShalat = terpilih);
+      _hitungWaktuShalat();
+    }
+  }
+
+  Future<void> _pakaiGpsUntukWaktuShalat() async {
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Izin lokasi ditolak')));
+        }
+        return;
+      }
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Aktifkan layanan lokasi (GPS) di perangkat Anda')),
+          );
+        }
+        return;
+      }
+      final pos = await Geolocator.getCurrentPosition();
+      final utcOffsetJam = DateTime.now().timeZoneOffset.inHours;
+      final namaZona = switch (utcOffsetJam) {
+        7 => 'WIB',
+        8 => 'WITA',
+        9 => 'WIT',
+        _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
+      };
+      setState(() {
+        _lokasiWaktuShalat = KecamatanModel(
+          id: 'gps_lokasi_saat_ini',
+          kecamatan: 'Lokasi Anda Saat Ini',
+          kabupaten: null,
+          provinsi: '(berdasarkan GPS)',
+          lat: pos.latitude,
+          lng: pos.longitude,
+          latDms: null,
+          lngDms: null,
+          elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
+          zonaWaktu: namaZona,
+          utcOffset: utcOffsetJam,
+        );
+      });
+      _hitungWaktuShalat();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil lokasi GPS: $e')));
+      }
+    }
   }
 
   Future<void> _pilihTanggal() async {
@@ -73,7 +140,7 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Future<void> _hitungWaktuShalat() async {
-    final data = widget.data;
+    final data = _lokasiWaktuShalat;
     if (data.utcOffset == null || data.zonaWaktu == null) {
       setState(() => _loadingShalat = false);
       return;
@@ -145,7 +212,7 @@ class _DetailScreenState extends State<DetailScreen> {
           null => '',
         }),
         actions: [
-          const HomeButton(),
+          HomeButton(),
           IconButton(
             icon: const Icon(Icons.copy_rounded),
             tooltip: 'Salin Semua Data',
@@ -411,6 +478,27 @@ class _DetailScreenState extends State<DetailScreen> {
       trailing: _buildHijriLabel(),
       children: [
         Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            children: [
+              Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  _lokasiWaktuShalat.kecamatan,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12.5, color: Colors.grey.shade500),
+                ),
+              ),
+              TextButton(
+                onPressed: _gantiLokasiWaktuShalat,
+                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), minimumSize: Size.zero),
+                child: const Text('Ganti Lokasi', style: TextStyle(fontSize: 12)),
+              ),
+            ],
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: InkWell(
             onTap: _pilihTanggal,
@@ -441,7 +529,7 @@ class _DetailScreenState extends State<DetailScreen> {
             style: AppTypography.captionEdu(color: Colors.grey.shade500),
           )
         else
-          PrayerTimeTable(entries: _waktuShalat!, labelZona: data.zonaWaktu ?? 'Zona'),
+          PrayerTimeTable(entries: _waktuShalat!, labelZona: _lokasiWaktuShalat.zonaWaktu ?? 'Zona'),
         const SizedBox(height: 4),
         Center(
           child: Wrap(
@@ -458,7 +546,7 @@ class _DetailScreenState extends State<DetailScreen> {
               TextButton.icon(
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => ExportJadwalScreen(data: data)),
+                    MaterialPageRoute(builder: (_) => ExportJadwalScreen(data: _lokasiWaktuShalat)),
                   );
                 },
                 icon: const Icon(Icons.picture_as_pdf_rounded, size: 16),
@@ -537,7 +625,7 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _buildHijriLabel() {
-    final data = widget.data;
+    final data = _lokasiWaktuShalat;
     if (data.utcOffset == null) return const SizedBox.shrink();
     final hijri = HijriService.instance.konversi(
       _tanggalDipilih,
