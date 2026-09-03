@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import '../models/kecamatan_model.dart';
 import '../services/app_data_service.dart';
 import '../services/hisab_service.dart';
+import '../services/hijri_service.dart';
 import '../services/home_location_service.dart';
 import '../services/adzan_notification_service.dart';
 import '../services/prayer_settings_service.dart';
@@ -12,10 +14,10 @@ import 'location_picker_sheet.dart';
 
 enum _StatusWidget { memuat, butuhIzin, gpsMati, error, siap }
 
-/// Widget ringkas di Home: menampilkan waktu shalat yang SEDANG berjalan &
-/// BERIKUTNYA saja, berdasarkan lokasi GPS perangkat secara default. Tap
-/// untuk membuka jadwal satu hari penuh. Pengguna bisa mengganti lokasi
-/// acuan lewat tombol "Ganti Lokasi".
+/// Widget ringkas di Home: menampilkan waktu shalat BERIKUTNYA dengan
+/// hitung mundur langsung (live countdown), berdasarkan lokasi GPS
+/// perangkat secara default. Tap untuk membuka jadwal satu hari penuh.
+/// Pengguna bisa mengganti lokasi acuan lewat tombol "Ganti Lokasi".
 class HomePrayerWidget extends StatefulWidget {
   const HomePrayerWidget({super.key});
 
@@ -30,12 +32,26 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
   _StatusWidget _status = _StatusWidget.memuat;
   KecamatanModel? _lokasi;
   List<WaktuShalatEntry>? _waktuShalat;
+  WaktuShalatEntry? _imsakBesok;
   bool _pakaiGps = true;
+  Timer? _timerHitungMundur;
 
   @override
   void initState() {
     super.initState();
     _muat();
+    // Perbarui tampilan tiap detik supaya hitung mundur berjalan live,
+    // tanpa perlu hitung ulang waktu shalat dari nol tiap kali (cuma
+    // rebuild angka detiknya).
+    _timerHitungMundur = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted && _status == _StatusWidget.siap) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timerHitungMundur?.cancel();
+    super.dispose();
   }
 
   Future<void> _muat() async {
@@ -158,10 +174,25 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
       ihtiyathMenit: ihtiyath,
     );
 
+    // Siapkan Imsak besok di muka (untuk kasus semua waktu hari ini sudah
+    // lewat / sudah lewat Isya) -- supaya tidak perlu hitung ulang async
+    // saat widget sedang render/countdown per detik.
+    final besok = HisabService.hitung(
+      tanggal: DateTime.now().add(const Duration(days: 1)),
+      lat: lokasi.lat,
+      lng: lokasi.lng,
+      elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+      utcOffset: lokasi.utcOffset!,
+      sudutIsya: sudutIsya,
+      sudutSubuh: sudutSubuh,
+      ihtiyathMenit: ihtiyath,
+    );
+
     if (mounted) {
       setState(() {
         _lokasi = lokasi;
         _waktuShalat = hasil;
+        _imsakBesok = besok.first;
         _status = _StatusWidget.siap;
       });
     }
@@ -171,16 +202,38 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
     await AdzanNotificationService.instance.jadwalkanUntukHariIni(hasil);
   }
 
-  ({WaktuShalatEntry sekarang, WaktuShalatEntry? berikutnya}) _cariSekarangDanBerikutnya(
-    List<WaktuShalatEntry> entries,
-  ) {
+  /// Cari waktu shalat BERIKUTNYA (belum lewat) dari daftar hari ini; kalau
+  /// semua sudah lewat (sudah lewat Isya), lompat ke Imsak besok --
+  /// makanya `_hitungUntuk` juga menyiapkan `_imsakBesok` di muka supaya
+  /// tidak perlu hitung ulang async saat widget sedang render/countdown.
+  WaktuShalatEntry _cariBerikutnya(List<WaktuShalatEntry> entries) {
     final now = DateTime.now();
-    int aktifIndex = 0;
-    for (int i = 0; i < entries.length; i++) {
-      if (!now.isBefore(entries[i].waktuDaerah)) aktifIndex = i;
+    for (final e in entries) {
+      if (now.isBefore(e.waktuDaerah)) return e;
     }
-    final berikutnya = aktifIndex + 1 < entries.length ? entries[aktifIndex + 1] : null;
-    return (sekarang: entries[aktifIndex], berikutnya: berikutnya);
+    return _imsakBesok ?? entries.last;
+  }
+
+  String _formatDurasi(Duration d) {
+    if (d.isNegative) return '00:00:00';
+    final j = d.inHours.toString().padLeft(2, '0');
+    final m = (d.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$j:$m:$s';
+  }
+
+  static const _namaHari = {1: 'Senin', 2: 'Selasa', 3: 'Rabu', 4: 'Kamis', 5: 'Jumat', 6: 'Sabtu', 7: 'Ahad'};
+  static const _namaBulanMasehi = {
+    1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
+    7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember',
+  };
+
+  String _formatTanggalGabungan(DateTime tanggal) {
+    final labelMasehi = '${tanggal.day} ${_namaBulanMasehi[tanggal.month]} ${tanggal.year}';
+    final lokasi = _lokasi;
+    if (lokasi?.utcOffset == null) return labelMasehi;
+    final hijri = HijriService.instance.konversi(tanggal, lat: lokasi!.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!);
+    return '$labelMasehi / ${hijri.hari} ${hijri.namaBulanH} ${hijri.tahunH}';
   }
 
   /// Sentinel object untuk membedakan "pengguna pilih GPS" dari "pengguna
@@ -257,44 +310,62 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
 
       case _StatusWidget.siap:
         if (_waktuShalat == null || _lokasi == null) return const SizedBox.shrink();
-        final hasil = _cariSekarangDanBerikutnya(_waktuShalat!);
+        final berikutnya = _cariBerikutnya(_waktuShalat!);
+        final sisaWaktu = berikutnya.waktuDaerah.difference(DateTime.now());
         String fmt(DateTime dt) => '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
         return InkWell(
           onTap: _bukaJadwalLengkap,
           borderRadius: BorderRadius.circular(12),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(_pakaiGps ? Icons.my_location_rounded : Icons.location_on_rounded,
-                  size: 13, color: Colors.white70),
-              const SizedBox(width: 4),
-              // Nama waktu + jam sedang berlangsung (mis. "Dhuha 05:56")
-              Text(hasil.sekarang.nama,
-                  style: AppTypography.bodyLg(color: Colors.white).copyWith(fontWeight: FontWeight.w700, fontSize: 14)),
-              const SizedBox(width: 5),
-              Text(fmt(hasil.sekarang.waktuDaerah),
-                  style: AppTypography.dataDisplay(color: AppColors.goldLight, fontSize: 13)),
-              if (hasil.berikutnya != null) ...[
-                const SizedBox(width: 8),
-                Icon(Icons.arrow_forward_rounded, size: 12, color: Colors.white38),
-                const SizedBox(width: 8),
-                Text(hasil.berikutnya!.nama,
-                    style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 12.5)),
-                const SizedBox(width: 5),
-                Text(fmt(hasil.berikutnya!.waktuDaerah),
-                    style: AppTypography.dataDisplay(color: Colors.white54, fontSize: 12)),
-              ],
-              const Spacer(),
-              InkWell(
-                onTap: _gantiLokasi,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                  child: Text(_lokasi!.kecamatan.length > 10 ? 'Ganti' : _lokasi!.kecamatan,
+              Row(
+                children: [
+                  Icon(_pakaiGps ? Icons.my_location_rounded : Icons.location_on_rounded,
+                      size: 13, color: Colors.white70),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      _lokasi!.kecamatan,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white70, fontSize: 11, decoration: TextDecoration.underline)),
+                      style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 12),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: _gantiLokasi,
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      child: Text('(Ganti)', style: TextStyle(color: AppColors.goldLight, fontSize: 12)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${berikutnya.nama} ${fmt(berikutnya.waktuDaerah)} ',
+                      style: AppTypography.headlineLg(color: Colors.white).copyWith(fontSize: 26, fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: _lokasi!.zonaWaktu ?? '',
+                      style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 14),
+                    ),
+                  ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white54),
+              const SizedBox(height: 4),
+              Text(
+                '- ${_formatDurasi(sisaWaktu)}',
+                style: AppTypography.dataDisplay(color: Colors.white60, fontSize: 15),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _formatTanggalGabungan(DateTime.now()),
+                style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 12.5),
+              ),
             ],
           ),
         );
