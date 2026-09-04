@@ -44,6 +44,11 @@ dependencies:
   # otomatis dilewati di sana.
   geocoding: ^4.0.0
 
+  # HTTP client -- dipakai untuk reverse geocoding via OpenStreetMap
+  # Nominatim (jalur yang BISA jalan di Web, karena cuma request HTTP
+  # biasa, bukan plugin native seperti `geocoding`).
+  http: ^1.2.2
+
   # Lokasi GPS perangkat (opsional, untuk menambah titik kustom cepat)
   geolocator: ^11.0.0
 
