@@ -1,5 +1,5 @@
 name: pencari_kecamatan
-description: "Koordinat Kec. Tashil — LF Ma'had 'Aly Lirboyo & MHM Kediri"
+description: "Aplikasi Falak — LF Ma'had 'Aly Lirboyo & MHM Kediri"
 publish_to: "none"
 version: 1.0.0+1
 
@@ -38,6 +38,11 @@ dependencies:
   # Notifikasi adzan terjadwal
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
+
+  # Reverse geocoding (opsional, dengan fallback offline -- lihat
+  # reverse_geocode_helper.dart). Tidak didukung di Flutter Web, jadi
+  # otomatis dilewati di sana.
+  geocoding: ^4.0.0
 
   # Lokasi GPS perangkat (opsional, untuk menambah titik kustom cepat)
   geolocator: ^11.0.0
