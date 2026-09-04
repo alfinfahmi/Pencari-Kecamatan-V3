@@ -5,6 +5,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../models/kecamatan_model.dart';
+import '../services/app_data_service.dart';
+import '../services/reverse_geocode_helper.dart';
 import '../services/hisab_service.dart';
 import '../services/hijri_service.dart';
 import '../services/prayer_settings_service.dart';
@@ -90,21 +92,16 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
         9 => 'WIT',
         _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
       };
+      final lokasiBaru = await lengkapiInfoLokasiGps(
+        lat: pos.latitude,
+        lng: pos.longitude,
+        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
+        zonaWaktu: namaZona,
+        utcOffset: utcOffsetJam,
+      );
 
       setState(() {
-        _lokasi = KecamatanModel(
-          id: 'gps_lokasi_saat_ini',
-          kecamatan: 'Lokasi Anda Saat Ini',
-          kabupaten: null,
-          provinsi: '(berdasarkan GPS)',
-          lat: pos.latitude,
-          lng: pos.longitude,
-          latDms: null,
-          lngDms: null,
-          elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
-          zonaWaktu: namaZona,
-          utcOffset: utcOffsetJam,
-        );
+        _lokasi = lokasiBaru;
       });
     } catch (e) {
       if (mounted) {
