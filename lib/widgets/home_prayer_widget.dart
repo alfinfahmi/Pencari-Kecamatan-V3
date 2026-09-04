@@ -6,6 +6,7 @@ import '../services/app_data_service.dart';
 import '../services/hisab_service.dart';
 import '../services/hijri_service.dart';
 import '../services/home_location_service.dart';
+import '../services/reverse_geocode_helper.dart';
 import '../services/adzan_notification_service.dart';
 import '../services/prayer_settings_service.dart';
 import '../theme/app_theme.dart';
@@ -98,15 +99,12 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
       };
       final elevasiBulat = pos.altitude > 0 ? pos.altitude.round() : 0;
 
-      final lokasiGps = KecamatanModel(
-        id: 'gps_lokasi_saat_ini',
-        kecamatan: 'Lokasi Anda Saat Ini',
-        kabupaten: null,
-        provinsi: '(berdasarkan GPS)',
+      // Coba reverse geocoding sungguhan dulu (Android/iOS + internet),
+      // otomatis jatuh ke "kecamatan terdekat" offline kalau gagal/di web
+      // -- lihat reverse_geocode_helper.dart.
+      final lokasiGps = await lengkapiInfoLokasiGps(
         lat: pos.latitude,
         lng: pos.longitude,
-        latDms: null,
-        lngDms: null,
         elevasiM: elevasiBulat,
         zonaWaktu: namaZona,
         utcOffset: utcOffsetJam,
@@ -327,7 +325,7 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      _lokasi!.kecamatan,
+                      [_lokasi!.kecamatan, _lokasi!.kabupaten].where((e) => e != null).join(', '),
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 12),
                     ),
