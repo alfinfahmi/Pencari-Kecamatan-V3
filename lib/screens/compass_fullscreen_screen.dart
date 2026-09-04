@@ -22,7 +22,7 @@ class CompassFullscreenScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text('Kompas Kiblat'),
-        actions: const [HomeButton()],
+        actions: [HomeButton()],
       ),
       body: SafeArea(
         child: Column(

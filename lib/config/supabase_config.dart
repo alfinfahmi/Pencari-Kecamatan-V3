@@ -18,12 +18,12 @@
 /// Security (RLS) yang sudah didefinisikan di schema.sql, BUKAN oleh
 /// kerahasiaan key ini.
 class SupabaseConfig {
-  static const String supabaseUrl = 'https://jtmpztriyqjcydkvladm.supabase.co/rest/v1/';
-  static const String supabasePublishableKey = 'sb_publishable_PLGNlFYY-OhKIZlPRCSyZg_VC5OfV_t';
+  static const String supabaseUrl = 'ISI_URL_PROJECT_ANDA_DI_SINI';
+  static const String supabasePublishableKey = 'ISI_PUBLISHABLE_KEY_ANDA_DI_SINI';
 
   static bool get isConfigured =>
-      supabaseUrl != 'https://jtmpztriyqjcydkvladm.supabase.co/rest/v1/' &&
-      supabasePublishableKey != 'sb_publishable_PLGNlFYY-OhKIZlPRCSyZg_VC5OfV_t' &&
+      supabaseUrl != 'ISI_URL_PROJECT_ANDA_DI_SINI' &&
+      supabasePublishableKey != 'ISI_PUBLISHABLE_KEY_ANDA_DI_SINI' &&
       supabaseUrl.isNotEmpty &&
       supabasePublishableKey.isNotEmpty;
 }

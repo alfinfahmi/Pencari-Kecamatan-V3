@@ -130,7 +130,7 @@ class _UsulkanKoreksiScreenState extends State<UsulkanKoreksiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Usulkan Koreksi Data'), actions: const [HomeButton()]),
+      appBar: AppBar(title: const Text('Usulkan Koreksi Data'), actions: [HomeButton()]),
       body: SafeArea(
         child: Column(
           children: [

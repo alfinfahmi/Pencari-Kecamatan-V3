@@ -102,7 +102,7 @@ class _AddPointScreenState extends State<AddPointScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Titik Kustom'), actions: const [HomeButton()]),
+      appBar: AppBar(title: const Text('Tambah Titik Kustom'), actions: [HomeButton()]),
       body: SafeArea(
         child: Column(
           children: [

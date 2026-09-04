@@ -88,7 +88,7 @@ class _ModerationPanelScreenState extends State<ModerationPanelScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Panel Moderasi'),
-        actions: [const HomeButton(), IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _muat)],
+        actions: [HomeButton(), IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _muat)],
       ),
       body: SafeArea(
         child: Column(

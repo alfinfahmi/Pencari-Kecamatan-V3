@@ -47,7 +47,7 @@ class PencariKecamatanApp extends StatelessWidget {
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {
         return MaterialApp(
-          title: 'Koordinat Kec. Tashil',
+          title: 'Aplikasi Falak',
           debugShowCheckedModeBanner: false,
           themeMode: mode,
           theme: AppTheme.light(),
