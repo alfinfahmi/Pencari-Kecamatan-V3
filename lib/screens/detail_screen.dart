@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/app_data_service.dart';
+import '../services/reverse_geocode_helper.dart';
 import '../services/qibla_service.dart';
 import '../services/hisab_service.dart';
 import '../services/hijri_service.dart';
@@ -88,20 +89,15 @@ class _DetailScreenState extends State<DetailScreen> {
         9 => 'WIT',
         _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
       };
+      final lokasiBaru = await lengkapiInfoLokasiGps(
+        lat: pos.latitude,
+        lng: pos.longitude,
+        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
+        zonaWaktu: namaZona,
+        utcOffset: utcOffsetJam,
+      );
       setState(() {
-        _lokasiWaktuShalat = KecamatanModel(
-          id: 'gps_lokasi_saat_ini',
-          kecamatan: 'Lokasi Anda Saat Ini',
-          kabupaten: null,
-          provinsi: '(berdasarkan GPS)',
-          lat: pos.latitude,
-          lng: pos.longitude,
-          latDms: null,
-          lngDms: null,
-          elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
-          zonaWaktu: namaZona,
-          utcOffset: utcOffsetJam,
-        );
+        _lokasiWaktuShalat = lokasiBaru;
       });
       _hitungWaktuShalat();
     } catch (e) {
