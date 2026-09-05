@@ -8,6 +8,7 @@ import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
 import '../widgets/home_button.dart';
+import 'kriteria_hilal_settings_sheet.dart';
 import '../widgets/location_picker_sheet.dart';
 
 /// Menampilkan tabel ijtimak akhir bulan resmi Lajnah Falakiyah Ma'had
@@ -148,8 +149,8 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   ///   mungkin terlihat
   Color _warnaKeadaanHilal(bool memenuhi, double tinggiHilal) {
     if (memenuhi) return AppColors.emerald;
-    if (tinggiHilal > 0) return Colors.amber.shade800;
-    return Colors.orange.shade700;
+    if (tinggiHilal > 0) return Colors.amber.shade700;
+    return Colors.deepOrange.shade700;
   }
 
   String _formatHariPasaran(DateTime tanggal) {
@@ -174,7 +175,17 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tabel Ijtimak'),
-        actions: [HomeButton()],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.tune_rounded),
+            tooltip: 'Kriteria Imkan Rukyat',
+            onPressed: () async {
+              final berubah = await KriteriaHilalSettingsSheet.show(context);
+              if (berubah == true && context.mounted) setState(() {});
+            },
+          ),
+          HomeButton(),
+        ],
       ),
       body: SafeArea(
         child: Column(

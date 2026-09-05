@@ -5,6 +5,7 @@ import 'models/custom_point_model.dart';
 import 'screens/splash_screen.dart';
 import 'services/adzan_notification_service.dart';
 import 'services/hijri_service.dart';
+import 'services/hisab_preference_service.dart';
 import 'services/supabase_service.dart';
 import 'theme/app_theme.dart';
 
@@ -41,6 +42,7 @@ void main() async {
   // 1440H-1500H). Kalau gagal dimuat, aplikasi tetap jalan normal lewat
   // fallback formula -- tidak crash.
   await HijriService.muatTabelIjtimak();
+  await HisabPreferenceService.muatKeHijriService();
 
   runApp(const PencariKecamatanApp());
 }

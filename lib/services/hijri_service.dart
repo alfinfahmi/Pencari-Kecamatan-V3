@@ -2,6 +2,24 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart' show rootBundle;
 
+/// Pilihan kriteria imkan rukyat (ambang batas lolos/tidaknya hilal),
+/// TERPISAH dari mesin hitung posisi bulan/matahari itu sendiri --
+/// keempatnya memakai angka tinggi hilal/elongasi/usia hilal yang SAMA,
+/// cuma beda syarat ambang batasnya.
+enum KriteriaImkanRukyat {
+  mabims2021,
+  irtifa2UsiaHilal6Jam,
+  irtifa2UsiaHilal8Jam,
+  irtifa2Saja;
+
+  String get label => switch (this) {
+        KriteriaImkanRukyat.mabims2021 => 'MABIMS 2021 (Irtifa 3°, Elongasi 6.4°)',
+        KriteriaImkanRukyat.irtifa2UsiaHilal6Jam => 'Irtifa 2°, Usia Hilal 6 Jam',
+        KriteriaImkanRukyat.irtifa2UsiaHilal8Jam => 'Irtifa 2°, Usia Hilal 8 Jam',
+        KriteriaImkanRukyat.irtifa2Saja => 'Irtifa 2° Saja',
+      };
+}
+
 /// Hasil penentuan tanggal Hijriah untuk satu tanggal Masehi.
 class TanggalHijriah {
   final int hari;
@@ -16,6 +34,9 @@ class TanggalHijriah {
   final double tinggiHilalDerajat;
   /// Elongasi (jarak sudut bulan-matahari, derajat) saat maghrib yang sama.
   final double elongasiDerajat;
+  /// Usia hilal (jam) -- selisih waktu dari ijtimak sampai maghrib hari
+  /// itu, dipakai kriteria yang berbasis "usia hilal" (bukan cuma elongasi).
+  final double usiaHilalJam;
 
   TanggalHijriah({
     required this.hari,
@@ -27,10 +48,12 @@ class TanggalHijriah {
     required this.istikmal,
     required this.tinggiHilalDerajat,
     required this.elongasiDerajat,
+    required this.usiaHilalJam,
   });
 
-  /// Kriteria MABIMS 2021 terpenuhi? (tinggi hilal >=3 derajat DAN elongasi
-  /// >=6.4 derajat). Ini persis kebalikan dari [istikmal].
+  /// Kriteria imkan rukyat yang AKTIF (sesuai HijriService.kriteriaAktif
+  /// saat tanggal ini dihitung) terpenuhi? Ini persis kebalikan dari
+  /// [istikmal].
   bool get mabimsTerpenuhi => !istikmal;
 
   String get label => '$hari $namaBulanH $tahunH H';
@@ -329,7 +352,7 @@ class HijriService {
   /// CATATAN: hasil ini menggambarkan keadaan hilal menuju bulan
   /// BERIKUTNYA (ijtimak ini menandai transisi ke bulan setelahnya),
   /// bukan tentang bulan yang baru saja berakhir.
-  static ({bool memenuhi, double tinggiHilal, double elongasi}) hitungKeadaanHilalPadaIjtimak({
+  static ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) hitungKeadaanHilalPadaIjtimak({
     required DateTime ijtimakWib,
     required double lat,
     required double lng,
@@ -340,7 +363,11 @@ class HijriService {
     return _hilalMemenuhiMabims(ijtimakJde: jdeUt, lat: lat, lng: lng, utcOffset: utcOffset);
   }
 
-  static ({bool memenuhi, double tinggiHilal, double elongasi}) _hilalMemenuhiMabims({
+  /// Kriteria imkan rukyat yang aktif -- diisi HisabPreferenceService saat
+  /// aplikasi start, default MABIMS 2021 kalau belum pernah diatur.
+  static KriteriaImkanRukyat kriteriaAktif = KriteriaImkanRukyat.mabims2021;
+
+  static ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) _hilalMemenuhiMabims({
     required double ijtimakJde,
     required double lat,
     required double lng,
@@ -359,11 +386,19 @@ class HijriService {
     final cosElong = (_sind(declS) * _sind(declM) + _cosd(declS) * _cosd(declM) * _cosd(raS - raM))
         .clamp(-1.0, 1.0);
     final elongasi = acos(cosElong) * 180 / pi;
+    final usiaHilalJam = maghribUtc.difference(ijtimakUtc).inMinutes / 60.0;
 
-    return (memenuhi: altM >= 3.0 && elongasi >= 6.4, tinggiHilal: altM, elongasi: elongasi);
+    final memenuhi = switch (kriteriaAktif) {
+      KriteriaImkanRukyat.mabims2021 => altM >= 3.0 && elongasi >= 6.4,
+      KriteriaImkanRukyat.irtifa2UsiaHilal6Jam => altM >= 2.0 && usiaHilalJam >= 6.0,
+      KriteriaImkanRukyat.irtifa2UsiaHilal8Jam => altM >= 2.0 && usiaHilalJam >= 8.0,
+      KriteriaImkanRukyat.irtifa2Saja => altM >= 2.0,
+    };
+
+    return (memenuhi: memenuhi, tinggiHilal: altM, elongasi: elongasi, usiaHilalJam: usiaHilalJam);
   }
 
-  static ({DateTime tanggal1, DateTime ijtimak, bool istikmal, double tinggiHilal, double elongasi}) tentukanAwalBulan({
+  static ({DateTime tanggal1, DateTime ijtimak, bool istikmal, double tinggiHilal, double elongasi, double usiaHilalJam}) tentukanAwalBulan({
     required int tahunH,
     required int bulanH,
     required double lat,
@@ -386,6 +421,7 @@ class HijriService {
       istikmal: !hasil.memenuhi,
       tinggiHilal: hasil.tinggiHilal,
       elongasi: hasil.elongasi,
+      usiaHilalJam: hasil.usiaHilalJam,
     );
   }
 
@@ -439,6 +475,7 @@ class HijriService {
       istikmal: awalIni.istikmal,
       tinggiHilalDerajat: awalIni.tinggiHilal,
       elongasiDerajat: awalIni.elongasi,
+      usiaHilalJam: awalIni.usiaHilalJam,
     );
   }
 }

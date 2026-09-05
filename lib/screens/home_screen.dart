@@ -391,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 8),
           tile(
             icon: Icons.calendar_month_rounded,
-            label: 'Kalender\nHijriah',
+            label: 'Kalender',
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const HijriCalendarScreen()),

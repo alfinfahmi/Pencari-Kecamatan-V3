@@ -6,6 +6,7 @@ import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
 import '../widgets/home_button.dart';
+import 'kriteria_hilal_settings_sheet.dart';
 import '../widgets/location_picker_sheet.dart';
 
 /// Kalender dua sistem (Hijriah & Masehi) -- navigasi per bulan Masehi,
@@ -113,7 +114,17 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kalender Hijriah & Masehi'),
-        actions: [HomeButton()],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.tune_rounded),
+            tooltip: 'Kriteria Imkan Rukyat',
+            onPressed: () async {
+              final berubah = await KriteriaHilalSettingsSheet.show(context);
+              if (berubah == true && context.mounted) setState(() {});
+            },
+          ),
+          HomeButton(),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -329,6 +340,22 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
     );
   }
 
+  Widget _barisDetailKalender(String label, String nilai) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Expanded(flex: 5, child: Text(label, style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600))),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 4,
+            child: Text(nilai, textAlign: TextAlign.right, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _tampilkanDetailHari(DateTime tanggalMasehi, TanggalHijriah? hijri, String? namaPenting) {
     showModalBottomSheet(
       context: context,
@@ -361,6 +388,37 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
                     Text(namaPenting, style: const TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
+              ),
+            ],
+            if (hijri != null) ...[
+              const Divider(height: 24),
+              Text('Keadaan Hilal Awal Bulan Ini', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
+              const SizedBox(height: 6),
+              _barisDetailKalender(
+                'Waktu ijtimak',
+                '${hijri.ijtimakAwalBulan.day}/${hijri.ijtimakAwalBulan.month}/${hijri.ijtimakAwalBulan.year} '
+                '${hijri.ijtimakAwalBulan.hour.toString().padLeft(2, '0')}:${hijri.ijtimakAwalBulan.minute.toString().padLeft(2, '0')} WIB',
+              ),
+              _barisDetailKalender('Tinggi hilal saat maghrib', '${hijri.tinggiHilalDerajat.toStringAsFixed(2)}\u00b0'),
+              _barisDetailKalender('Elongasi', '${hijri.elongasiDerajat.toStringAsFixed(2)}\u00b0'),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(
+                    hijri.mabimsTerpenuhi ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                    size: 15,
+                    color: hijri.mabimsTerpenuhi ? AppColors.emerald : Colors.deepOrange.shade700,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    hijri.mabimsTerpenuhi ? 'Kriteria MABIMS terpenuhi' : 'Kriteria MABIMS tidak terpenuhi (istikmal)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12.5,
+                      color: hijri.mabimsTerpenuhi ? AppColors.emerald : Colors.deepOrange.shade700,
+                    ),
+                  ),
+                ],
               ),
             ],
             const SizedBox(height: 12),
