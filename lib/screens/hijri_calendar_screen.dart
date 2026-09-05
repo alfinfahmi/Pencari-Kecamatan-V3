@@ -121,7 +121,20 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
             _buildBarisLokasi(),
             _buildNavigasiBulan(),
             const Divider(height: 1),
-            Expanded(child: _buildGridKalender()),
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  // Batasi lebar maksimum -- tanpa ini, di layar lebar
+                  // (desktop/tablet/web) 7 kolom jadi sangat lebar, dan
+                  // karena tingginya proporsional (childAspectRatio),
+                  // kotak kalender jadi raksasa. Dibatasi supaya ukurannya
+                  // tetap wajar seperti di HP, cukup diberi ruang kosong
+                  // di kiri-kanan pada layar lebar.
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: _buildGridKalender(),
+                ),
+              ),
+            ),
             _buildCatatan(),
             const WatermarkFooter(),
           ],
@@ -277,6 +290,8 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
               return InkWell(
                 onTap: diLuarBulanIni ? null : () => _tampilkanDetailHari(tanggalMasehi, hijri, namaPenting),
                 borderRadius: BorderRadius.circular(10),
+                hoverColor: AppColors.emerald.withOpacity(0.08),
+                splashColor: AppColors.emerald.withOpacity(0.15),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),

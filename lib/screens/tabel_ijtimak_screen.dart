@@ -140,6 +140,18 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   /// hasil ekstraksi lama SALAH (kesalahan pemetaan teks Arab->Indonesia,
   /// meski tanggal & nama harinya sendiri terbukti benar). Dihitung ulang
   /// pakai rumus yang sudah divalidasi terhadap sumber independen.
+  /// Warna keadaan hilal, 3 tingkat (bukan biner ya/tidak):
+  /// - Hijau: kriteria MABIMS terpenuhi (tinggi >=3 derajat, elongasi >=6.4)
+  /// - Kuning: hilal SUDAH di atas ufuk (tinggi positif) tapi belum
+  ///   memenuhi ambang MABIMS -- lebih "dekat" daripada kasus negatif
+  /// - Oranye: hilal masih di BAWAH ufuk (tinggi negatif) -- jelas belum
+  ///   mungkin terlihat
+  Color _warnaKeadaanHilal(bool memenuhi, double tinggiHilal) {
+    if (memenuhi) return AppColors.emerald;
+    if (tinggiHilal > 0) return Colors.amber.shade800;
+    return Colors.orange.shade700;
+  }
+
   String _formatHariPasaran(DateTime tanggal) {
     final hari = _namaHariLengkap[tanggal.weekday]!;
     final pasaran = HijriService.hitungPasaran(tanggal);
@@ -370,27 +382,15 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
           ),
           if (hilal != null) ...[
             const SizedBox(height: 3),
-            Row(
-              children: [
-                Icon(
-                  hilal.memenuhi ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                  size: 12,
-                  color: hilal.memenuhi ? AppColors.emerald : Colors.orange.shade700,
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Tinggi hilal ${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, '
-                    'elongasi ${hilal.elongasi.toStringAsFixed(1)}\u00b0 '
-                    '(menuju bulan berikutnya)',
-                    style: TextStyle(
-                      fontSize: 10.5,
-                      color: hilal.memenuhi ? AppColors.emerald : Colors.orange.shade700,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+            Text(
+              'Tinggi hilal ${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, '
+              'elongasi ${hilal.elongasi.toStringAsFixed(1)}\u00b0 '
+              '(menuju bulan berikutnya)',
+              style: TextStyle(
+                fontSize: 10.5,
+                color: _warnaKeadaanHilal(hilal.memenuhi, hilal.tinggiHilal),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ],
