@@ -73,6 +73,27 @@ class HijriService {
     9: 'Ramadhan', 10: 'Syawal', 11: "Dzulqa'dah", 12: 'Dzulhijjah',
   };
 
+  static const _pasaranUrutan = ['Legi', 'Pahing', 'Pon', 'Wage', 'Kliwon'];
+
+  /// Hitung nama pasaran Jawa (siklus 5 hari) untuk tanggal Masehi
+  /// tertentu, via Julian Day Number modulo 5.
+  ///
+  /// TERVALIDASI terhadap 6 tanggal berurutan yang dikonfirmasi banyak
+  /// sumber independen (portal berita nasional, awal September 2026):
+  /// 1 Sep 2026=Legi, 2 Sep=Pahing, 3 Sep=Pon, 4 Sep=Wage, 5 Sep=Kliwon,
+  /// 6 Sep=Legi -- SEMUA cocok persis dengan rumus ini.
+  static String hitungPasaran(DateTime tanggal) {
+    final jdn = _julianDayNumber(tanggal.year, tanggal.month, tanggal.day);
+    return _pasaranUrutan[jdn % 5];
+  }
+
+  static int _julianDayNumber(int y, int m, int d) {
+    final a = (14 - m) ~/ 12;
+    final y2 = y + 4800 - a;
+    final m2 = m + 12 * a - 3;
+    return d + (153 * m2 + 2) ~/ 5 + 365 * y2 + y2 ~/ 4 - y2 ~/ 100 + y2 ~/ 400 - 32045;
+  }
+
   // Cache tabel ijtimak di memori -- dimuat sekali via [muatTabelIjtimak]
   // saat aplikasi start (lihat main.dart), supaya seluruh method di bawah
   // TETAP synchronous (dipanggil berulang dalam loop pencarian bulan di
@@ -123,6 +144,31 @@ class HijriService {
   /// MENGAKHIRI bulan_h" (konvensi Lirboyo). Sudah diverifikasi silang
   /// sebelumnya: As-Syahru(Y, N) == Tabel(Y, N-1), dengan wrap tahun kalau
   /// N=1 (jadi Tabel(Y-1, 12)).
+  /// Parsing string ISO "YYYY-MM-DDTHH:MM:SS" (format tabel ijtimak) secara
+  /// MANUAL, TIDAK memakai `DateTime.parse()` biasa.
+  ///
+  /// BUG YANG DIHINDARI: `DateTime.parse()` pada string TANPA penanda
+  /// zona waktu eksplisit (tanpa akhiran 'Z' atau offset) akan
+  /// diinterpretasikan sebagai WAKTU LOKAL PERANGKAT -- BUKAN otomatis
+  /// WIB seperti yang mungkin diasumsikan. Kalau timezone perangkat/
+  /// browser pengguna BUKAN WIB, seluruh perhitungan jadi bergeser
+  /// berjam-jam (bisa membalik tanda tinggi hilal dari positif ke
+  /// negatif!). Parsing manual ke `DateTime.utc(...)` ini menghilangkan
+  /// ketergantungan pada timezone perangkat sepenuhnya -- angka wall-clock
+  /// dibaca apa adanya, terlepas dari device sedang di zona waktu mana.
+  static DateTime parseWibSebagaiUtc(String iso) {
+    final m = RegExp(r'^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})').firstMatch(iso);
+    if (m == null) throw FormatException('Format tanggal tabel ijtimak tidak dikenali: $iso');
+    return DateTime.utc(
+      int.parse(m.group(1)!),
+      int.parse(m.group(2)!),
+      int.parse(m.group(3)!),
+      int.parse(m.group(4)!),
+      int.parse(m.group(5)!),
+      int.parse(m.group(6)!),
+    );
+  }
+
   static double? _ijtimakJdeDariTabel(int tahunH, int bulanH) {
     final tabel = _tabelIjtimak;
     if (tabel == null || tabel.isEmpty) return null;
@@ -143,7 +189,7 @@ class HijriService {
     // Tabel disimpan sebagai waktu WIB (UTC+7) apa adanya -- konversi ke
     // JDE (UT) supaya sama persis representasinya dengan hasil formula
     // As-Syahru di bawah (keduanya dikonsumsi lewat _jdeToDateTimeUtc).
-    final wibDt = DateTime.parse(wibIso);
+    final wibDt = parseWibSebagaiUtc(wibIso);
     final utcDt = wibDt.subtract(const Duration(hours: 7));
     return 2451544.5 + utcDt.difference(DateTime.utc(2000, 1, 1)).inMicroseconds / (86400 * 1000000);
   }

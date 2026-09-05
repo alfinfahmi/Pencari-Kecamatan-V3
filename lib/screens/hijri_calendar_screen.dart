@@ -35,7 +35,12 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
     1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
     7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember',
   };
-  static const _namaHariSingkat = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Ahad'];
+  // Urutan kolom kalender: Ahad di depan (sesuai referensi), bukan Senin.
+  static const _namaHariKolom = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  static const _namaHariLengkap = {1: 'Senin', 2: 'Selasa', 3: 'Rabu', 4: 'Kamis', 5: 'Jumat', 6: 'Sabtu', 7: 'Ahad'};
+  static const _angkaArab = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
+
+  static String _keAngkaArab(int n) => n.toString().split('').map((d) => _angkaArab[int.parse(d)]).join();
 
   /// Hari-hari penting yang tanggal hisabnya TETAP (urutan hari dalam
   /// bulan Hijriah), BUKAN yang butuh penetapan resmi.
@@ -151,16 +156,48 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
     );
   }
 
+  /// Label rentang bulan Hijriah yang tercakup dalam bulan Masehi yang
+  /// sedang tampil (mis. "Rabiul Awal - Rabiul Akhir 1448"), sesuai
+  /// referensi desain -- satu bulan Masehi hampir selalu melintasi 2
+  /// bulan Hijriah karena panjang bulannya beda (~29.5 vs 30/31 hari).
+  String? _labelRentangHijriah() {
+    final lokasi = _lokasi;
+    if (lokasi == null || lokasi.utcOffset == null) return null;
+
+    final hari1 = _bulanTampil;
+    final hariTerakhir = DateTime(_bulanTampil.year, _bulanTampil.month + 1, 0);
+    final hijriAwal = HijriService.instance.konversi(hari1, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!);
+    final hijriAkhir = HijriService.instance.konversi(hariTerakhir, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!);
+
+    if (hijriAwal.bulanH == hijriAkhir.bulanH && hijriAwal.tahunH == hijriAkhir.tahunH) {
+      return '${hijriAwal.namaBulanH} ${hijriAwal.tahunH}';
+    }
+    if (hijriAwal.tahunH == hijriAkhir.tahunH) {
+      return '${hijriAwal.namaBulanH} - ${hijriAkhir.namaBulanH} ${hijriAwal.tahunH}';
+    }
+    return '${hijriAwal.namaBulanH} ${hijriAwal.tahunH} - ${hijriAkhir.namaBulanH} ${hijriAkhir.tahunH}';
+  }
+
   Widget _buildNavigasiBulan() {
+    final labelHijriah = _labelRentangHijriah();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+      padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(icon: const Icon(Icons.chevron_left_rounded), onPressed: () => _gantiBulan(-1)),
-          Text(
-            '${_namaBulanMasehi[_bulanTampil.month]} ${_bulanTampil.year}',
-            style: AppTypography.headlineMd(),
+          Column(
+            children: [
+              Text(
+                '${_namaBulanMasehi[_bulanTampil.month]} ${_bulanTampil.year}',
+                style: AppTypography.headlineMd(),
+              ),
+              if (labelHijriah != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(labelHijriah, style: TextStyle(fontSize: 12.5, color: Colors.grey.shade500)),
+                ),
+            ],
           ),
           IconButton(icon: const Icon(Icons.chevron_right_rounded), onPressed: () => _gantiBulan(1)),
         ],
@@ -170,16 +207,21 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
 
   Widget _buildGridKalender() {
     final lokasi = _lokasi;
-    final jumlahHari = DateTime(_bulanTampil.year, _bulanTampil.month + 1, 0).day;
     final hari1 = DateTime(_bulanTampil.year, _bulanTampil.month, 1);
-    final offsetAwal = hari1.weekday - 1;
+    final jumlahHariBulanIni = DateTime(_bulanTampil.year, _bulanTampil.month + 1, 0).day;
+    // weekday Dart: Senin=1..Ahad=7. Kolom kita mulai dari Ahad(indeks 0),
+    // jadi offset = weekday % 7 (Ahad->0, Senin->1, ..., Sabtu->6).
+    final offsetAwal = hari1.weekday % 7;
+    final totalSel = offsetAwal + jumlahHariBulanIni;
+    final extraSetelah = (7 - totalSel % 7) % 7;
+    final totalGrid = totalSel + extraSetelah;
     final now = DateTime.now();
 
     return SingleChildScrollView(
       child: Column(
         children: [
           Row(
-            children: _namaHariSingkat
+            children: _namaHariKolom
                 .map((h) => Expanded(
                       child: Center(
                         child: Text(h, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5, color: Colors.grey.shade600)),
@@ -192,12 +234,21 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 6),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, childAspectRatio: 0.78),
-            itemCount: offsetAwal + jumlahHari,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              childAspectRatio: 0.8,
+              crossAxisSpacing: 2,
+              mainAxisSpacing: 2,
+            ),
+            itemCount: totalGrid,
             itemBuilder: (context, index) {
-              if (index < offsetAwal) return const SizedBox.shrink();
-              final tanggalMasehi = DateTime(_bulanTampil.year, _bulanTampil.month, index - offsetAwal + 1);
+              // Satu rumus untuk ketiga kasus (bulan lalu/ini/depan) --
+              // menambah/mengurangi hari dari tanggal 1 bulan yang tampil.
+              final tanggalMasehi = hari1.add(Duration(days: index - offsetAwal));
+              final diLuarBulanIni = tanggalMasehi.month != _bulanTampil.month || tanggalMasehi.year != _bulanTampil.year;
               final iniHariIni = tanggalMasehi.year == now.year && tanggalMasehi.month == now.month && tanggalMasehi.day == now.day;
+              final iniJumat = tanggalMasehi.weekday == 5;
+              final iniAhad = tanggalMasehi.weekday == 7;
 
               TanggalHijriah? hijri;
               String? namaPenting;
@@ -206,36 +257,51 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
                 namaPenting = _hariPenting[(hijri.bulanH, hijri.hari)];
               }
 
+              // Warna angka Masehi: hari ini > redup (luar bulan) > Ahad
+              // (merah) > Jumat (hijau) > biasa -- meniru pola referensi.
+              Color warnaAngka;
+              if (diLuarBulanIni) {
+                warnaAngka = Colors.grey.withOpacity(0.35);
+              } else if (iniHariIni) {
+                warnaAngka = AppColors.emeraldDark;
+              } else if (iniAhad) {
+                warnaAngka = Colors.red.shade300;
+              } else if (iniJumat) {
+                warnaAngka = AppColors.emerald;
+              } else {
+                warnaAngka = Theme.of(context).brightness == Brightness.dark ? AppColors.textDark : AppColors.textLight;
+              }
+              final warnaHijriKecil = diLuarBulanIni ? Colors.grey.withOpacity(0.3) : Colors.grey.shade500;
+              final warnaPasaran = diLuarBulanIni ? Colors.grey.withOpacity(0.3) : Colors.grey.shade500;
+
               return InkWell(
-                onTap: () => _tampilkanDetailHari(tanggalMasehi, hijri, namaPenting),
-                borderRadius: BorderRadius.circular(8),
+                onTap: diLuarBulanIni ? null : () => _tampilkanDetailHari(tanggalMasehi, hijri, namaPenting),
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  margin: const EdgeInsets.all(2),
-                  padding: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
-                    color: iniHariIni ? AppColors.emerald.withOpacity(0.15) : null,
-                    borderRadius: BorderRadius.circular(8),
-                    border: iniHariIni ? Border.all(color: AppColors.emerald) : null,
+                    borderRadius: BorderRadius.circular(10),
+                    border: iniHariIni ? Border.all(color: AppColors.emerald, width: 1.4) : null,
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (hijri != null)
+                        Text(_keAngkaArab(hijri.hari), style: TextStyle(fontSize: 10, color: warnaHijriKecil)),
                       Text(
                         '${tanggalMasehi.day}',
-                        style: TextStyle(
-                          fontWeight: iniHariIni ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 14,
-                          color: iniHariIni ? AppColors.emeraldDark : null,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: warnaAngka),
                       ),
-                      if (hijri != null)
-                        Text('${hijri.hari}', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
-                      if (namaPenting != null)
-                        Container(
-                          margin: const EdgeInsets.only(top: 2),
-                          width: 5, height: 5,
-                          decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
-                        ),
+                      if (!diLuarBulanIni) ...[
+                        Text(HijriService.hitungPasaran(tanggalMasehi), style: TextStyle(fontSize: 9.5, color: warnaPasaran)),
+                        if (namaPenting != null)
+                          Container(
+                            margin: const EdgeInsets.only(top: 2),
+                            width: 5, height: 5,
+                            decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
+                          ),
+                      ],
                     ],
                   ),
                 ),
@@ -249,7 +315,6 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
   }
 
   void _tampilkanDetailHari(DateTime tanggalMasehi, TanggalHijriah? hijri, String? namaPenting) {
-    const namaHari = {1: 'Senin', 2: 'Selasa', 3: 'Rabu', 4: 'Kamis', 5: 'Jumat', 6: 'Sabtu', 7: 'Ahad'};
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -259,7 +324,8 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${namaHari[tanggalMasehi.weekday]}, ${tanggalMasehi.day} ${_namaBulanMasehi[tanggalMasehi.month]} ${tanggalMasehi.year}',
+              '${_namaHariLengkap[tanggalMasehi.weekday]} ${HijriService.hitungPasaran(tanggalMasehi)}, '
+              '${tanggalMasehi.day} ${_namaBulanMasehi[tanggalMasehi.month]} ${tanggalMasehi.year}',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 6),
@@ -294,13 +360,40 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
   }
 
   Widget _buildCatatan() {
+    Widget legenda(Color warna, String label) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 10, height: 10, decoration: BoxDecoration(color: warna, borderRadius: BorderRadius.circular(3))),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
+        ],
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
-      child: Text(
-        '\u2022 Tanda kuning: hari penting dengan tanggal hisab tetap (Maulid, Isra Mi\'raj, dst.). '
-        'Awal Ramadhan/Syawal/Dzulhijjah TIDAK ditandai di sini karena butuh penetapan resmi.\n'
-        '\u2022 Semua tanggal Hijriah adalah perkiraan hisab, bisa berbeda 1 hari dari sidang isbat/rukyat.',
-        style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500, height: 1.4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: [
+              legenda(AppColors.emerald, 'Hari ini'),
+              legenda(Colors.red.shade300, 'Ahad'),
+              legenda(AppColors.emerald, 'Jumat'),
+              legenda(AppColors.gold, 'Hari penting'),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Angka kecil di atas: tanggal Hijriah (angka Arab). '
+            'Awal Ramadhan/Syawal/Dzulhijjah TIDAK ditandai di sini karena butuh penetapan resmi. '
+            'Semua tanggal Hijriah adalah perkiraan hisab, bisa berbeda 1 hari dari sidang isbat/rukyat.',
+            style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500, height: 1.4),
+          ),
+        ],
       ),
     );
   }

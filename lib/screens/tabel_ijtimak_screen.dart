@@ -72,7 +72,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
       final now = DateTime.now();
       int? tahunSekarang;
       for (final entry in data) {
-        final tgl = DateTime.parse(entry['ijtimak_wib'] as String);
+        final tgl = HijriService.parseWibSebagaiUtc(entry['ijtimak_wib'] as String);
         if (tgl.isAfter(now)) {
           tahunSekarang = entry['tahun_h'] as int;
           break;
@@ -133,8 +133,21 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     }
   }
 
+  static const _namaHariLengkap = {1: 'Senin', 2: 'Selasa', 3: 'Rabu', 4: 'Kamis', 5: 'Jumat', 6: 'Sabtu', 7: 'Ahad'};
+
+  /// Nama hari + pasaran dihitung ULANG di sini (bukan dari field
+  /// `hari_pasaran` hasil ekstraksi Excel dulu) -- ternyata kolom pasaran
+  /// hasil ekstraksi lama SALAH (kesalahan pemetaan teks Arab->Indonesia,
+  /// meski tanggal & nama harinya sendiri terbukti benar). Dihitung ulang
+  /// pakai rumus yang sudah divalidasi terhadap sumber independen.
+  String _formatHariPasaran(DateTime tanggal) {
+    final hari = _namaHariLengkap[tanggal.weekday]!;
+    final pasaran = HijriService.hitungPasaran(tanggal);
+    return '$hari $pasaran';
+  }
+
   String _formatTanggalJam(String iso) {
-    final dt = DateTime.parse(iso);
+    final dt = HijriService.parseWibSebagaiUtc(iso);
     const bulan = {
       1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun',
       7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des',
@@ -328,7 +341,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   }
 
   Widget _buildBarisBulan(Map<String, dynamic> e) {
-    final ijtimakWib = DateTime.parse(e['ijtimak_wib'] as String);
+    final ijtimakWib = HijriService.parseWibSebagaiUtc(e['ijtimak_wib'] as String);
     final lokasi = _lokasi;
 
     ({bool memenuhi, double tinggiHilal, double elongasi})? hilal;
@@ -352,7 +365,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${_formatTanggalJam(e['ijtimak_wib'] as String)} \u2022 ${e['hari_pasaran']}',
+            '${_formatTanggalJam(e['ijtimak_wib'] as String)} \u2022 ${_formatHariPasaran(ijtimakWib)}',
             style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
           ),
           if (hilal != null) ...[
