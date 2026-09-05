@@ -12,6 +12,7 @@ import '../widgets/home_prayer_widget.dart';
 import '../widgets/watermark_footer.dart';
 import 'moderation_panel_screen.dart';
 import 'adzan_settings_screen.dart';
+import 'tabel_ijtimak_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -191,6 +192,15 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const AdzanSettingsScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.calendar_view_month_rounded),
+            tooltip: 'Tabel Ijtimak',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TabelIjtimakScreen()),
               );
             },
           ),

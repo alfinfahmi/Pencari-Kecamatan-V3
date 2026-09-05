@@ -1,0 +1,5132 @@
+{
+  "sumber": "Lajnah Falakiyah Ma'had 'Aly Lirboyo - Tabel Ijtimak Akhir Bulan",
+  "rentang": "1440H - 1500H",
+  "satuan_waktu": "WIB (UTC+7), waktu ijtimak akhir bulan (menjelang bulan berikutnya)",
+  "jumlah_entri": 732,
+  "data": [
+    {
+      "tahun_h": 1440,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2018-10-09T10:46:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2018-11-07T23:02:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2018-12-07T14:20:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2019-01-06T08:28:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2019-02-05T04:03:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2019-03-06T23:03:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2019-04-05T15:50:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2019-05-05T05:45:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2019-06-03T17:01:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2019-07-03T02:16:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2019-08-01T10:11:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1440,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2019-08-30T17:36:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2019-09-29T01:26:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2019-10-28T10:38:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2019-11-26T22:05:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2019-12-26T12:13:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2020-01-25T04:42:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2020-02-23T22:31:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2020-03-24T16:28:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2020-04-23T09:25:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2020-05-23T00:38:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2020-06-21T13:41:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2020-07-21T00:32:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1441,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2020-08-19T09:41:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2020-09-17T17:59:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2020-10-17T02:30:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2020-11-15T12:07:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2020-12-14T23:16:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2021-01-13T12:00:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2021-02-12T02:05:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2021-03-13T17:21:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2021-04-12T09:30:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2021-05-12T01:59:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2021-06-10T17:52:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2021-07-10T08:16:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1442,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2021-08-08T20:50:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2021-09-07T07:51:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2021-10-06T18:05:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2021-11-05T04:14:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2021-12-04T14:43:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2022-01-03T01:33:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2022-02-01T12:46:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2022-03-03T00:34:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2022-04-01T13:24:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2022-05-01T03:27:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2022-05-30T18:30:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2022-06-29T09:52:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1443,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2022-07-29T00:54:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2022-08-27T15:16:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2022-09-26T04:54:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2022-10-25T17:48:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2022-11-24T05:57:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2022-12-23T17:16:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2023-01-22T03:53:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2023-02-20T14:05:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2023-03-22T00:23:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2023-04-20T11:12:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2023-05-19T22:53:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2023-06-18T11:37:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1444,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2023-07-18T01:31:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2023-08-16T16:38:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2023-09-15T08:39:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2023-10-15T00:55:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2023-11-13T16:27:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2023-12-13T06:31:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2024-01-11T18:57:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2024-02-10T05:59:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2024-03-10T16:00:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2024-04-09T01:20:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2024-05-08T10:21:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2024-06-06T19:37:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1445,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2024-07-06T05:57:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2024-08-04T18:12:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2024-09-03T08:55:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2024-10-03T01:49:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2024-11-01T19:47:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2024-12-01T13:21:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2024-12-31T05:26:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2025-01-29T19:35:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2025-02-28T07:44:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2025-03-29T17:57:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2025-04-28T02:31:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2025-05-27T10:02:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1446,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2025-06-25T17:31:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2025-07-25T02:11:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2025-08-23T13:06:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2025-09-22T02:53:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2025-10-21T19:25:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2025-11-20T13:47:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2025-12-20T08:43:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2026-01-19T02:52:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2026-02-17T19:01:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2026-03-19T08:23:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2026-04-17T18:51:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2026-05-17T03:01:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1447,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2026-06-15T09:54:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2026-07-14T16:43:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2026-08-13T00:36:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2026-09-11T10:26:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2026-10-10T22:50:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2026-11-09T14:02:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2026-12-09T07:51:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2027-01-08T03:24:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2027-02-06T22:56:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2027-03-08T16:29:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2027-04-07T06:51:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2027-05-06T17:58:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1448,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2027-06-05T02:40:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2027-07-04T10:02:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2027-08-02T17:05:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2027-09-01T00:41:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2027-09-30T09:36:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2027-10-29T20:36:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2027-11-28T10:24:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2027-12-28T03:12:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2028-01-26T22:12:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2028-02-25T17:37:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2028-03-26T11:31:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2028-04-25T02:46:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1449,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2028-05-24T15:16:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2028-06-23T01:27:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2028-07-22T10:01:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2028-08-20T17:43:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2028-09-19T01:23:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2028-10-18T09:56:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2028-11-16T20:17:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2028-12-16T09:06:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2029-01-15T00:24:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2029-02-13T17:31:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2029-03-15T11:19:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2029-04-14T04:40:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1450,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2029-05-13T20:42:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2029-06-12T10:50:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2029-07-11T22:51:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2029-08-10T08:55:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2029-09-08T17:44:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2029-10-08T02:14:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2029-11-06T11:24:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2029-12-05T21:52:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2030-01-04T09:49:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2030-02-02T23:07:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2030-03-04T13:34:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2030-04-03T05:02:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1451,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2030-05-02T21:12:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2030-06-01T13:21:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2030-07-01T04:34:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2030-07-30T18:10:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2030-08-29T06:07:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2030-09-27T16:54:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2030-10-27T03:16:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2030-11-25T13:46:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2030-12-25T00:32:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2031-01-23T11:30:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2031-02-21T22:48:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2031-03-23T10:49:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1452,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2031-04-21T23:57:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2031-05-21T14:17:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2031-06-20T05:24:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2031-07-19T20:40:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2031-08-18T11:32:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2031-09-17T01:47:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2031-10-16T15:20:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2031-11-15T04:09:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2031-12-14T16:05:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2032-01-13T03:06:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2032-02-11T13:24:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2032-03-11T23:24:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1453,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2032-04-10T09:39:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2032-05-09T20:35:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2032-06-08T08:32:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2032-07-07T21:41:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2032-08-06T12:11:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2032-09-05T03:56:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2032-10-04T20:26:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2032-11-03T12:45:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2032-12-03T03:53:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2033-01-01T17:17:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2033-01-31T04:59:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2033-03-01T15:23:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1454,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2033-03-31T00:51:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2033-04-29T09:46:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2033-05-28T18:36:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2033-06-27T04:07:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2033-07-26T15:12:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2033-08-25T04:39:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2033-09-23T20:39:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2033-10-23T14:28:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2033-11-22T08:39:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2033-12-22T01:46:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2034-01-20T17:01:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2034-02-19T06:10:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1455,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2034-03-20T17:14:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2034-04-19T02:25:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2034-05-18T10:12:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2034-06-16T17:25:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2034-07-16T01:15:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2034-08-14T10:53:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2034-09-12T23:13:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2034-10-12T14:32:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2034-11-11T08:16:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2034-12-11T03:14:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2035-01-09T22:03:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2035-02-08T15:22:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1456,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2035-03-10T06:09:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2035-04-08T17:57:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2035-05-08T03:03:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2035-06-06T10:20:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2035-07-05T16:59:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2035-08-04T00:11:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2035-09-02T08:59:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2035-10-01T20:06:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2035-10-31T09:58:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2035-11-30T02:37:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2035-12-29T21:31:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2036-01-28T17:17:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1457,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2036-02-27T11:59:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2036-03-28T03:56:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2036-04-26T16:33:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2036-05-26T02:16:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2036-06-24T10:09:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2036-07-23T17:16:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2036-08-22T00:35:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2036-09-20T08:51:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2036-10-19T18:50:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2036-11-18T07:14:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2036-12-17T22:34:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2037-01-16T16:34:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1458,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2037-02-15T11:54:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2037-03-17T06:36:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2037-04-15T23:07:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2037-05-15T12:54:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2037-06-14T00:10:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2037-07-13T09:31:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2037-08-11T17:41:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2037-09-10T01:25:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2037-10-09T09:34:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2037-11-07T19:03:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2037-12-07T06:38:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2038-01-05T20:41:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1459,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2038-02-04T12:52:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2038-03-06T06:15:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2038-04-04T23:43:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2038-05-04T16:19:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2038-06-03T07:24:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2038-07-02T20:32:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2038-08-01T07:40:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2038-08-30T17:12:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2038-09-29T01:57:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2038-10-28T10:52:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2038-11-26T20:46:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2038-12-26T08:02:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1460,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2039-01-24T20:36:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2039-02-23T10:17:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2039-03-25T00:59:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2039-04-23T16:34:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2039-05-23T08:38:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2039-06-22T00:21:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2039-07-21T14:53:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2039-08-20T03:50:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2039-09-18T15:23:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2039-10-18T02:08:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2039-11-16T12:46:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2039-12-15T23:32:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1461,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2040-01-14T10:25:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2040-02-12T21:24:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2040-03-13T08:46:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2040-04-11T21:00:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2040-05-11T10:28:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2040-06-10T01:03:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2040-07-09T16:14:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2040-08-08T07:26:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2040-09-06T22:13:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2040-10-06T12:25:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2040-11-05T01:56:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2040-12-04T14:33:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1462,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2041-01-03T02:07:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2041-02-01T12:42:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2041-03-02T22:39:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2041-04-01T08:29:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2041-04-30T18:46:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2041-05-30T05:56:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2041-06-28T18:17:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2041-07-28T08:02:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2041-08-26T23:16:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2041-09-25T15:41:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2041-10-25T08:30:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2041-11-24T00:36:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1463,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2041-12-23T15:06:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2042-01-22T03:42:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2042-02-20T14:38:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2042-03-22T00:23:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2042-04-20T09:19:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2042-05-19T17:54:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2042-06-18T02:48:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2042-07-17T12:51:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2042-08-16T01:01:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2042-09-14T15:50:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2042-10-14T09:03:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2042-11-13T03:28:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1464,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2042-12-12T21:29:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2043-01-11T13:53:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2043-02-10T04:07:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2043-03-11T16:09:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2043-04-10T02:06:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2043-05-09T10:21:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2043-06-07T17:35:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2043-07-07T00:50:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2043-08-05T09:22:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2043-09-03T20:17:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2043-10-03T10:12:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2043-11-02T02:57:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1465,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2043-12-01T21:37:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2043-12-31T16:48:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2044-01-30T11:04:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2044-02-29T03:12:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2044-03-29T16:26:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2044-04-28T02:42:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2044-05-27T10:39:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2044-06-25T17:24:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2044-07-25T00:10:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2044-08-23T08:06:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2044-09-21T18:03:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2044-10-21T06:36:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1466,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2044-11-19T21:57:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2044-12-19T15:53:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2045-01-18T11:25:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2045-02-17T06:51:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2045-03-19T00:15:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2045-04-17T14:26:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2045-05-17T01:26:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2045-06-15T10:04:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2045-07-14T17:28:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2045-08-13T00:39:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2045-09-11T08:27:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2045-10-10T17:36:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1467,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2045-11-09T04:48:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2045-12-08T18:41:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2046-01-07T11:24:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2046-02-06T06:09:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2046-03-08T01:15:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2046-04-06T18:51:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2046-05-06T09:56:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2046-06-04T22:22:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2046-07-04T08:38:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2046-08-02T17:25:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2046-09-01T01:25:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2046-09-30T09:25:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1468,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2046-10-29T18:17:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2046-11-28T04:50:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2046-12-27T17:39:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2047-01-26T08:43:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2047-02-25T01:26:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2047-03-26T18:44:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2047-04-25T11:40:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2047-05-25T03:27:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2047-06-23T17:35:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2047-07-23T05:49:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2047-08-21T16:16:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2047-09-20T01:31:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1469,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2047-10-19T10:27:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2047-11-17T19:59:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2047-12-17T06:38:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2048-01-15T18:32:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2048-02-14T07:31:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2048-03-14T21:27:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2048-04-13T12:19:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2048-05-13T03:58:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2048-06-11T19:50:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2048-07-11T11:04:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2048-08-10T00:59:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2048-09-08T13:24:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1470,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2048-10-08T00:45:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2048-11-06T11:38:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2048-12-05T22:30:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2049-01-04T09:24:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2049-02-02T20:15:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2049-03-04T07:11:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2049-04-02T18:39:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2049-05-02T07:11:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2049-05-31T21:00:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2049-06-30T11:50:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2049-07-30T03:07:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2049-08-28T18:18:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1471,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2049-09-27T09:05:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2049-10-26T23:15:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2049-11-25T12:35:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2049-12-25T00:51:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2050-01-23T11:57:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2050-02-21T22:03:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2050-03-23T07:40:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2050-04-21T17:25:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2050-05-21T03:51:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2050-06-19T15:21:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2050-07-19T04:16:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2050-08-17T18:47:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1472,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2050-09-16T10:49:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2050-10-16T03:48:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2050-11-14T20:41:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2050-12-14T12:18:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2051-01-13T01:58:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2051-02-11T13:41:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2051-03-12T23:52:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2051-04-11T08:59:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2051-05-10T17:29:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2051-06-09T01:56:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2051-07-08T11:09:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2051-08-06T22:05:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1473,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2051-09-05T11:33:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2051-10-05T03:47:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2051-11-03T21:59:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2051-12-03T16:37:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2052-01-02T10:05:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2052-02-01T01:30:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2052-03-01T14:35:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2052-03-31T01:27:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2052-04-29T10:20:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2052-05-28T17:50:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2052-06-27T00:50:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2052-07-26T08:31:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1474,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2052-08-24T18:06:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2052-09-23T06:32:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2052-10-22T22:03:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2052-11-21T16:02:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2052-12-21T11:15:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2053-01-20T06:12:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2053-02-18T23:31:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2053-03-20T14:11:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2053-04-19T01:48:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2053-05-18T10:43:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2053-06-16T17:51:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2053-07-16T00:26:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1475,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2053-08-14T07:41:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2053-09-12T16:36:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2053-10-12T03:53:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2053-11-10T17:55:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2053-12-10T10:40:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2054-01-09T05:34:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2054-02-08T01:14:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2054-03-09T19:46:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2054-04-08T11:32:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2054-05-08T00:00:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2054-06-06T09:40:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2054-07-05T17:34:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1476,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2054-08-04T00:48:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2054-09-02T08:18:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2054-10-01T16:49:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2054-10-31T03:01:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2054-11-29T15:33:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2054-12-29T06:52:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2055-01-28T00:39:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2055-02-26T19:39:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2055-03-28T14:01:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2055-04-27T06:17:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2055-05-26T19:57:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2055-06-25T07:15:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1477,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2055-07-24T16:48:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2055-08-23T01:15:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2055-09-21T09:19:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2055-10-20T17:49:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2055-11-19T03:34:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2055-12-18T15:15:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2056-01-17T05:11:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2056-02-15T21:00:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2056-03-16T13:52:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2056-04-15T06:50:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2056-05-14T23:06:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2056-06-13T14:04:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1478,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2056-07-13T03:20:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2056-08-11T14:48:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2056-09-10T00:47:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2056-10-09T10:00:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2056-11-07T19:21:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2056-12-07T05:31:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2057-01-05T16:49:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2057-02-04T05:10:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2057-03-05T18:25:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2057-04-04T08:31:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2057-05-03T23:32:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2057-06-02T15:11:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1479,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2057-07-02T06:47:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2057-07-31T21:32:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2057-08-30T10:54:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2057-09-28T23:00:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2057-10-28T10:19:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2057-11-26T21:22:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2057-12-26T08:22:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2058-01-24T19:14:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2058-02-23T05:57:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2058-03-24T16:50:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2058-04-23T04:29:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2058-05-22T17:23:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1480,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2058-06-21T07:35:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2058-07-20T22:40:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2058-08-19T14:03:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2058-09-18T05:17:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2058-10-17T20:05:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2058-11-16T10:09:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2058-12-15T23:12:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2059-01-14T10:57:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2059-02-12T21:27:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2059-03-14T07:05:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2059-04-12T16:29:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2059-05-12T02:15:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1481,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2059-06-10T12:57:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2059-07-10T00:59:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2059-08-08T14:38:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2059-09-07T06:01:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2059-10-06T22:50:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2059-11-05T16:11:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2059-12-05T08:49:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2060-01-03T23:40:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2060-02-02T12:23:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2060-03-02T23:12:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2060-04-01T08:38:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2060-04-30T17:11:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1482,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2060-05-30T01:23:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2060-06-28T09:58:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2060-07-27T19:50:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2060-08-26T07:56:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2060-09-24T22:53:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2060-10-24T16:26:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2060-11-23T11:16:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2060-12-23T05:40:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2061-01-21T22:16:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2061-02-20T12:31:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2061-03-22T00:23:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2061-04-20T10:05:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1483,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2061-05-19T18:03:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2061-06-18T01:03:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2061-07-17T08:10:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2061-08-15T16:39:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2061-09-14T03:37:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2061-10-13T17:41:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2061-11-12T10:40:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2061-12-12T05:33:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2062-01-11T00:53:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2062-02-09T19:11:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2062-03-11T11:13:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2062-04-10T00:17:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1484,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2062-05-09T10:23:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2062-06-07T18:12:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2062-07-07T00:53:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2062-08-05T07:40:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2062-09-03T15:42:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2062-10-03T01:50:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2062-11-01T14:33:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2062-12-01T06:01:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2062-12-30T23:57:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2063-01-29T19:23:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2063-02-28T14:38:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2063-03-30T07:50:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1485,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2063-04-28T21:52:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2063-05-28T08:47:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2063-06-26T17:26:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2063-07-26T00:55:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2063-08-24T08:18:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2063-09-22T16:22:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2063-10-22T01:46:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2063-11-20T13:09:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2063-12-20T03:04:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2064-01-18T19:37:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2064-02-17T14:03:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2064-03-18T08:45:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1486,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2064-04-17T02:02:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2064-05-16T16:55:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2064-06-15T05:21:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2064-07-14T15:46:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2064-08-13T00:49:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2064-09-11T09:11:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2064-10-10T17:34:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2064-11-09T02:45:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2064-12-08T13:29:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2065-01-07T02:15:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2065-02-05T17:02:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2065-03-07T09:15:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1487,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2065-04-06T02:01:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2065-05-05T18:31:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2065-06-04T10:05:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2065-07-04T00:16:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2065-08-02T12:46:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2065-08-31T23:40:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2065-09-30T09:24:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2065-10-29T18:49:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2065-11-28T04:40:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2065-12-27T15:28:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2066-01-26T03:14:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2066-02-24T15:51:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1488,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2066-03-26T05:14:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2066-04-24T19:30:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2066-05-24T10:39:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2066-06-23T02:16:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2066-07-22T17:34:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2066-08-21T07:50:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2066-09-19T20:48:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2066-10-19T08:43:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2066-11-17T20:06:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2066-12-17T07:18:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2067-01-15T18:17:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2067-02-14T04:58:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1489,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2067-03-15T15:29:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2067-04-14T02:24:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2067-05-13T14:21:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2067-06-12T03:41:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2067-07-11T18:16:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2067-08-10T09:37:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2067-09-09T01:09:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2067-10-08T16:28:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2067-11-07T07:14:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2067-12-06T21:05:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2068-01-05T09:38:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2068-02-03T20:45:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1490,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2068-03-04T06:38:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2068-04-02T15:52:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2068-05-02T01:07:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2068-05-31T11:04:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2068-06-29T22:12:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2068-07-29T10:55:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2068-08-28T01:29:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2068-09-26T17:49:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2068-10-26T11:17:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2068-11-25T04:42:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2068-12-24T20:45:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2069-01-23T10:37:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1491,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2069-02-21T22:17:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2069-03-23T08:13:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2069-04-21T16:59:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2069-05-21T01:06:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2069-06-19T09:14:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2069-07-18T18:13:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2069-08-17T05:03:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2069-09-15T18:36:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2069-10-15T11:04:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2069-11-14T05:38:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2069-12-14T00:38:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2070-01-12T18:23:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1492,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2070-02-11T09:53:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2070-03-12T22:53:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2070-04-11T09:31:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2070-05-10T18:09:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2070-06-09T01:25:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2070-07-08T08:15:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2070-08-06T15:52:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2070-09-05T01:29:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2070-10-04T14:02:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2070-11-03T05:43:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2070-12-02T23:54:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2071-01-01T19:16:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1493,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2071-01-31T14:16:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2071-03-02T07:32:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2071-03-31T22:04:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2071-04-30T09:31:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2071-05-29T18:17:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2071-06-28T01:21:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2071-07-27T07:57:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2071-08-25T15:17:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2071-09-24T00:22:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2071-10-23T11:50:00",
+      "hari_pasaran": "Jumat Wage"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2071-11-22T02:00:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2071-12-21T18:47:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1494,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2072-01-20T13:35:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2072-02-19T09:04:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2072-03-20T03:22:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2072-04-18T18:57:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2072-05-18T07:19:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2072-06-16T16:58:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2072-07-16T00:56:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2072-08-14T08:21:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2072-09-12T16:07:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2072-10-12T00:56:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2072-11-10T11:22:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2072-12-09T23:59:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1495,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2073-01-08T15:11:00",
+      "hari_pasaran": "Ahad Pahing"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2073-02-07T08:41:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2073-03-09T03:16:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2073-04-07T21:14:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2073-05-07T13:16:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2073-06-06T02:52:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2073-07-05T14:17:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2073-08-04T00:04:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2073-09-02T08:53:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2073-10-01T17:22:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2073-10-31T02:13:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2073-11-29T12:12:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1496,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2073-12-28T23:56:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2074-01-27T13:38:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2074-02-26T05:01:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2074-03-27T21:20:00",
+      "hari_pasaran": "Selasa Kliwon"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2074-04-26T13:48:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2074-05-26T05:45:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2074-06-24T20:39:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2074-07-24T10:07:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2074-08-22T22:00:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2074-09-21T08:29:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2074-10-20T18:12:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2074-11-19T03:56:00",
+      "hari_pasaran": "Senin Pahing"
+    },
+    {
+      "tahun_h": 1497,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2074-12-18T14:20:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2075-01-17T01:37:00",
+      "hari_pasaran": "Kamis Legi"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2075-02-15T13:41:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2075-03-17T02:26:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2075-04-15T15:56:00",
+      "hari_pasaran": "Senin Wage"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2075-05-15T06:23:00",
+      "hari_pasaran": "Rabu Wage"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2075-06-13T21:40:00",
+      "hari_pasaran": "Kamis Pon"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2075-07-13T13:12:00",
+      "hari_pasaran": "Sabtu Pon"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2075-08-12T04:11:00",
+      "hari_pasaran": "Senin Pon"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2075-09-10T18:03:00",
+      "hari_pasaran": "Selasa Pahing"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2075-10-10T06:44:00",
+      "hari_pasaran": "Kamis Pahing"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2075-11-08T18:36:00",
+      "hari_pasaran": "Jumat Legi"
+    },
+    {
+      "tahun_h": 1498,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2075-12-08T06:04:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2076-01-06T17:15:00",
+      "hari_pasaran": "Senin Kliwon"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2076-02-05T04:02:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2076-03-05T14:25:00",
+      "hari_pasaran": "Kamis Wage"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2076-04-04T00:48:00",
+      "hari_pasaran": "Sabtu Wage"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2076-05-03T11:52:00",
+      "hari_pasaran": "Ahad Pon"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2076-06-02T00:15:00",
+      "hari_pasaran": "Selasa Pon"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2076-07-01T14:05:00",
+      "hari_pasaran": "Rabu Pahing"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2076-07-31T05:06:00",
+      "hari_pasaran": "Jumat Pahing"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2076-08-29T20:44:00",
+      "hari_pasaran": "Sabtu Legi"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2076-09-28T12:28:00",
+      "hari_pasaran": "Senin Legi"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2076-10-28T03:51:00",
+      "hari_pasaran": "Rabu Legi"
+    },
+    {
+      "tahun_h": 1499,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2076-11-26T18:29:00",
+      "hari_pasaran": "Kamis Kliwon"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 1,
+      "nama_bulan_h": "Muharram",
+      "ijtimak_wib": "2076-12-26T07:54:00",
+      "hari_pasaran": "Sabtu Kliwon"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 2,
+      "nama_bulan_h": "Safar",
+      "ijtimak_wib": "2077-01-24T19:46:00",
+      "hari_pasaran": "Ahad Wage"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 3,
+      "nama_bulan_h": "Rabiul Awwal",
+      "ijtimak_wib": "2077-02-23T06:07:00",
+      "hari_pasaran": "Selasa Wage"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 4,
+      "nama_bulan_h": "Rabiul Akhir",
+      "ijtimak_wib": "2077-03-24T15:25:00",
+      "hari_pasaran": "Rabu Pon"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 5,
+      "nama_bulan_h": "Jumadil Awwal",
+      "ijtimak_wib": "2077-04-23T00:21:00",
+      "hari_pasaran": "Jumat Pon"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 6,
+      "nama_bulan_h": "Jumadil Akhir",
+      "ijtimak_wib": "2077-05-22T09:38:00",
+      "hari_pasaran": "Sabtu Pahing"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 7,
+      "nama_bulan_h": "Rajab",
+      "ijtimak_wib": "2077-06-20T19:56:00",
+      "hari_pasaran": "Ahad Legi"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 8,
+      "nama_bulan_h": "Sya'ban",
+      "ijtimak_wib": "2077-07-20T07:42:00",
+      "hari_pasaran": "Selasa Legi"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 9,
+      "nama_bulan_h": "Ramadhan",
+      "ijtimak_wib": "2077-08-18T21:18:00",
+      "hari_pasaran": "Rabu Kliwon"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 10,
+      "nama_bulan_h": "Syawal",
+      "ijtimak_wib": "2077-09-17T12:54:00",
+      "hari_pasaran": "Jumat Kliwon"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 11,
+      "nama_bulan_h": "Dzulqa'dah",
+      "ijtimak_wib": "2077-10-17T06:08:00",
+      "hari_pasaran": "Ahad Kliwon"
+    },
+    {
+      "tahun_h": 1500,
+      "bulan_h": 12,
+      "nama_bulan_h": "Dzulhijjah",
+      "ijtimak_wib": "2077-11-16T00:01:00",
+      "hari_pasaran": "Selasa Kliwon"
+    }
+  ]
+}

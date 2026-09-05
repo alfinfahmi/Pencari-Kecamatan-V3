@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'models/custom_point_model.dart';
 import 'screens/splash_screen.dart';
 import 'services/adzan_notification_service.dart';
+import 'services/hijri_service.dart';
 import 'services/supabase_service.dart';
 import 'theme/app_theme.dart';
 
@@ -34,6 +35,12 @@ void main() async {
   // Hanya menyiapkan plugin, TIDAK menyalakan notifikasi apa pun --
   // default tetap mati sampai pengguna aktifkan sendiri lewat pengaturan.
   await AdzanNotificationService.instance.initialize();
+
+  // Muat tabel ijtimak resmi Lirboyo ke cache memori (dipakai HijriService
+  // sebagai sumber utama, fallback ke formula kalau di luar rentang
+  // 1440H-1500H). Kalau gagal dimuat, aplikasi tetap jalan normal lewat
+  // fallback formula -- tidak crash.
+  await HijriService.muatTabelIjtimak();
 
   runApp(const PencariKecamatanApp());
 }

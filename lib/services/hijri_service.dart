@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/services.dart' show rootBundle;
 
 /// Hasil penentuan tanggal Hijriah untuk satu tanggal Masehi.
 class TanggalHijriah {
@@ -26,10 +28,13 @@ class TanggalHijriah {
 /// Engine hisab Hijriah lengkap, disusun dari DUA sumber yang saling
 /// tervalidasi:
 ///
-/// 1. Waktu ijtimak: formula dari file "As_Syahru_fixed.xlsx" milik
-///    pengguna (varian rumus Jean Meeus untuk konjungsi/New Moon). Sudah
-///    diverifikasi cocok (selisih ~3 menit) dengan Tabel Ijtimak resmi
-///    Lajnah Falakiyah Ma'had 'Aly Lirboyo untuk contoh yang sama-sama diuji.
+/// 1. Waktu ijtimak: DIUTAMAKAN dari Tabel Ijtimak resmi Lajnah Falakiyah
+///    Ma'had 'Aly Lirboyo (1440H-1500H, data pasti institusi sendiri --
+///    lihat assets/data/tabel_ijtimak.json). Kalau tahun yang dicari di
+///    LUAR rentang itu (kasus sangat jarang), otomatis fallback ke
+///    formula dari file "As_Syahru_fixed.xlsx" (varian rumus Jean Meeus
+///    untuk konjungsi/New Moon) -- sudah diverifikasi cocok (selisih ~3
+///    menit) dengan tabel di atas untuk contoh yang sama-sama diuji.
 ///
 /// 2. Tinggi hilal & keputusan awal bulan: posisi bulan dihitung dengan
 ///    algoritma Meeus (Astronomical Algorithms, bab 47, presisi rendah
@@ -57,6 +62,32 @@ class HijriService {
     9: 'Ramadhan', 10: 'Syawal', 11: "Dzulqa'dah", 12: 'Dzulhijjah',
   };
 
+  // Cache tabel ijtimak di memori -- dimuat sekali via [muatTabelIjtimak]
+  // saat aplikasi start (lihat main.dart), supaya seluruh method di bawah
+  // TETAP synchronous (dipanggil berulang dalam loop pencarian bulan di
+  // [konversi]) tanpa perlu diubah jadi async satu-satu.
+  static Map<String, String>? _tabelIjtimak;
+
+  /// Muat tabel ijtimak dari assets ke cache memori. Aman dipanggil
+  /// berkali-kali (no-op kalau sudah termuat). Kalau GAGAL dimuat (mis.
+  /// file rusak/tidak ada), diam-diam dilewati -- seluruh method tetap
+  /// berfungsi normal via fallback formula As-Syahru, TIDAK crash.
+  static Future<void> muatTabelIjtimak() async {
+    if (_tabelIjtimak != null) return;
+    try {
+      final raw = await rootBundle.loadString('assets/data/tabel_ijtimak.json');
+      final jsonMap = json.decode(raw) as Map<String, dynamic>;
+      final data = (jsonMap['data'] as List).cast<Map<String, dynamic>>();
+      final map = <String, String>{};
+      for (final e in data) {
+        map['${e['tahun_h']}_${e['bulan_h']}'] = e['ijtimak_wib'] as String;
+      }
+      _tabelIjtimak = map;
+    } catch (_) {
+      _tabelIjtimak = {}; // tetap tandai "sudah dicoba", biar tidak retry tiap panggilan
+    }
+  }
+
   static double _sind(double x) => sin(x * pi / 180);
   static double _cosd(double x) => cos(x * pi / 180);
   static double _tand(double x) => tan(x * pi / 180);
@@ -74,7 +105,48 @@ class HijriService {
   /// alasan konsistensi/keamanan yang sama seperti [_mod].
   static int _modInt(int a, int b) => a - b * (a / b).floor();
 
+  /// Cari ijtimak di tabel resmi, kalau ada. PENTING: konvensi penomoran
+  /// bulan tabel BEDA SATU ANGKA dari parameter (tahunH, bulanH) di sini
+  /// -- (tahunH, bulanH) merujuk "ijtimak yang MENGAWALI bulan bulanH"
+  /// (konvensi As-Syahru), sedangkan tabel menyimpan "ijtimak yang
+  /// MENGAKHIRI bulan_h" (konvensi Lirboyo). Sudah diverifikasi silang
+  /// sebelumnya: As-Syahru(Y, N) == Tabel(Y, N-1), dengan wrap tahun kalau
+  /// N=1 (jadi Tabel(Y-1, 12)).
+  static double? _ijtimakJdeDariTabel(int tahunH, int bulanH) {
+    final tabel = _tabelIjtimak;
+    if (tabel == null || tabel.isEmpty) return null;
+
+    final int tahunTabel;
+    final int bulanTabel;
+    if (bulanH == 1) {
+      tahunTabel = tahunH - 1;
+      bulanTabel = 12;
+    } else {
+      tahunTabel = tahunH;
+      bulanTabel = bulanH - 1;
+    }
+
+    final wibIso = tabel['${tahunTabel}_$bulanTabel'];
+    if (wibIso == null) return null;
+
+    // Tabel disimpan sebagai waktu WIB (UTC+7) apa adanya -- konversi ke
+    // JDE (UT) supaya sama persis representasinya dengan hasil formula
+    // As-Syahru di bawah (keduanya dikonsumsi lewat _jdeToDateTimeUtc).
+    final wibDt = DateTime.parse(wibIso);
+    final utcDt = wibDt.subtract(const Duration(hours: 7));
+    return 2451544.5 + utcDt.difference(DateTime.utc(2000, 1, 1)).inMicroseconds / (86400 * 1000000);
+  }
+
   static double _ijtimakJde(int tahunH, int bulanH) {
+    final dariTabel = _ijtimakJdeDariTabel(tahunH, bulanH);
+    if (dariTabel != null) return dariTabel;
+    return _ijtimakJdeFormula(tahunH, bulanH);
+  }
+
+  /// Fallback: rumus As-Syahru (varian Meeus) -- dipakai HANYA kalau
+  /// (tahunH, bulanH) di luar rentang tabel (1440H-1500H), kasus yang
+  /// sangat jarang terjadi dalam pemakaian normal aplikasi.
+  static double _ijtimakJdeFormula(int tahunH, int bulanH) {
     final a8 = (tahunH + 29.530589 * (bulanH - 1) / 354.367068 - 1410) * 12;
     final b8 = a8 / 1200;
     final c8 = 2447740.652 + 29.530589 * a8 + 0.0001178 * b8 * b8;
