@@ -367,7 +367,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     final ijtimakWib = HijriService.parseWibSebagaiUtc(e['ijtimak_wib'] as String);
     final lokasi = _lokasi;
 
-    ({bool memenuhi, double tinggiHilal, double elongasi})? hilal;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilal;
     if (lokasi != null && lokasi.utcOffset != null) {
       hilal = HijriService.hitungKeadaanHilalPadaIjtimak(
         ijtimakWib: ijtimakWib,
