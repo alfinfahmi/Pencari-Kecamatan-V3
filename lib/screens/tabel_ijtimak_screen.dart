@@ -23,6 +23,21 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   String? _error;
   int? _tahunSekarangPerkiraan;
 
+  final _tahunController = TextEditingController();
+  int? _bulanFilter; // null = semua bulan
+
+  static const _namaBulanHijriah = {
+    1: 'Muharram', 2: 'Safar', 3: 'Rabiul Awwal', 4: 'Rabiul Akhir',
+    5: 'Jumadil Awwal', 6: 'Jumadil Akhir', 7: 'Rajab', 8: "Sya'ban",
+    9: 'Ramadhan', 10: 'Syawal', 11: "Dzulqa'dah", 12: 'Dzulhijjah',
+  };
+
+  @override
+  void dispose() {
+    _tahunController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -105,19 +120,63 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Data resmi Lajnah Falakiyah Ma'had 'Aly Lirboyo. Murni referensi -- "
-                    'perhitungan Hijriah aplikasi ini (badge tanggal, jadwal shalat) memakai '
-                    'rumus live terpisah, jadi bisa berbeda beberapa menit dari tabel ini '
-                    '(sama-sama sahih, cuma metode berbeda).',
+                    "Data Lajnah Falakiyah Ma'had 'Aly Lirboyo. Murni referensi -- "
+                    'perhitungan Data Hijriah aplikasi ini (badge tanggal, jadwal shalat) memakai '
+                    'rumus live terpisah, jadi bisa berbeda beberapa menit dari tabel ini',
                     style: AppTypography.captionEdu(color: Colors.grey.shade600),
                   ),
                 ],
               ),
             ),
+            _buildKotakPencarian(),
             Expanded(child: _buildBody()),
             const WatermarkFooter(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildKotakPencarian() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: TextField(
+              controller: _tahunController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Tahun H', isDense: true, hintText: 'mis. 1448'),
+              onChanged: (_) => setState(() {}),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 3,
+            child: DropdownButtonFormField<int?>(
+              initialValue: _bulanFilter,
+              decoration: const InputDecoration(labelText: 'Bulan', isDense: true),
+              items: [
+                const DropdownMenuItem<int?>(value: null, child: Text('Semua Bulan')),
+                ..._namaBulanHijriah.entries
+                    .map((e) => DropdownMenuItem<int?>(value: e.key, child: Text(e.value, overflow: TextOverflow.ellipsis))),
+              ],
+              onChanged: (v) => setState(() => _bulanFilter = v),
+            ),
+          ),
+          if (_tahunController.text.isNotEmpty || _bulanFilter != null) ...[
+            const SizedBox(width: 4),
+            IconButton(
+              icon: const Icon(Icons.close_rounded),
+              tooltip: 'Reset filter',
+              onPressed: () => setState(() {
+                _tahunController.clear();
+                _bulanFilter = null;
+              }),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -130,20 +189,39 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final tahunList = _perTahun!.keys.toList()..sort();
+    final tahunFilter = int.tryParse(_tahunController.text.trim());
+    var tahunList = _perTahun!.keys.toList()..sort();
+    if (tahunFilter != null) {
+      tahunList = tahunList.where((t) => t == tahunFilter).toList();
+    }
+
+    if (tahunList.isEmpty) {
+      return Center(
+        child: Text(
+          _tahunController.text.trim().isEmpty
+              ? 'Tidak ditemukan'
+              : 'Tahun $tahunFilter di luar rentang tabel (1440H-1500H)',
+          style: TextStyle(color: Colors.grey.shade500),
+        ),
+      );
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       itemCount: tahunList.length,
       itemBuilder: (context, index) {
         final tahun = tahunList[index];
-        final entries = _perTahun![tahun]!..sort((a, b) => (a['bulan_h'] as int).compareTo(b['bulan_h'] as int));
+        var entries = _perTahun![tahun]!..sort((a, b) => (a['bulan_h'] as int).compareTo(b['bulan_h'] as int));
+        if (_bulanFilter != null) {
+          entries = entries.where((e) => e['bulan_h'] == _bulanFilter).toList();
+        }
+        final sedangMencari = tahunFilter != null || _bulanFilter != null;
         final iniTahunSekarang = tahun == _tahunSekarangPerkiraan;
 
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           child: ExpansionTile(
-            initiallyExpanded: iniTahunSekarang,
+            initiallyExpanded: iniTahunSekarang || sedangMencari,
             title: Row(
               children: [
                 Text('$tahun H', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),

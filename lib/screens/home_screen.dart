@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import '../main.dart' show themeModeNotifier;
 import '../models/kecamatan_model.dart';
 import '../models/custom_point_model.dart';
 import '../services/app_data_service.dart';
 import '../services/favorite_service.dart';
 import '../services/custom_point_service.dart';
+import '../services/reverse_geocode_helper.dart';
 import '../services/supabase_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/kecamatan_card.dart';
 import '../widgets/home_prayer_widget.dart';
 import '../widgets/watermark_footer.dart';
+import 'detail_screen.dart';
 import 'moderation_panel_screen.dart';
 import 'adzan_settings_screen.dart';
 import 'tabel_ijtimak_screen.dart';
@@ -195,15 +198,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.calendar_view_month_rounded),
-            tooltip: 'Tabel Ijtimak',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const TabelIjtimakScreen()),
-              );
-            },
-          ),
           ValueListenableBuilder<ThemeMode>(
             valueListenable: themeModeNotifier,
             builder: (context, mode, _) {
@@ -245,6 +239,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 // posisinya bergeser.
                 if (_tab == _Tab.pencarian && !_sudahMencari)
                   SliverToBoxAdapter(key: const ValueKey('prayer_widget'), child: const HomePrayerWidget()),
+                if (_tab == _Tab.pencarian && !_sudahMencari)
+                  SliverToBoxAdapter(key: const ValueKey('menu_cepat'), child: _buildMenuCepat(isDark)),
                 if (_tab == _Tab.pencarian)
                   SliverToBoxAdapter(key: const ValueKey('search_card'), child: _buildSearchCard(isDark)),
                 SliverToBoxAdapter(key: const ValueKey('tab_bar'), child: _buildTabBar()),
@@ -275,6 +271,127 @@ class _HomeScreenState extends State<HomeScreen> {
   /// ringkas terpisah), Flutter akan MEMBONGKAR & MEMBUAT ULANG elemen
   /// TextField-nya saat berpindah mode -- itulah yang menyebabkan
   /// keyboard tertutup sendiri tiap kali mulai mengetik huruf pertama.
+  bool _memuatMenuLokasi = false;
+
+  /// Ambil lokasi GPS (dengan fallback nama tempat berlapis, lihat
+  /// reverse_geocode_helper.dart), lalu buka DetailScreen langsung ke
+  /// bagian yang diminta. Dipakai tombol "Waktu Shalat" & "Data
+  /// Geografis" di menu cepat Home.
+  Future<void> _bukaDetailDenganGps(DetailSection section) async {
+    if (_memuatMenuLokasi) return;
+    setState(() => _memuatMenuLokasi = true);
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Izin lokasi ditolak -- tidak bisa mengambil GPS')),
+          );
+        }
+        return;
+      }
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Aktifkan layanan lokasi (GPS) di perangkat Anda')),
+          );
+        }
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition();
+      final utcOffsetJam = DateTime.now().timeZoneOffset.inHours;
+      final namaZona = switch (utcOffsetJam) {
+        7 => 'WIB',
+        8 => 'WITA',
+        9 => 'WIT',
+        _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
+      };
+      final lokasi = await lengkapiInfoLokasiGps(
+        lat: pos.latitude,
+        lng: pos.longitude,
+        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
+        zonaWaktu: namaZona,
+        utcOffset: utcOffsetJam,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => DetailScreen(data: lokasi, initialSection: section)),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil lokasi GPS: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _memuatMenuLokasi = false);
+    }
+  }
+
+  /// Menu cepat Home: Waktu Shalat & Data Geografis (berbasis lokasi GPS
+  /// saat ini) + Daftar Ijtimak (tidak perlu lokasi, tabel resmi Lirboyo).
+  Widget _buildMenuCepat(bool isDark) {
+    Widget tile({required IconData icon, required String label, required VoidCallback onTap}) {
+      return Expanded(
+        child: InkWell(
+          onTap: _memuatMenuLokasi ? null : onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: isDark ? Colors.white12 : Colors.black.withOpacity(0.06)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_memuatMenuLokasi)
+                  const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2))
+                else
+                  Icon(icon, color: AppColors.emerald, size: 22),
+                const SizedBox(height: 6),
+                Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 6, 14, 2),
+      child: Row(
+        children: [
+          tile(
+            icon: Icons.access_time_rounded,
+            label: 'Waktu\nShalat',
+            onTap: () => _bukaDetailDenganGps(DetailSection.waktuShalat),
+          ),
+          const SizedBox(width: 8),
+          tile(
+            icon: Icons.public_rounded,
+            label: 'Data\nGeografis',
+            onTap: () => _bukaDetailDenganGps(DetailSection.geografis),
+          ),
+          const SizedBox(width: 8),
+          tile(
+            icon: Icons.calendar_view_month_rounded,
+            label: 'Daftar\nIjtimak',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TabelIjtimakScreen()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSearchCard(bool isDark) {
     return Container(
       margin: EdgeInsets.fromLTRB(14, _sudahMencari ? 10 : 8, 14, _sudahMencari ? 6 : 4),
