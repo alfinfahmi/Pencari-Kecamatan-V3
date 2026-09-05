@@ -629,12 +629,9 @@ class _DetailScreenState extends State<DetailScreen> {
       lng: data.lng,
       utcOffset: data.utcOffset!,
     );
-    return Tooltip(
-      message: 'Perkiraan hisab (ijtimak + tinggi hilal, kriteria MABIMS 2021: '
-          'tinggi hilal ≥3°, elongasi ≥6.4°). Bisa berbeda 1 hari dari '
-          'penetapan resmi (sidang isbat/rukyatul hilal sungguhan) — bukan '
-          'untuk kepastian awal bulan ibadah.'
-          '${hijri.istikmal ? ' Bulan sebelumnya istikmal (30 hari).' : ''}',
+    return InkWell(
+      onTap: () => _tampilkanDetailHilal(hijri),
+      borderRadius: BorderRadius.circular(6),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -643,6 +640,81 @@ class _DetailScreenState extends State<DetailScreen> {
           Text(
             '${hijri.label} *',
             style: AppTypography.bodyMd(color: Colors.grey.shade500).copyWith(fontSize: 11.5),
+          ),
+          const SizedBox(width: 2),
+          Icon(Icons.info_outline_rounded, size: 12, color: Colors.grey.shade400),
+        ],
+      ),
+    );
+  }
+
+  void _tampilkanDetailHilal(TanggalHijriah hijri) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Detail Keadaan Hilal'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _barisDetailHilal('Awal bulan (perkiraan)', hijri.label),
+            _barisDetailHilal(
+              'Waktu ijtimak',
+              '${hijri.ijtimakAwalBulan.day}/${hijri.ijtimakAwalBulan.month}/${hijri.ijtimakAwalBulan.year} '
+              '${hijri.ijtimakAwalBulan.hour.toString().padLeft(2, '0')}:${hijri.ijtimakAwalBulan.minute.toString().padLeft(2, '0')} WIB',
+            ),
+            _barisDetailHilal('Tinggi hilal saat maghrib', '${hijri.tinggiHilalDerajat.toStringAsFixed(2)}°'),
+            _barisDetailHilal('Elongasi (jarak bulan-matahari)', '${hijri.elongasiDerajat.toStringAsFixed(2)}°'),
+            const Divider(height: 20),
+            _barisDetailHilal('Kriteria MABIMS 2021', 'Tinggi hilal ≥3°, elongasi ≥6.4°'),
+            Row(
+              children: [
+                Icon(
+                  hijri.mabimsTerpenuhi ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  size: 16,
+                  color: hijri.mabimsTerpenuhi ? AppColors.emerald : Colors.red,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  hijri.mabimsTerpenuhi ? 'Kriteria terpenuhi' : 'Kriteria TIDAK terpenuhi (istikmal)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: hijri.mabimsTerpenuhi ? AppColors.emerald : Colors.red,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                'Presisi posisi bulan di sini presisi rendah (~±0.3°). Untuk tanggal "tipis" '
+                '(nilai dekat ambang), hasil bisa berbeda dari penetapan resmi sidang isbat, '
+                'yang juga mempertimbangkan laporan rukyat lapangan sungguhan.',
+                style: TextStyle(fontSize: 11, color: Colors.grey.shade600, height: 1.4),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Tutup')),
+        ],
+      ),
+    );
+  }
+
+  Widget _barisDetailHilal(String label, String nilai) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(flex: 5, child: Text(label, style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600))),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 4,
+            child: Text(nilai, textAlign: TextAlign.right, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
           ),
         ],
       ),

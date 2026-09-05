@@ -11,6 +11,11 @@ class TanggalHijriah {
   final DateTime ijtimakAwalBulan;
   final DateTime awalBulanMasehi;
   final bool istikmal;
+  /// Tinggi hilal (derajat) saat maghrib pada hari ijtimak awal bulan ini
+  /// -- dipakai untuk detail "Keadaan Hilal" yang lebih rinci.
+  final double tinggiHilalDerajat;
+  /// Elongasi (jarak sudut bulan-matahari, derajat) saat maghrib yang sama.
+  final double elongasiDerajat;
 
   TanggalHijriah({
     required this.hari,
@@ -20,7 +25,13 @@ class TanggalHijriah {
     required this.ijtimakAwalBulan,
     required this.awalBulanMasehi,
     required this.istikmal,
+    required this.tinggiHilalDerajat,
+    required this.elongasiDerajat,
   });
+
+  /// Kriteria MABIMS 2021 terpenuhi? (tinggi hilal >=3 derajat DAN elongasi
+  /// >=6.4 derajat). Ini persis kebalikan dari [istikmal].
+  bool get mabimsTerpenuhi => !istikmal;
 
   String get label => '$hari $namaBulanH $tahunH H';
 }
@@ -259,7 +270,31 @@ class HijriService {
     return dtLokalFinal.subtract(Duration(hours: utcOffset));
   }
 
-  static bool _hilalMemenuhiMabims({
+  /// Hitung keadaan hilal (tinggi & elongasi) untuk SATU waktu ijtimak yang
+  /// SUDAH DIKETAHUI (mis. dari Tabel Ijtimak), TANPA perlu melalui proses
+  /// cari-di-tabel/formula lagi -- dipakai layar Tabel Ijtimak yang sudah
+  /// punya waktu ijtimak_wib langsung dari data tabel.
+  ///
+  /// [ijtimakWib] harus dalam format WIB (UTC+7), sesuai format tabel.
+  /// [utcOffset] adalah zona waktu LOKASI yang mau dicek keadaan hilalnya
+  /// (bisa beda dari WIB, mis. WITA/WIT), dipakai untuk menentukan maghrib
+  /// hari itu DI LOKASI tersebut.
+  ///
+  /// CATATAN: hasil ini menggambarkan keadaan hilal menuju bulan
+  /// BERIKUTNYA (ijtimak ini menandai transisi ke bulan setelahnya),
+  /// bukan tentang bulan yang baru saja berakhir.
+  static ({bool memenuhi, double tinggiHilal, double elongasi}) hitungKeadaanHilalPadaIjtimak({
+    required DateTime ijtimakWib,
+    required double lat,
+    required double lng,
+    required int utcOffset,
+  }) {
+    final ijtimakUtc = ijtimakWib.subtract(const Duration(hours: 7));
+    final jdeUt = 2451544.5 + ijtimakUtc.difference(DateTime.utc(2000, 1, 1)).inMicroseconds / (86400 * 1000000);
+    return _hilalMemenuhiMabims(ijtimakJde: jdeUt, lat: lat, lng: lng, utcOffset: utcOffset);
+  }
+
+  static ({bool memenuhi, double tinggiHilal, double elongasi}) _hilalMemenuhiMabims({
     required double ijtimakJde,
     required double lat,
     required double lng,
@@ -279,10 +314,10 @@ class HijriService {
         .clamp(-1.0, 1.0);
     final elongasi = acos(cosElong) * 180 / pi;
 
-    return altM >= 3.0 && elongasi >= 6.4;
+    return (memenuhi: altM >= 3.0 && elongasi >= 6.4, tinggiHilal: altM, elongasi: elongasi);
   }
 
-  static ({DateTime tanggal1, DateTime ijtimak, bool istikmal}) tentukanAwalBulan({
+  static ({DateTime tanggal1, DateTime ijtimak, bool istikmal, double tinggiHilal, double elongasi}) tentukanAwalBulan({
     required int tahunH,
     required int bulanH,
     required double lat,
@@ -294,12 +329,18 @@ class HijriService {
     final ijtimakLokal = ijtimakUtc.add(Duration(hours: utcOffset));
     final hariIjtimak = DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day);
 
-    final memenuhi = _hilalMemenuhiMabims(ijtimakJde: jde, lat: lat, lng: lng, utcOffset: utcOffset);
-    final tanggal1 = memenuhi
+    final hasil = _hilalMemenuhiMabims(ijtimakJde: jde, lat: lat, lng: lng, utcOffset: utcOffset);
+    final tanggal1 = hasil.memenuhi
         ? hariIjtimak.add(const Duration(days: 1))
         : hariIjtimak.add(const Duration(days: 2));
 
-    return (tanggal1: tanggal1, ijtimak: ijtimakLokal, istikmal: !memenuhi);
+    return (
+      tanggal1: tanggal1,
+      ijtimak: ijtimakLokal,
+      istikmal: !hasil.memenuhi,
+      tinggiHilal: hasil.tinggiHilal,
+      elongasi: hasil.elongasi,
+    );
   }
 
   TanggalHijriah konversi(
@@ -350,6 +391,8 @@ class HijriService {
       ijtimakAwalBulan: awalIni.ijtimak,
       awalBulanMasehi: awalIni.tanggal1,
       istikmal: awalIni.istikmal,
+      tinggiHilalDerajat: awalIni.tinggiHilal,
+      elongasiDerajat: awalIni.elongasi,
     );
   }
 }

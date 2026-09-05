@@ -16,6 +16,7 @@ import 'detail_screen.dart';
 import 'moderation_panel_screen.dart';
 import 'adzan_settings_screen.dart';
 import 'tabel_ijtimak_screen.dart';
+import 'hijri_calendar_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -354,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 else
                   Icon(icon, color: AppColors.emerald, size: 22),
                 const SizedBox(height: 6),
-                Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
+                Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600)),
               ],
             ),
           ),
@@ -384,6 +385,16 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const TabelIjtimakScreen()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+          tile(
+            icon: Icons.calendar_month_rounded,
+            label: 'Kalender\nHijriah',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const HijriCalendarScreen()),
               );
             },
           ),

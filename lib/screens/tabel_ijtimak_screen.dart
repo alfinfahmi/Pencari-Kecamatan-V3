@@ -1,16 +1,25 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:geolocator/geolocator.dart';
+import '../models/kecamatan_model.dart';
+import '../services/hijri_service.dart';
+import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
 import '../widgets/home_button.dart';
+import '../widgets/location_picker_sheet.dart';
 
 /// Menampilkan tabel ijtimak akhir bulan resmi Lajnah Falakiyah Ma'had
-/// 'Aly Lirboyo (1440H-1500H, 732 entri) sebagai referensi. MURNI untuk
-/// dilihat -- TIDAK dipakai sebagai sumber perhitungan aplikasi (mesin
-/// hisab Hijriah aplikasi ini memakai rumus live terpisah), jadi kedua
-/// angka bisa saja berbeda beberapa menit karena metode hitung berbeda
-/// meski sama-sama sahih.
+/// 'Aly Lirboyo (1440H-1500H, 732 entri) sebagai referensi, LENGKAP dengan
+/// detail keadaan hilal (tinggi & elongasi) di lokasi pilihan pengguna.
+///
+/// Waktu ijtimak MURNI untuk dilihat -- TIDAK dipakai sebagai sumber
+/// perhitungan aplikasi (mesin hisab Hijriah aplikasi ini memakai rumus
+/// live terpisah), jadi kedua angka bisa saja berbeda beberapa menit
+/// karena metode hitung berbeda meski sama-sama sahih. Detail hilal DI
+/// LAYAR INI dihitung langsung dari waktu ijtimak tabel, jadi konsisten
+/// dengan angka ijtimak yang ditampilkan.
 class TabelIjtimakScreen extends StatefulWidget {
   const TabelIjtimakScreen({super.key});
 
@@ -24,7 +33,10 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   int? _tahunSekarangPerkiraan;
 
   final _tahunController = TextEditingController();
-  int? _bulanFilter; // null = semua bulan
+  int? _bulanFilter;
+
+  KecamatanModel? _lokasi;
+  bool _memuatLokasi = false;
 
   static const _namaBulanHijriah = {
     1: 'Muharram', 2: 'Safar', 3: 'Rabiul Awwal', 4: 'Rabiul Akhir',
@@ -42,6 +54,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   void initState() {
     super.initState();
     _muat();
+    _muatLokasiDariGps();
   }
 
   Future<void> _muat() async {
@@ -77,6 +90,49 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     }
   }
 
+  Future<void> _muatLokasiDariGps() async {
+    setState(() => _memuatLokasi = true);
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
+      if (!await Geolocator.isLocationServiceEnabled()) return;
+
+      final pos = await Geolocator.getCurrentPosition();
+      final utcOffsetJam = DateTime.now().timeZoneOffset.inHours;
+      final namaZona = switch (utcOffsetJam) {
+        7 => 'WIB',
+        8 => 'WITA',
+        9 => 'WIT',
+        _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
+      };
+      final lokasi = await lengkapiInfoLokasiGps(
+        lat: pos.latitude,
+        lng: pos.longitude,
+        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
+        zonaWaktu: namaZona,
+        utcOffset: utcOffsetJam,
+      );
+      if (mounted) setState(() => _lokasi = lokasi);
+    } catch (_) {
+      // Diamkan -- detail hilal cukup disembunyikan kalau lokasi gagal
+      // didapat, tabel ijtimak sendiri tetap tampil normal.
+    } finally {
+      if (mounted) setState(() => _memuatLokasi = false);
+    }
+  }
+
+  Future<void> _gantiLokasi() async {
+    final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi untuk Keadaan Hilal');
+    if (terpilih == kPilihGpsSentinel) {
+      await _muatLokasiDariGps();
+    } else if (terpilih is KecamatanModel) {
+      setState(() => _lokasi = terpilih);
+    }
+  }
+
   String _formatTanggalJam(String iso) {
     final dt = DateTime.parse(iso);
     const bulan = {
@@ -101,7 +157,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(14),
-              margin: const EdgeInsets.all(14),
+              margin: const EdgeInsets.fromLTRB(14, 14, 14, 8),
               decoration: BoxDecoration(
                 color: AppColors.emerald.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(12),
@@ -128,11 +184,40 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
                 ],
               ),
             ),
+            _buildBarisLokasi(),
             _buildKotakPencarian(),
             Expanded(child: _buildBody()),
             const WatermarkFooter(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBarisLokasi() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+      child: Row(
+        children: [
+          Icon(Icons.location_on_outlined, size: 15, color: Colors.grey.shade500),
+          const SizedBox(width: 6),
+          Expanded(
+            child: _memuatLokasi
+                ? Text('Mengambil lokasi...', style: TextStyle(fontSize: 12.5, color: Colors.grey.shade500))
+                : Text(
+                    _lokasi != null
+                        ? 'Keadaan hilal untuk: ${_lokasi!.kecamatan}'
+                        : 'Lokasi belum tersedia -- detail hilal disembunyikan',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
+                  ),
+          ),
+          TextButton(
+            onPressed: _memuatLokasi ? null : _gantiLokasi,
+            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), minimumSize: Size.zero),
+            child: const Text('Ganti Lokasi', style: TextStyle(fontSize: 12)),
+          ),
+        ],
       ),
     );
   }
@@ -235,23 +320,69 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
                 ],
               ],
             ),
-            children: entries.map((e) {
-              return ListTile(
-                dense: true,
-                leading: SizedBox(
-                  width: 28,
-                  child: Text('${e['bulan_h']}', style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
-                ),
-                title: Text(e['nama_bulan_h'] as String, style: const TextStyle(fontSize: 13.5)),
-                subtitle: Text(
-                  '${_formatTanggalJam(e['ijtimak_wib'] as String)} \u2022 ${e['hari_pasaran']}',
-                  style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
-                ),
-              );
-            }).toList(),
+            children: entries.map((e) => _buildBarisBulan(e)).toList(),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildBarisBulan(Map<String, dynamic> e) {
+    final ijtimakWib = DateTime.parse(e['ijtimak_wib'] as String);
+    final lokasi = _lokasi;
+
+    ({bool memenuhi, double tinggiHilal, double elongasi})? hilal;
+    if (lokasi != null && lokasi.utcOffset != null) {
+      hilal = HijriService.hitungKeadaanHilalPadaIjtimak(
+        ijtimakWib: ijtimakWib,
+        lat: lokasi.lat,
+        lng: lokasi.lng,
+        utcOffset: lokasi.utcOffset!,
+      );
+    }
+
+    return ListTile(
+      dense: true,
+      leading: SizedBox(
+        width: 28,
+        child: Text('${e['bulan_h']}', style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+      ),
+      title: Text(e['nama_bulan_h'] as String, style: const TextStyle(fontSize: 13.5)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${_formatTanggalJam(e['ijtimak_wib'] as String)} \u2022 ${e['hari_pasaran']}',
+            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+          ),
+          if (hilal != null) ...[
+            const SizedBox(height: 3),
+            Row(
+              children: [
+                Icon(
+                  hilal.memenuhi ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  size: 12,
+                  color: hilal.memenuhi ? AppColors.emerald : Colors.orange.shade700,
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Tinggi hilal ${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, '
+                    'elongasi ${hilal.elongasi.toStringAsFixed(1)}\u00b0 '
+                    '(menuju bulan berikutnya)',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: hilal.memenuhi ? AppColors.emerald : Colors.orange.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+      isThreeLine: hilal != null,
     );
   }
 }
