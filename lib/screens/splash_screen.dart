@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../services/app_data_service.dart';
 import '../services/activation_service.dart';
 import '../theme/app_theme.dart';
-import 'activation_screen.dart';
-import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,11 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final activated = await ActivationService().isActivated();
 
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => activated ? const HomeScreen() : const ActivationScreen(),
-      ),
-    );
+    context.go(activated ? '/home' : '/aktivasi');
   }
 
   @override

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import '../main.dart' show themeModeNotifier;
 import '../models/kecamatan_model.dart';
 import '../models/custom_point_model.dart';
@@ -13,10 +15,7 @@ import '../widgets/kecamatan_card.dart';
 import '../widgets/home_prayer_widget.dart';
 import '../widgets/watermark_footer.dart';
 import 'detail_screen.dart';
-import 'moderation_panel_screen.dart';
-import 'adzan_settings_screen.dart';
-import 'tabel_ijtimak_screen.dart';
-import 'hijri_calendar_screen.dart';
+import '../router/kecamatan_uri.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,12 +42,69 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _sudahMencari = false;
 
   int _searchRequestId = 0;
+  Timer? _urlSyncDebounce;
 
   @override
   void initState() {
     super.initState();
     _loadFavorites();
     _results = _data.referensi;
+
+    // Baca state awal dari URL (tab aktif + kata kunci pencarian) --
+    // supaya refresh browser TIDAK kehilangan pencarian/tab yang sedang
+    // dibuka. Dijalankan setelah frame pertama supaya GoRouterState sudah
+    // pasti tersedia dari context.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _muatStateDariUrl());
+  }
+
+  @override
+  void dispose() {
+    _urlSyncDebounce?.cancel();
+    super.dispose();
+  }
+
+  void _muatStateDariUrl() {
+    if (!mounted) return;
+    final q = GoRouterState.of(context).uri.queryParameters;
+    final tabAwal = q['tab'];
+    final queryAwal = q['q'];
+
+    if (tabAwal != null) {
+      for (final t in _Tab.values) {
+        if (t.name == tabAwal) {
+          setState(() => _tab = t);
+        }
+      }
+    }
+    if (queryAwal != null && queryAwal.isNotEmpty) {
+      _searchController.text = queryAwal;
+      _onSearchChanged(queryAwal);
+    }
+  }
+
+  /// Perbarui URL (memakai `go`, yang MEMANG SUDAH TIDAK menambah riwayat
+  /// browser baru -- lihat dokumentasi go_router) supaya mencerminkan tab
+  /// & kata kunci pencarian saat ini -- inilah yang membuat refresh
+  /// browser bisa mengembalikan pencarian yang sedang dibuka.
+  ///
+  /// SENGAJA DIBERI JEDA (debounce 700ms) sebelum benar-benar mengubah
+  /// URL -- BUKAN setiap ketukan huruf. Alasan keamanan: mengubah URL
+  /// terlalu sering berpotensi memicu Flutter membongkar-ulang halaman
+  /// (mirip persis kelas bug "keyboard tertutup sendiri" yang pernah
+  /// terjadi di aplikasi ini sebelumnya karena rebuild tak terduga). Jeda
+  /// ini membuat perubahan URL baru terjadi setelah pengguna berhenti
+  /// mengetik sejenak, jauh mengurangi risiko itu tanpa kehilangan
+  /// manfaat utamanya (pencarian tetap ada kalau di-refresh saat idle).
+  void _sinkronkanUrl() {
+    _urlSyncDebounce?.cancel();
+    _urlSyncDebounce = Timer(const Duration(milliseconds: 700), () {
+      if (!mounted) return;
+      final query = <String, String>{'tab': _tab.name};
+      if (_sudahMencari && _searchController.text.trim().isNotEmpty) {
+        query['q'] = _searchController.text.trim();
+      }
+      context.go(Uri(path: '/home', queryParameters: query).toString());
+    });
   }
 
   Future<void> _loadFavorites() async {
@@ -69,6 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _searching = true;
       }
     });
+    _sinkronkanUrl();
 
     if (query.trim().isEmpty) return;
 
@@ -183,9 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: const Icon(Icons.fact_check_rounded),
                 tooltip: 'Panel Moderasi',
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ModerationPanelScreen()),
-                  );
+                  context.push('/moderasi');
                 },
               );
             },
@@ -194,9 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.notifications_outlined),
             tooltip: 'Notifikasi Adzan',
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AdzanSettingsScreen()),
-              );
+              context.push('/notifikasi-adzan');
             },
           ),
           ValueListenableBuilder<ThemeMode>(
@@ -320,9 +373,9 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       if (!mounted) return;
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => DetailScreen(data: lokasi, initialSection: section)),
-      );
+      final query = kecamatanKeQuery(lokasi);
+      query['section'] = section.name;
+      context.push(Uri(path: '/detail', queryParameters: query).toString());
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengambil lokasi GPS: $e')));
@@ -390,9 +443,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icons.calendar_view_month_rounded,
             label: 'Daftar\nIjtimak',
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const TabelIjtimakScreen()),
-              );
+              context.push('/tabel-ijtimak');
             },
           ),
           const SizedBox(width: 8),
@@ -400,9 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icons.calendar_month_rounded,
             label: 'Kalender',
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const HijriCalendarScreen()),
-              );
+              context.push('/kalender');
             },
           ),
           ],
@@ -533,7 +582,10 @@ class _HomeScreenState extends State<HomeScreen> {
       final selected = _tab == tab;
       return Expanded(
         child: InkWell(
-          onTap: () => setState(() => _tab = tab),
+          onTap: () {
+            setState(() => _tab = tab);
+            _sinkronkanUrl();
+          },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(

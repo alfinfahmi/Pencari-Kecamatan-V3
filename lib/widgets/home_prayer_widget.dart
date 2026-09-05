@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/kecamatan_model.dart';
 import '../services/app_data_service.dart';
 import '../services/hisab_service.dart';
@@ -11,6 +12,7 @@ import '../services/adzan_notification_service.dart';
 import '../services/prayer_settings_service.dart';
 import '../theme/app_theme.dart';
 import '../screens/detail_screen.dart';
+import '../router/kecamatan_uri.dart';
 import 'location_picker_sheet.dart';
 
 enum _StatusWidget { memuat, butuhIzin, gpsMati, error, siap }
@@ -254,9 +256,9 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
 
   void _bukaJadwalLengkap() {
     if (_lokasi == null) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => DetailScreen(data: _lokasi!, initialSection: DetailSection.waktuShalat)),
-    );
+    final query = kecamatanKeQuery(_lokasi!);
+    query['section'] = DetailSection.waktuShalat.name;
+    context.push(Uri(path: '/detail', queryParameters: query).toString());
   }
 
   @override

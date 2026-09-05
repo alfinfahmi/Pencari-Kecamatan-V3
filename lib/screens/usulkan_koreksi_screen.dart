@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import '../models/kecamatan_model.dart';
 import '../models/koreksi_model.dart';
 import '../services/supabase_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home_button.dart';
-import 'auth_screen.dart';
 
 class UsulkanKoreksiScreen extends StatefulWidget {
   final KecamatanModel data;
@@ -84,9 +84,7 @@ class _UsulkanKoreksiScreenState extends State<UsulkanKoreksiScreen> {
 
   Future<void> _kirim() async {
     if (!SupabaseService.instance.isLoggedIn) {
-      final result = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
-      );
+      final result = await context.push<bool>('/auth');
       if (result != true) return;
     }
 

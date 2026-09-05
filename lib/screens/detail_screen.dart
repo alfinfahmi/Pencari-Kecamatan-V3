@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import '../models/kecamatan_model.dart';
 import '../services/app_data_service.dart';
 import '../services/reverse_geocode_helper.dart';
@@ -15,11 +16,8 @@ import '../widgets/home_button.dart';
 import '../widgets/location_picker_sheet.dart';
 import '../widgets/qibla_compass.dart';
 import '../widgets/prayer_time_table.dart';
-import 'add_point_screen.dart';
-import 'compass_fullscreen_screen.dart';
+import '../router/kecamatan_uri.dart';
 import 'prayer_settings_sheet.dart';
-import 'export_jadwal_screen.dart';
-import 'usulkan_koreksi_screen.dart';
 
 /// Bagian mana di DetailScreen yang harus langsung terlihat saat halaman
 /// dibuka -- dipakai oleh 4 tombol menu cepat di KecamatanCard supaya
@@ -353,9 +351,7 @@ class _DetailScreenState extends State<DetailScreen> {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => UsulkanKoreksiScreen(data: data),
-                ));
+                context.push(Uri(path: '/usulkan-koreksi', queryParameters: kecamatanKeQuery(data)).toString());
               },
               icon: const Icon(Icons.edit_location_alt_rounded, size: 18),
               label: const Text('Usulkan Koreksi Data Ini'),
@@ -371,9 +367,7 @@ class _DetailScreenState extends State<DetailScreen> {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => AddPointScreen(induk: data)),
-                );
+                context.push(Uri(path: '/tambah-titik', queryParameters: kecamatanKeQuery(data)).toString());
               },
               icon: const Icon(Icons.add_location_alt_rounded),
               label: const Text('Tambah Titik di Kecamatan Ini'),
@@ -404,12 +398,10 @@ class _DetailScreenState extends State<DetailScreen> {
       children: [
         GestureDetector(
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => CompassFullscreenScreen(
-                bearingDerajat: bearingKiblat,
-                namaLokasi: data.kecamatan,
-              ),
-            ));
+            context.push(Uri(path: '/kompas', queryParameters: {
+              'bearing': bearingKiblat.toString(),
+              'nama': data.kecamatan,
+            }).toString());
           },
           child: Center(child: QiblaCompass(bearingDerajat: bearingKiblat)),
         ),
@@ -543,9 +535,7 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
               TextButton.icon(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => ExportJadwalScreen(data: _lokasiWaktuShalat)),
-                  );
+                  context.push(Uri(path: '/ekspor', queryParameters: kecamatanKeQuery(_lokasiWaktuShalat)).toString());
                 },
                 icon: const Icon(Icons.picture_as_pdf_rounded, size: 16),
                 label: const Text('Ekspor Jadwal', style: TextStyle(fontSize: 12.5)),
@@ -654,7 +644,7 @@ class _DetailScreenState extends State<DetailScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Detail Keadaan Hilal'),
+        title: Text('Keadaan Hilal Awal ${hijri.namaBulanH}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

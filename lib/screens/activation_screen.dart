@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../services/activation_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
-import 'home_screen.dart';
 
 class ActivationScreen extends StatefulWidget {
   const ActivationScreen({super.key});
@@ -29,9 +29,7 @@ class _ActivationScreenState extends State<ActivationScreen> {
     setState(() => _loading = false);
 
     if (ok) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      context.go('/home');
     } else {
       setState(() => _error = 'Serial number tidak valid. Silakan coba lagi.');
     }

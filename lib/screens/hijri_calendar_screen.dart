@@ -394,7 +394,7 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
             ],
             if (hijri != null) ...[
               const Divider(height: 24),
-              Text('Keadaan Hilal Awal Bulan Ini', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
+              Text('Keadaan Hilal Awal ${hijri.namaBulanH}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
               const SizedBox(height: 6),
               _barisDetailKalender(
                 'Waktu ijtimak',

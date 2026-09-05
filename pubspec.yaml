@@ -11,6 +11,10 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.6
 
+  # Routing berbasis URL -- supaya tiap layar punya alamat sendiri di
+  # browser (web), jadi refresh browser TIDAK kembali ke Home lagi.
+  go_router: ^16.2.5
+
   # Penyimpanan lokal offline (favorit, riwayat, titik kustom, status aktivasi)
   hive: ^2.2.3
   hive_flutter: ^1.1.0
