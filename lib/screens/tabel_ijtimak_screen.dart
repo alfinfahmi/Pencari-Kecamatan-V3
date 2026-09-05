@@ -120,7 +120,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Data Lajnah Falakiyah Ma'had 'Aly Lirboyo. Murni referensi -- "
+                    'Data ijtimak akhir bulan. Murni referensi -- '
                     'perhitungan Data Hijriah aplikasi ini (badge tanggal, jadwal shalat) memakai '
                     'rumus live terpisah, jadi bisa berbeda beberapa menit dari tabel ini',
                     style: AppTypography.captionEdu(color: Colors.grey.shade600),
