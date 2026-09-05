@@ -13,6 +13,10 @@ class KecamatanModel {
   final String? zonaWaktu;
   final int? utcOffset;
   final bool isReferensi;
+  /// Nama desa/kelurahan -- OPSIONAL, cuma terisi untuk lokasi hasil GPS
+  /// (dari reverse geocoding), tidak ada di data kecamatan resmi (yang
+  /// memang levelnya kecamatan, bukan desa).
+  final String? kelurahan;
 
   KecamatanModel({
     required this.id,
@@ -27,6 +31,7 @@ class KecamatanModel {
     required this.zonaWaktu,
     required this.utcOffset,
     this.isReferensi = false,
+    this.kelurahan,
   });
 
   factory KecamatanModel.fromJson(Map<String, dynamic> json, {bool isReferensi = false}) {
@@ -49,6 +54,7 @@ class KecamatanModel {
   /// Teks lengkap untuk fitur "Salin Data".
   String toClipboardText() {
     final buf = StringBuffer();
+    if (kelurahan != null) buf.writeln(kelurahan);
     buf.writeln(kecamatan);
     if (kabupaten != null) buf.writeln(kabupaten);
     buf.writeln(provinsi);

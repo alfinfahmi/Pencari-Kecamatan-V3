@@ -5,28 +5,40 @@ import 'package:http/http.dart' as http;
 import '../models/kecamatan_model.dart';
 import 'app_data_service.dart';
 
+/// Hasil mentah satu percobaan geocoding -- dipisah dari KecamatanModel
+/// supaya bisa digabung dengan hasil "kecamatan terdekat" dari database
+/// sendiri di langkah akhir.
+class _HasilGeocoding {
+  final String? kelurahan;
+  final String? kabupaten;
+  final String? provinsi;
+  _HasilGeocoding({this.kelurahan, this.kabupaten, this.provinsi});
+}
+
 /// Melengkapi titik GPS mentah (lat, lng) dengan nama tempat yang paling
-/// akurat yang bisa didapat, dengan urutan prioritas 3 lapis:
+/// lengkap yang bisa didapat.
 ///
-/// 1. **Reverse geocoding native** (layanan geocoding bawaan Android/iOS,
-///    lewat package `geocoding`) -- paling akurat kalau berhasil, tapi
-///    TIDAK berjalan di Flutter Web (keterbatasan resmi package ini),
-///    jadi otomatis dilewati di platform web.
-/// 2. **Nominatim (OpenStreetMap)**, lewat HTTP biasa -- BISA jalan di
-///    SEMUA platform termasuk Web (karena cuma request HTTP, bukan plugin
-///    native). Dicoba kalau langkah 1 dilewati/gagal. Gratis, tanpa API
-///    key, tapi kualitas data tergantung kelengkapan pemetaan OpenStreetMap
-///    di lokasi tersebut (umumnya baik untuk kota besar, bisa kurang
-///    lengkap di daerah terpencil).
-/// 3. **Fallback offline**: kalau kedua langkah di atas gagal (tidak ada
-///    internet, timeout, data OSM kosong di lokasi itu) -- jatuh ke
-///    "kecamatan terdekat" dari database 7.274 kecamatan sendiri. Ini
-///    yang menjamin fitur ini TETAP berfungsi 100% offline sebagai
-///    fallback terakhir, bukan gagal total.
+/// PENTING soal nama KECAMATAN: layanan geocoding pihak ketiga (baik
+/// native Android/iOS maupun Nominatim) TIDAK punya field yang persis
+/// sama dengan "kecamatan" di Indonesia -- field seperti `subLocality`
+/// atau `village`/`suburb` seringkali sebenarnya level DESA/KELURAHAN,
+/// bukan kecamatan. Kalau field itu langsung dipakai sebagai "kecamatan",
+/// hasilnya bisa jadi nama desa, dan kecamatan sungguhannya malah hilang
+/// dari tampilan.
+///
+/// Makanya sekarang alurnya:
+/// 1. Coba geocoding (native lalu Nominatim) HANYA untuk dapat nama
+///    desa/kelurahan yang lebih rinci (kalau ada) + kabupaten/provinsi.
+/// 2. Nama KECAMATAN selalu diambil dari `kecamatanTerdekat()` -- database
+///    7.274 kecamatan milik sendiri, yang MEMANG terindeks per kecamatan
+///    sehingga lebih bisa diandalkan untuk level ini dibanding menebak
+///    dari field geocoding yang ambigu.
+/// 3. Kabupaten/provinsi: pakai hasil geocoding kalau berhasil (biasanya
+///    akurat), fallback ke kecamatan terdekat kalau geocoding gagal.
 ///
 /// Koordinat (lat, lng) yang dipakai untuk PERHITUNGAN (waktu shalat,
-/// kiblat, dst.) SELALU koordinat GPS asli apa adanya di ketiga jalur --
-/// yang berbeda cuma LABEL nama tempatnya, bukan akurasi hisabnya.
+/// kiblat, dst.) SELALU koordinat GPS asli apa adanya -- yang berbeda
+/// cuma detail nama tempatnya, bukan akurasi hisabnya.
 Future<KecamatanModel> lengkapiInfoLokasiGps({
   required double lat,
   required double lng,
@@ -34,24 +46,20 @@ Future<KecamatanModel> lengkapiInfoLokasiGps({
   required String zonaWaktu,
   required int utcOffset,
 }) async {
+  _HasilGeocoding? geo;
   if (!kIsWeb) {
-    final hasil = await _cobaGeocodingNative(
-      lat: lat, lng: lng, elevasiM: elevasiM, zonaWaktu: zonaWaktu, utcOffset: utcOffset,
-    );
-    if (hasil != null) return hasil;
+    geo = await _cobaGeocodingNative(lat, lng);
   }
-
-  final hasilNominatim = await _cobaNominatim(
-    lat: lat, lng: lng, elevasiM: elevasiM, zonaWaktu: zonaWaktu, utcOffset: utcOffset,
-  );
-  if (hasilNominatim != null) return hasilNominatim;
+  geo ??= await _cobaNominatim(lat, lng);
 
   final terdekat = AppDataService.instance.kecamatanTerdekat(lat, lng);
+
   return KecamatanModel(
     id: 'gps_lokasi_saat_ini',
     kecamatan: terdekat?.kecamatan ?? 'Lokasi Anda Saat Ini',
-    kabupaten: terdekat?.kabupaten,
-    provinsi: terdekat?.provinsi ?? '(berdasarkan GPS)',
+    kelurahan: geo?.kelurahan,
+    kabupaten: geo?.kabupaten ?? terdekat?.kabupaten,
+    provinsi: geo?.provinsi ?? terdekat?.provinsi ?? '(berdasarkan GPS)',
     lat: lat,
     lng: lng,
     latDms: null,
@@ -62,55 +70,34 @@ Future<KecamatanModel> lengkapiInfoLokasiGps({
   );
 }
 
-Future<KecamatanModel?> _cobaGeocodingNative({
-  required double lat,
-  required double lng,
-  required int elevasiM,
-  required String zonaWaktu,
-  required int utcOffset,
-}) async {
+Future<_HasilGeocoding?> _cobaGeocodingNative(double lat, double lng) async {
   try {
     final placemarks = await geocoding.placemarkFromCoordinates(lat, lng)
         .timeout(const Duration(seconds: 6));
     if (placemarks.isEmpty) return null;
     final p = placemarks.first;
 
-    final namaKecamatan = (p.subLocality != null && p.subLocality!.isNotEmpty)
+    final kelurahan = (p.subLocality != null && p.subLocality!.isNotEmpty)
         ? p.subLocality!
         : (p.locality != null && p.locality!.isNotEmpty)
             ? p.locality!
             : null;
-    if (namaKecamatan == null) return null;
 
-    return KecamatanModel(
-      id: 'gps_lokasi_saat_ini',
-      kecamatan: namaKecamatan,
+    return _HasilGeocoding(
+      kelurahan: kelurahan,
       kabupaten: (p.subAdministrativeArea != null && p.subAdministrativeArea!.isNotEmpty)
           ? p.subAdministrativeArea
           : null,
       provinsi: (p.administrativeArea != null && p.administrativeArea!.isNotEmpty)
-          ? p.administrativeArea!
-          : 'Indonesia',
-      lat: lat,
-      lng: lng,
-      latDms: null,
-      lngDms: null,
-      elevasiM: elevasiM,
-      zonaWaktu: zonaWaktu,
-      utcOffset: utcOffset,
+          ? p.administrativeArea
+          : null,
     );
   } catch (_) {
     return null;
   }
 }
 
-Future<KecamatanModel?> _cobaNominatim({
-  required double lat,
-  required double lng,
-  required int elevasiM,
-  required String zonaWaktu,
-  required int utcOffset,
-}) async {
+Future<_HasilGeocoding?> _cobaNominatim(double lat, double lng) async {
   try {
     final url = Uri.parse(
       'https://nominatim.openstreetmap.org/reverse'
@@ -134,25 +121,13 @@ Future<KecamatanModel?> _cobaNominatim({
       return null;
     }
 
-    final kecamatan = ambil(['city_district', 'suburb', 'village', 'town', 'municipality']);
-    if (kecamatan == null) return null;
-
-    final kabupaten = ambil(['county', 'state_district', 'city']);
+    final kelurahan = ambil(['village', 'suburb', 'hamlet']);
+    final kabupaten = ambil(['county', 'state_district', 'city', 'city_district']);
     final provinsi = ambil(['state']);
 
-    return KecamatanModel(
-      id: 'gps_lokasi_saat_ini',
-      kecamatan: kecamatan,
-      kabupaten: kabupaten,
-      provinsi: provinsi ?? 'Indonesia',
-      lat: lat,
-      lng: lng,
-      latDms: null,
-      lngDms: null,
-      elevasiM: elevasiM,
-      zonaWaktu: zonaWaktu,
-      utcOffset: utcOffset,
-    );
+    if (kelurahan == null && kabupaten == null && provinsi == null) return null;
+
+    return _HasilGeocoding(kelurahan: kelurahan, kabupaten: kabupaten, provinsi: provinsi);
   } catch (_) {
     return null;
   }

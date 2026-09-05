@@ -325,7 +325,7 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      [_lokasi!.kecamatan, _lokasi!.kabupaten].where((e) => e != null).join(', '),
+                      [_lokasi!.kelurahan, _lokasi!.kecamatan, _lokasi!.kabupaten].where((e) => e != null).join(', '),
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.bodyMd(color: Colors.white70).copyWith(fontSize: 12),
                     ),

@@ -165,7 +165,9 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
             child: _memuatLokasi
                 ? Text('Mengambil lokasi...', style: TextStyle(fontSize: 12.5, color: Colors.grey.shade500))
                 : Text(
-                    _lokasi != null ? _lokasi!.kecamatan : 'Lokasi belum tersedia',
+                    _lokasi != null
+                        ? [_lokasi!.kelurahan, _lokasi!.kecamatan].where((e) => e != null).join(', ')
+                        : 'Lokasi belum tersedia',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
                   ),

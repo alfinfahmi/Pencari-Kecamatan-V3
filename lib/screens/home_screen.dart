@@ -342,6 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(14),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 14),
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(14),
@@ -365,8 +366,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 6, 14, 2),
-      child: Row(
-        children: [
+      // IntrinsicHeight + stretch: menyamakan tinggi SEMUA kotak menu ke
+      // tinggi kotak yang paling tinggi -- tanpa ini, kotak "Kalender"
+      // (teks 1 baris) jadi lebih pendek daripada kotak lain (teks 2
+      // baris), membuat sudut border-nya terlihat tidak seragam.
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           tile(
             icon: Icons.access_time_rounded,
             label: 'Waktu\nShalat',
@@ -398,7 +405,8 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

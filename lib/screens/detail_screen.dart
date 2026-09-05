@@ -481,7 +481,9 @@ class _DetailScreenState extends State<DetailScreen> {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  _lokasiWaktuShalat.kecamatan,
+                  [_lokasiWaktuShalat.kelurahan, _lokasiWaktuShalat.kecamatan, _lokasiWaktuShalat.kabupaten]
+                      .where((e) => e != null)
+                      .join(', '),
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 12.5, color: Colors.grey.shade500),
                 ),

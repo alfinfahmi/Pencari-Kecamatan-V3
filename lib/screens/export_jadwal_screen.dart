@@ -303,6 +303,8 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (_lokasi.kelurahan != null)
+                        Text(_lokasi.kelurahan!, style: AppTypography.bodyMd(color: Colors.grey.shade500).copyWith(fontSize: 12)),
                       Text(_lokasi.kecamatan, style: AppTypography.headlineMd()),
                       Text('${_lokasi.kabupaten ?? '-'}, ${_lokasi.provinsi}',
                           style: AppTypography.bodyMd(color: Colors.grey.shade600)),
