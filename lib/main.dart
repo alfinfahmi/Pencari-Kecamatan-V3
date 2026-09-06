@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/custom_point_model.dart';
-import 'router/app_router.dart';
+import 'screens/splash_screen.dart';
 import 'services/adzan_notification_service.dart';
 import 'services/hijri_service.dart';
 import 'services/hisab_preference_service.dart';
@@ -55,13 +55,13 @@ class PencariKecamatanApp extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {
-        return MaterialApp.router(
+        return MaterialApp(
           title: 'Aplikasi Falak',
           debugShowCheckedModeBanner: false,
           themeMode: mode,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
-          routerConfig: appRouter,
+          home: const SplashScreen(),
         );
       },
     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../services/supabase_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
@@ -39,7 +38,7 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _passwordController.text,
         );
       }
-      if (mounted) context.pop(true);
+      if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       setState(() => _error = 'Gagal: ${e.toString()}');
     } finally {

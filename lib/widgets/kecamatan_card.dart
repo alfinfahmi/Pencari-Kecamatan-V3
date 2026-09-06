@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import '../models/kecamatan_model.dart';
 import '../services/favorite_service.dart';
 import '../theme/app_theme.dart';
 import '../screens/detail_screen.dart';
-import '../router/kecamatan_uri.dart';
+import '../screens/add_point_screen.dart';
 
 class KecamatanCard extends StatefulWidget {
   final KecamatanModel data;
@@ -45,13 +44,15 @@ class _KecamatanCardState extends State<KecamatanCard> {
   Future<void> _bukaDetail(BuildContext context, DetailSection section) async {
     await _favService.addToHistory(widget.data.id);
     if (!context.mounted) return;
-    final query = kecamatanKeQuery(widget.data);
-    query['section'] = section.name;
-    context.push(Uri(path: '/detail', queryParameters: query).toString());
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => DetailScreen(data: widget.data, initialSection: section)),
+    );
   }
 
   void _bukaTambahTitik(BuildContext context) {
-    context.push(Uri(path: '/tambah-titik', queryParameters: kecamatanKeQuery(widget.data)).toString());
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => AddPointScreen(induk: widget.data)),
+    );
   }
 
   @override
