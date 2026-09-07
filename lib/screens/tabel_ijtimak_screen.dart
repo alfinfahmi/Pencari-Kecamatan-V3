@@ -377,13 +377,17 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
       );
     }
 
+    final bulanH = e['bulan_h'] as int;
+    final bulanBerikutnyaH = bulanH == 12 ? 1 : bulanH + 1;
+    final namaBerikutnya = _namaBulanHijriah[bulanBerikutnyaH];
+
     return ListTile(
       dense: true,
       leading: SizedBox(
         width: 28,
-        child: Text('${e['bulan_h']}', style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+        child: Text('$bulanH', style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
       ),
-      title: Text(e['nama_bulan_h'] as String, style: const TextStyle(fontSize: 13.5)),
+      title: Text('${e['nama_bulan_h']} \u2192 $namaBerikutnya', style: const TextStyle(fontSize: 13.5)),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -395,8 +399,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
             const SizedBox(height: 3),
             Text(
               'Tinggi hilal ${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, '
-              'elongasi ${hilal.elongasi.toStringAsFixed(1)}\u00b0 '
-              '(menuju bulan berikutnya)',
+              'elongasi ${hilal.elongasi.toStringAsFixed(1)}\u00b0',
               style: TextStyle(
                 fontSize: 10.5,
                 color: _warnaKeadaanHilal(hilal.memenuhi, hilal.tinggiHilal),
