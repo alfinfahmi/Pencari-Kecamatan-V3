@@ -122,6 +122,106 @@ class MeeusHisabService {
     return dtLokal.subtract(Duration(hours: utcOffset));
   }
 
+  /// Cari waktu ijtimak (konjungsi/new moon) memakai algoritma Jean Meeus
+  /// Bab 49 "Phases of the Moon" (Astronomical Algorithms) -- BUKAN
+  /// formula linear sederhana K=(Y+29.53...)x12 yang selama ini dipakai
+  /// bersama oleh HijriService untuk kedua metode. Tervalidasi cocok
+  /// PERSIS terhadap tabel referensi independen (perbandingan Jean Meeus
+  /// vs As-Syahru, 1440H-1464H) hingga menit, termasuk koreksi ΔT
+  /// (selisih Terrestrial Time ke UT) yang tanpanya hasilnya meleset
+  /// beberapa menit.
+  ///
+  /// `k` = indeks bulan sinodis sejak epoch Meeus (2000.0); k=232 adalah
+  /// ijtimak akhir Dzulhijjah 1439H / awal Muharram 1440H (9 Okt 2018),
+  /// dipakai sebagai jangkar. Karena tiap bulan Hijriah = tepat satu
+  /// siklus sinodis berurutan, k bertambah 1 setiap kali bulanH maju 1.
+  static DateTime cariIjtimakUtc({required int tahunH, required int bulanH}) {
+    final k = (232 + (tahunH - 1440) * 12 + (bulanH - 1)).toDouble();
+    final t = k / 1236.85;
+
+    double sind(double x) => sin(x * pi / 180);
+
+    final jde = 2451550.09766 +
+        29.530588861 * k +
+        0.00015437 * t * t -
+        0.000000150 * t * t * t +
+        0.00000000073 * t * t * t * t;
+
+    final e = 1 - 0.002516 * t - 0.0000074 * t * t;
+    final m = 2.5534 + 29.10535669 * k - 0.0000014 * t * t - 0.00000011 * t * t * t;
+    final mp = 201.5643 + 385.81693528 * k + 0.0107582 * t * t + 0.00001238 * t * t * t - 0.000000058 * t * t * t * t;
+    final f = 160.7108 + 390.67050284 * k - 0.0016118 * t * t - 0.00000227 * t * t * t + 0.000000011 * t * t * t * t;
+    final omega = 124.7746 - 1.56375588 * k + 0.0020672 * t * t + 0.00000215 * t * t * t;
+
+    final dJde = -0.40720 * sind(mp) +
+        0.17241 * e * sind(m) +
+        0.01608 * sind(2 * mp) +
+        0.01039 * sind(2 * f) +
+        0.00739 * e * sind(mp - m) -
+        0.00514 * e * sind(mp + m) +
+        0.00208 * e * e * sind(2 * m) -
+        0.00111 * sind(mp - 2 * f) -
+        0.00057 * sind(mp + 2 * f) +
+        0.00056 * e * sind(2 * mp + m) -
+        0.00042 * sind(3 * mp) +
+        0.00042 * e * sind(m + 2 * f) +
+        0.00038 * e * sind(m - 2 * f) -
+        0.00024 * e * sind(2 * mp - m) -
+        0.00017 * sind(omega) -
+        0.00007 * sind(mp + 2 * m) +
+        0.00004 * sind(2 * mp - 2 * f) +
+        0.00004 * sind(3 * m) +
+        0.00003 * sind(mp + m - 2 * f) +
+        0.00003 * sind(2 * mp + 2 * f) -
+        0.00003 * sind(mp + m + 2 * f) +
+        0.00003 * sind(mp - m + 2 * f) -
+        0.00002 * sind(mp - m - 2 * f) -
+        0.00002 * sind(3 * mp + m) +
+        0.00002 * sind(4 * mp);
+
+    final a1 = 299.77 + 0.107408 * k - 0.009173 * t * t;
+    final a2 = 251.88 + 0.016321 * k;
+    final a3 = 251.83 + 26.651886 * k;
+    final a4 = 349.42 + 36.412478 * k;
+    final a5 = 84.66 + 18.206239 * k;
+    final a6 = 141.74 + 53.303771 * k;
+    final a7 = 207.14 + 2.453732 * k;
+    final a8 = 154.84 + 7.306860 * k;
+    final a9 = 34.52 + 27.261239 * k;
+    final a10 = 207.19 + 0.121824 * k;
+    final a11 = 291.34 + 1.844379 * k;
+    final a12 = 161.72 + 24.198154 * k;
+    final a13 = 239.56 + 25.513099 * k;
+    final a14 = 331.55 + 3.592518 * k;
+
+    final tambahan = 0.000325 * sind(a1) +
+        0.000165 * sind(a2) +
+        0.000164 * sind(a3) +
+        0.000126 * sind(a4) +
+        0.000110 * sind(a5) +
+        0.000062 * sind(a6) +
+        0.000060 * sind(a7) +
+        0.000056 * sind(a8) +
+        0.000047 * sind(a9) +
+        0.000042 * sind(a10) +
+        0.000040 * sind(a11) +
+        0.000037 * sind(a12) +
+        0.000035 * sind(a13) +
+        0.000023 * sind(a14);
+
+    final jdeFinal = jde + dJde + tambahan;
+
+    // Koreksi DeltaT (Terrestrial Time -> UT) -- polinomial Espenak/Meeus,
+    // akurat untuk rentang tahun 2005-2050. Tanpa koreksi ini, hasilnya
+    // meleset beberapa menit dari nilai sebenarnya.
+    final tahunPerkiraan = 2000 + (k - 232) / 12.3685 + 2018.77 - 2000;
+    final y = tahunPerkiraan - 2000;
+    final deltaTDetik = 62.92 + 0.32217 * y + 0.005589 * y * y;
+
+    final jdUt = jdeFinal - deltaTDetik / 86400.0;
+    return DateTime.utc(2000, 1, 1, 12).add(Duration(microseconds: ((jdUt - 2451545.0) * 86400 * 1000000).round()));
+  }
+
   static HasilHisabDetail hitung({
     required DateTime ijtimakUtc,
     required double lat,

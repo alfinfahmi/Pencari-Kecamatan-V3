@@ -37,15 +37,28 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
   /// Daftar metode yang tersedia -- tambahkan entri baru di sini kalau
   /// nanti ada metode hisab lain, tab baru otomatis muncul tanpa perlu
   /// ubah struktur layar ini.
-  static final _metodeList = <(String label, HasilHisabDetail Function({
-    required DateTime ijtimakUtc,
-    required double lat,
-    required double lng,
-    required double elevasiM,
-    required int utcOffset,
-  }))>[
-    ('Jean Meeus', MeeusHisabService.hitung),
-    ('As-Syahru', AsSyahruService.hitung),
+  ///
+  /// `cariIjtimakSendiri` OPSIONAL: kalau metode itu punya cara sendiri
+  /// menghitung waktu ijtimak (seperti Jean Meeus lewat algoritma Bab 49
+  /// yang tervalidasi terpisah), isi di sini supaya ijtimak yang
+  /// ditampilkan benar-benar milik metode itu sendiri -- bukan ikut
+  /// waktu ijtimak bersama dari HijriService. Kalau null (seperti
+  /// As-Syahru saat ini), dipakai waktu ijtimak bersama sebagai fallback
+  /// karena kami belum punya sumber tervalidasi untuk ijtimak khas
+  /// As-Syahru sendiri.
+  static final _metodeList = <(
+    String label,
+    HasilHisabDetail Function({
+      required DateTime ijtimakUtc,
+      required double lat,
+      required double lng,
+      required double elevasiM,
+      required int utcOffset,
+    }),
+    DateTime Function({required int tahunH, required int bulanH})?,
+  )>[
+    ('Jean Meeus', MeeusHisabService.hitung, MeeusHisabService.cariIjtimakUtc),
+    ('As-Syahru', AsSyahruService.hitung, null),
   ];
 
   static const _namaBulanHijriah = {
@@ -157,7 +170,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                       ? Center(child: Text('Isi Tahun H yang valid.', style: TextStyle(color: Colors.grey.shade500)))
                       : TabBarView(
                           controller: _tabController,
-                          children: _metodeList.map((m) => _buildIsiMetode(m.$2)).toList(),
+                          children: _metodeList.map((m) => _buildIsiMetode(m.$2, m.$3)).toList(),
                         ),
             ),
           ],
@@ -248,6 +261,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
       required double elevasiM,
       required int utcOffset,
     }) fungsiHitung,
+    DateTime Function({required int tahunH, required int bulanH})? cariIjtimakSendiri,
   ) {
     final lokasi = _lokasi!;
     final tahunH = int.parse(_tahunHController.text);
@@ -257,14 +271,21 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
       tahunH: tahunH, bulanH: bulanH, lat: lokasi.lat, lng: lokasi.lng,
       utcOffset: lokasi.utcOffset!, elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
     );
-    final ijtimakUtc = awal.ijtimak.subtract(Duration(hours: lokasi.utcOffset!));
+    // Kalau metode ini punya cara sendiri menghitung ijtimak (mis. Jean
+    // Meeus lewat algoritma Bab 49 tervalidasi terpisah), pakai itu --
+    // supaya waktu ijtimak yang ditampilkan benar-benar milik metode ini,
+    // bukan ikut angka bersama dari HijriService.
+    final ijtimakUtc = cariIjtimakSendiri != null
+        ? cariIjtimakSendiri(tahunH: tahunH, bulanH: bulanH)
+        : awal.ijtimak.subtract(Duration(hours: lokasi.utcOffset!));
+    final ijtimakLokal = ijtimakUtc.add(Duration(hours: lokasi.utcOffset!));
     final hasil = fungsiHitung(
       ijtimakUtc: ijtimakUtc, lat: lokasi.lat, lng: lokasi.lng,
       elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
     );
 
     final bulanSebelumnyaH = bulanH == 1 ? 12 : bulanH - 1;
-    final hariIjtimakSaja = DateTime(awal.ijtimak.year, awal.ijtimak.month, awal.ijtimak.day);
+    final hariIjtimakSaja = DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day);
     final tanggal1 = hasil.memenuhiMabims2021
         ? hariIjtimakSaja.add(const Duration(days: 1))
         : hariIjtimakSaja.add(const Duration(days: 2));
@@ -291,9 +312,9 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
               _baris('Ketinggian', '${lokasi.elevasiM ?? 0} m'),
               const Divider(height: 18),
               _baris('Ijtimak akhir ${_namaBulanHijriah[bulanSebelumnyaH]} $tahunH',
-                  '${_namaHariLengkap[awal.ijtimak.weekday]} ${HijriService.hitungPasaran(awal.ijtimak)}'),
+                  '${_namaHariLengkap[ijtimakLokal.weekday]} ${HijriService.hitungPasaran(ijtimakLokal)}'),
               _baris('Tanggal & Jam',
-                  '${awal.ijtimak.day} ${_namaBulanMasehi[awal.ijtimak.month]} ${awal.ijtimak.year}, '
+                  '${ijtimakLokal.day} ${_namaBulanMasehi[ijtimakLokal.month]} ${ijtimakLokal.year}, '
                   '${_jamStr(_utcJamKeLokal(ijtimakUtc, lokasi.utcOffset!))} ${lokasi.zonaWaktu ?? ''}'),
             ],
           ),

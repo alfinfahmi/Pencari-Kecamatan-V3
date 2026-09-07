@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/hijri_service.dart';
+import '../services/meeus_hisab_service.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
@@ -342,7 +343,11 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
     );
   }
 
-  Widget _kolomMetodeDialog(String namaMetode, ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) hilal) {
+  Widget _kolomMetodeDialog(
+    String namaMetode,
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) hilal,
+    DateTime ijtimakWib,
+  ) {
     final warna = hilal.memenuhi ? AppColors.emerald : Colors.deepOrange.shade700;
     return Container(
       padding: const EdgeInsets.all(10),
@@ -356,6 +361,12 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
         children: [
           Text(namaMetode, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
           const SizedBox(height: 4),
+          Text(
+            'Ijtimak: ${ijtimakWib.day}/${ijtimakWib.month}/${ijtimakWib.year} '
+            '${ijtimakWib.hour.toString().padLeft(2, '0')}:${ijtimakWib.minute.toString().padLeft(2, '0')}',
+            style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
+          ),
+          const SizedBox(height: 3),
           Text('Tinggi: ${hilal.tinggiHilal.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
           Text('Elongasi: ${hilal.elongasi.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
           const SizedBox(height: 4),
@@ -376,37 +387,30 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
     );
   }
 
-  Widget _barisDetailKalender(String label, String nilai) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Expanded(flex: 5, child: Text(label, style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600))),
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 4,
-            child: Text(nilai, textAlign: TextAlign.right, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   void _tampilkanDetailHari(DateTime tanggalMasehi, TanggalHijriah? hijri, String? namaPenting) {
     // Hitung KEDUA metode untuk perbandingan, terlepas dari metode mana
-    // yang sedang "aktif" secara global. Konversi manual (bukan lewat
-    // hitungKeadaanHilalPadaIjtimak langsung) karena hijri.ijtimakAwalBulan
-    // ada dalam zona waktu LOKASI (bisa WITA/WIT), sedangkan fungsi itu
-    // mengasumsikan WIB tetap -- jadi kita "bungkus ulang" jadi setara WIB
-    // dulu supaya konversinya benar untuk zona waktu apa pun.
+    // yang sedang "aktif" secara global.
+    //
+    // PENTING: waktu ijtimak Jean Meeus & As-Syahru TIDAK SELALU SAMA
+    // (bisa beda beberapa menit) -- untuk Jean Meeus kita pakai
+    // MeeusHisabService.cariIjtimakUtc() (algoritma Bab 49, tervalidasi
+    // terpisah terhadap tabel referensi independen), bukan ijtimak
+    // bersama dari HijriService. Untuk As-Syahru, kita BELUM punya
+    // sumber tervalidasi untuk ijtimak khas metode itu sendiri, jadi
+    // sementara tetap pakai ijtimak bersama (hijri.ijtimakAwalBulan).
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
+    DateTime? ijtimakMeeusUtc;
+    DateTime? ijtimakAsSyahruUtc;
     final lokasi = _lokasi;
     if (hijri != null && lokasi != null && lokasi.utcOffset != null) {
-      final ijtimakUtc = hijri.ijtimakAwalBulan.subtract(Duration(hours: lokasi.utcOffset!));
-      final ijtimakSetaraWib = ijtimakUtc.add(const Duration(hours: 7));
+      ijtimakMeeusUtc = MeeusHisabService.cariIjtimakUtc(tahunH: hijri.tahunH, bulanH: hijri.bulanH);
+      ijtimakAsSyahruUtc = hijri.ijtimakAwalBulan.subtract(Duration(hours: lokasi.utcOffset!));
+
       hilalMeeus = HijriService.hitungKeadaanHilalPadaIjtimak(
-        ijtimakWib: ijtimakSetaraWib,
+        ijtimakWib: ijtimakMeeusUtc.add(const Duration(hours: 7)),
         lat: lokasi.lat,
         lng: lokasi.lng,
         utcOffset: lokasi.utcOffset!,
@@ -414,7 +418,7 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
         paksaMetode: MetodeHisab.jeanMeeus,
       );
       hilalAsSyahru = HijriService.hitungKeadaanHilalPadaIjtimak(
-        ijtimakWib: ijtimakSetaraWib,
+        ijtimakWib: ijtimakAsSyahruUtc.add(const Duration(hours: 7)),
         lat: lokasi.lat,
         lng: lokasi.lng,
         utcOffset: lokasi.utcOffset!,
@@ -460,20 +464,20 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
               const Divider(height: 24),
               Text('Keadaan Hilal Awal ${hijri.namaBulanH} -- Perbandingan Metode',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
-              const SizedBox(height: 6),
-              _barisDetailKalender(
-                'Waktu ijtimak',
-                '${hijri.ijtimakAwalBulan.day}/${hijri.ijtimakAwalBulan.month}/${hijri.ijtimakAwalBulan.year} '
-                '${hijri.ijtimakAwalBulan.hour.toString().padLeft(2, '0')}:${hijri.ijtimakAwalBulan.minute.toString().padLeft(2, '0')} WIB',
-              ),
               const SizedBox(height: 8),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _kolomMetodeDialog('Jean Meeus', hilalMeeus)),
+                  Expanded(child: _kolomMetodeDialog('Jean Meeus', hilalMeeus, ijtimakMeeusUtc!.add(const Duration(hours: 7)))),
                   const SizedBox(width: 12),
-                  Expanded(child: _kolomMetodeDialog('As-Syahru', hilalAsSyahru)),
+                  Expanded(child: _kolomMetodeDialog('As-Syahru', hilalAsSyahru, ijtimakAsSyahruUtc!.add(const Duration(hours: 7)))),
                 ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Waktu ijtimak bisa berbeda beberapa menit antar metode -- '
+                'lihat masing-masing kartu di atas.',
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontStyle: FontStyle.italic),
               ),
               const SizedBox(height: 8),
               Text(

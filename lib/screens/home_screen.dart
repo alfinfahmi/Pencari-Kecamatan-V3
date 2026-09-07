@@ -45,6 +45,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int _searchRequestId = 0;
 
+  /// Dihitung SEKALI saat layar ini dibuka (bukan tiap kali build()
+  /// dipanggil ulang) -- kalau dipanggil langsung di dalam build(),
+  /// setiap rebuild (ganti tema, kembali dari layar lain, dll.) akan
+  /// memicu query baru ke Supabase, terasa seperti "refresh berulang".
+  late final Future<String> _roleFuture = SupabaseService.instance.getRole();
+
+  /// Cache manual untuk daftar Favorit/Riwayat -- dihitung ulang HANYA
+  /// saat pindah ke tab itu (lihat tabButton di bawah), BUKAN setiap kali
+  /// build() jalan ulang karena alasan lain (timer countdown widget
+  /// shalat, ganti tema, dll.) -- kalau tidak, query Hive berulang tiap
+  /// detik bisa terasa seperti "berkedip"/refresh terus-menerus.
+  Future<List<KecamatanModel>>? _favRiwayatFuture;
+
   @override
   void initState() {
     super.initState();
@@ -121,6 +134,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _toggleFavorite(String id) async {
     await _favService.toggleFavorite(id);
     await _loadFavorites();
+    // Kalau sedang di tab Favorit, daftar itu sendiri perlu ikut
+    // diperbarui (bukan cuma status bintang di kartu) -- supaya item yang
+    // baru di-unfavorite langsung hilang dari daftar, bukan menunggu
+    // pindah tab dulu.
+    if (_tab == _Tab.favorit && mounted) {
+      setState(() => _favRiwayatFuture = _favService.getFavoriteIds().then(_resolveIds));
+    }
   }
 
   /// Selain ID kecamatan resmi (lewat AppDataService), juga tangani ID
@@ -176,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           FutureBuilder<String>(
-            future: SupabaseService.instance.getRole(),
+            future: _roleFuture,
             builder: (context, snapshot) {
               final role = snapshot.data ?? 'umum';
               if (role != 'kontributor' && role != 'admin') return const SizedBox.shrink();
@@ -544,7 +564,14 @@ class _HomeScreenState extends State<HomeScreen> {
       final selected = _tab == tab;
       return Expanded(
         child: InkWell(
-          onTap: () => setState(() => _tab = tab),
+          onTap: () => setState(() {
+            _tab = tab;
+            if (tab != _Tab.pencarian) {
+              _favRiwayatFuture = tab == _Tab.favorit
+                  ? _favService.getFavoriteIds().then(_resolveIds)
+                  : _favService.getHistoryIds().then(_resolveIds);
+            }
+          }),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
@@ -592,7 +619,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return _sliverDaftarLokasi(_results, tampilkanHeader: _sudahMencari);
     }
 
-    final future = _tab == _Tab.favorit
+    final future = _favRiwayatFuture ??= _tab == _Tab.favorit
         ? _favService.getFavoriteIds().then(_resolveIds)
         : _favService.getHistoryIds().then(_resolveIds);
 

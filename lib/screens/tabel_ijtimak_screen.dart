@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/hijri_service.dart';
+import '../services/meeus_hisab_service.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
@@ -147,11 +148,20 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   ///   memenuhi ambang MABIMS -- lebih "dekat" daripada kasus negatif
   /// - Oranye: hilal masih di BAWAH ufuk (tinggi negatif) -- jelas belum
   ///   mungkin terlihat
-  Widget _barisMetode(String namaMetode, ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) hilal) {
+  Widget _barisMetode(
+    String namaMetode,
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) hilal, {
+    DateTime? ijtimakBerbeda,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(namaMetode, style: TextStyle(fontSize: 9.5, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+        if (ijtimakBerbeda != null)
+          Text(
+            'ijtimak ${ijtimakBerbeda.hour.toString().padLeft(2, '0')}:${ijtimakBerbeda.minute.toString().padLeft(2, '0')} WIB',
+            style: TextStyle(fontSize: 9, color: Colors.grey.shade400),
+          ),
         Text(
           '${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, elong. ${hilal.elongasi.toStringAsFixed(1)}\u00b0',
           style: TextStyle(
@@ -384,11 +394,26 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     final ijtimakWib = HijriService.parseWibSebagaiUtc(e['ijtimak_wib'] as String);
     final lokasi = _lokasi;
 
+    // Baris ini "ijtimak akhir bulan X" = ijtimak AWAL bulan X+1 -- untuk
+    // MeeusHisabService.cariIjtimakUtc butuh (tahunH, bulanH) bulan yang
+    // DIMULAI (X+1), bukan yang berakhir (X).
+    final bulanH = e['bulan_h'] as int;
+    final tahunH = e['tahun_h'] as int;
+    final bulanBerikutnyaH = bulanH == 12 ? 1 : bulanH + 1;
+    final tahunUntukBulanBerikutnya = bulanH == 12 ? tahunH + 1 : tahunH;
+    final namaBerikutnya = _namaBulanHijriah[bulanBerikutnyaH];
+
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
+    DateTime? ijtimakMeeusUtc;
     if (lokasi != null && lokasi.utcOffset != null) {
+      // Jean Meeus pakai waktu ijtimak HASIL PERHITUNGANNYA SENDIRI
+      // (algoritma Bab 49, tervalidasi terpisah) -- bisa beda beberapa
+      // menit dari tabel As-Syahru di atas, ini memang sengaja.
+      ijtimakMeeusUtc =
+          MeeusHisabService.cariIjtimakUtc(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH);
       hilalMeeus = HijriService.hitungKeadaanHilalPadaIjtimak(
-        ijtimakWib: ijtimakWib,
+        ijtimakWib: ijtimakMeeusUtc.add(const Duration(hours: 7)),
         lat: lokasi.lat,
         lng: lokasi.lng,
         utcOffset: lokasi.utcOffset!,
@@ -405,9 +430,6 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
       );
     }
 
-    final bulanH = e['bulan_h'] as int;
-    final bulanBerikutnyaH = bulanH == 12 ? 1 : bulanH + 1;
-    final namaBerikutnya = _namaBulanHijriah[bulanBerikutnyaH];
 
     return ListTile(
       dense: true,
@@ -428,7 +450,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _barisMetode('Jean Meeus', hilalMeeus)),
+                Expanded(child: _barisMetode('Jean Meeus', hilalMeeus, ijtimakBerbeda: ijtimakMeeusUtc?.add(const Duration(hours: 7)))),
                 const SizedBox(width: 10),
                 Expanded(child: _barisMetode('As-Syahru', hilalAsSyahru)),
               ],
