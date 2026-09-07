@@ -157,16 +157,16 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(namaMetode, style: TextStyle(fontSize: 9.5, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+        Text(namaMetode, style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
         if (ijtimakBerbeda != null)
           Text(
             'ijtimak ${ijtimakBerbeda.hour.toString().padLeft(2, '0')}:${ijtimakBerbeda.minute.toString().padLeft(2, '0')} WIB',
-            style: TextStyle(fontSize: 9, color: Colors.grey.shade400),
+            style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
           ),
         Text(
           '${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, elong. ${hilal.elongasi.toStringAsFixed(1)}\u00b0',
           style: TextStyle(
-            fontSize: 10.5,
+            fontSize: 12.5,
             color: _warnaKeadaanHilal(hilal.memenuhi, hilal.tinggiHilal),
             fontWeight: FontWeight.w600,
           ),
@@ -187,15 +187,13 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     return '$hari $pasaran';
   }
 
-  String _formatTanggalJam(String iso) {
+  String _formatTanggalSaja(String iso) {
     final dt = HijriService.parseWibSebagaiUtc(iso);
     const bulan = {
       1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun',
       7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des',
     };
-    final jam = dt.hour.toString().padLeft(2, '0');
-    final menit = dt.minute.toString().padLeft(2, '0');
-    return '${dt.day} ${bulan[dt.month]} ${dt.year}, $jam.$menit WIB';
+    return '${dt.day} ${bulan[dt.month]} ${dt.year}';
   }
 
   @override
@@ -455,7 +453,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${_formatTanggalJam(e['ijtimak_wib'] as String)} \u2022 ${_formatHariPasaran(ijtimakWib)}',
+            '${_formatTanggalSaja(e['ijtimak_wib'] as String)} \u2022 ${_formatHariPasaran(ijtimakWib)}',
             style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
           ),
           if (hilalMeeus != null && hilalAsSyahru != null) ...[
