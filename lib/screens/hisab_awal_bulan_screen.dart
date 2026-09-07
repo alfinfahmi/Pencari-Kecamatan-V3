@@ -127,6 +127,10 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     return Scaffold(
       backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppColors.backgroundDark : const Color(0xFFF6F8F7),
       appBar: AppBar(
+        backgroundColor: AppColors.emerald,
+        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        titleTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18),
         title: const Text('Hisab Awal Bulan'),
         actions: [HomeButton()],
         bottom: TabBar(
@@ -201,6 +205,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                   decoration: InputDecoration(
                     labelText: 'Tahun H',
                     labelStyle: const TextStyle(color: Colors.white70, fontSize: 11),
+                    floatingLabelStyle: const TextStyle(color: Colors.white, fontSize: 11),
                     isDense: true,
                     enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white38)),
                     focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppColors.gold)),
@@ -217,6 +222,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                   decoration: const InputDecoration(
                     labelText: 'Bulan',
                     labelStyle: TextStyle(color: Colors.white70, fontSize: 11),
+                    floatingLabelStyle: TextStyle(color: Colors.white, fontSize: 11),
                     isDense: true,
                     enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white38)),
                     focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.gold)),
@@ -265,7 +271,12 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(14),
-      child: Column(
+      child: Center(
+        child: ConstrainedBox(
+          // Batasi lebar maksimum -- tanpa ini, di layar lebar (desktop)
+          // kartu-kartu jadi melebar penuh ke seluruh layar, sulit dibaca.
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _kartuKesimpulan(hasil, bulanH, tahunH, tanggal1),
@@ -329,6 +340,8 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           const SizedBox(height: 12),
           const WatermarkFooter(),
         ],
+          ),
+        ),
       ),
     );
   }
