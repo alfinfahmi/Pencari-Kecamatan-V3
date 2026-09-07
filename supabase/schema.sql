@@ -19,7 +19,7 @@ create table public.profiles (
 -- bawah). Menaikkan ke 'admin' TETAP harus manual lewat Supabase
 -- Dashboard -> Table Editor -> profiles -> ubah kolom 'role' (sengaja
 -- tidak dibuat self-service untuk role setinggi itu).
-create function public.handle_new_user()
+create or replace function public.handle_new_user()
 returns trigger as $$
 declare
   kode text;
