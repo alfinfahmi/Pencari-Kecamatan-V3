@@ -66,6 +66,47 @@ class AsSyahruService {
   }
 
   /// Hasil lengkap satu perhitungan keadaan hilal metode As-Syahru.
+  /// Cari waktu ijtimak memakai rumus As-Syahru sendiri (bukan tabel
+  /// referensi HijriService, walau hasilnya IDENTIK -- rumus ini persis
+  /// sama dengan `HijriService._ijtimakJdeFormula`, byte-per-byte
+  /// tervalidasi cocok dengan file sumber "As_Syahru_fixed.xlsx", dan
+  /// tabel referensi HijriService pun terbukti konsisten dengan rumus
+  /// ini). Diekspos di sini secara EKSPLISIT (bukan cuma menumpang
+  /// HijriService diam-diam) supaya As-Syahru simetris dengan
+  /// MeeusHisabService.cariIjtimakUtc, dan tetap berfungsi mandiri untuk
+  /// tahun di luar rentang tabel HijriService (1440H-1500H).
+  ///
+  /// `bulanH` berarti "bulan yang DIMULAI oleh ijtimak ini" -- konvensi
+  /// yang sama dipakai di seluruh aplikasi (lihat catatan serupa di
+  /// MeeusHisabService.cariIjtimakUtc).
+  static DateTime cariIjtimakUtc({required int tahunH, required int bulanH}) {
+    final a8 = (tahunH + 29.530589 * (bulanH - 1) / 354.367068 - 1410) * 12;
+    final b8 = a8 / 1200;
+    final c8 = 2447740.652 + 29.530589 * a8 + 0.0001178 * b8 * b8;
+    final e8 = _mod((207.9587074 + 29.10535608 * a8 - 0.0000333 * b8 * b8) / 360, 1) * 360;
+    final f8 = _mod((111.1791307 + 385.81691806 * a8 + 0.0107306 * b8 * b8) / 360, 1) * 360;
+    final g8 = _mod((164.2162296 + 390.67050646 * a8 - 0.0016528 * b8 * b8) / 360, 1) * 360;
+
+    final h8 = (0.1734 - 0.000393 * b8) * _sind(e8) +
+        0.0021 * _sind(2 * e8) -
+        0.4068 * _sind(f8) +
+        0.0161 * _sind(2 * f8) -
+        0.0004 * _sind(3 * f8);
+    final i8 = h8 +
+        0.0104 * _sind(2 * g8) -
+        0.0051 * _sind(e8 + f8) -
+        0.0074 * _sind(e8 - f8) +
+        0.0004 * _sind(2 * g8 + e8) -
+        0.0004 * _sind(2 * g8 - e8) -
+        0.0006 * _sind(2 * g8 + f8) +
+        0.001 * _sind(2 * g8 - f8) +
+        0.0005 * _sind(e8 + 2 * f8);
+
+    final jde = c8 + i8;
+    final micros = ((jde - 2451544.5) * 86400 * 1000000).round();
+    return DateTime.utc(2000, 1, 1).add(Duration(microseconds: micros));
+  }
+
   static HasilHisabDetail hitung({
     required DateTime ijtimakUtc,
     required double lat,

@@ -58,7 +58,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     DateTime Function({required int tahunH, required int bulanH})?,
   )>[
     ('Jean Meeus', MeeusHisabService.hitung, MeeusHisabService.cariIjtimakUtc),
-    ('As-Syahru', AsSyahruService.hitung, null),
+    ('As-Syahru', AsSyahruService.hitung, AsSyahruService.cariIjtimakUtc),
   ];
 
   static const _namaBulanHijriah = {
