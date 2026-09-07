@@ -14,16 +14,26 @@ create table public.profiles (
   created_at timestamptz not null default now()
 );
 
--- Setiap user baru otomatis dapat baris profile dengan role 'umum'.
--- Admin harus menaikkan role kontributor/admin secara MANUAL lewat
--- Supabase Dashboard -> Table Editor -> profiles -> ubah kolom 'role'.
--- (Sengaja tidak dibuat self-service, sesuai matriks hak akses: hanya
--- Admin LF Lirboyo yang boleh mengelola akun.)
+-- Role awal user baru: 'umum' secara default, ATAU 'kontributor' kalau
+-- saat daftar menyertakan kode aktivasi "falak" (lihat fungsi trigger di
+-- bawah). Menaikkan ke 'admin' TETAP harus manual lewat Supabase
+-- Dashboard -> Table Editor -> profiles -> ubah kolom 'role' (sengaja
+-- tidak dibuat self-service untuk role setinggi itu).
 create function public.handle_new_user()
 returns trigger as $$
+declare
+  kode text;
+  role_awal public.user_role;
 begin
+  kode := lower(trim(new.raw_user_meta_data->>'kode_aktivasi'));
+  if kode = 'falak' then
+    role_awal := 'kontributor';
+  else
+    role_awal := 'umum';
+  end if;
+
   insert into public.profiles (id, nama, role)
-  values (new.id, new.raw_user_meta_data->>'nama', 'umum');
+  values (new.id, new.raw_user_meta_data->>'nama', role_awal);
   return new;
 end;
 $$ language plpgsql security definer;

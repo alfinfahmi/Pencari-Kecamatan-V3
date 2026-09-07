@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/app_data_service.dart';
-import '../services/activation_service.dart';
 import '../theme/app_theme.dart';
-import 'activation_screen.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,13 +19,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _init() async {
     await AppDataService.instance.load();
-    final activated = await ActivationService().isActivated();
 
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => activated ? const HomeScreen() : const ActivationScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
   }
 

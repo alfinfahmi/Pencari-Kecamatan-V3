@@ -14,6 +14,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _namaController = TextEditingController();
+  final _kodeAktivasiController = TextEditingController();
   bool _isDaftar = false;
   bool _loading = false;
   String? _error;
@@ -26,6 +27,7 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
           nama: _namaController.text.trim(),
+          kodeAktivasi: _kodeAktivasiController.text.trim(),
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -85,6 +87,16 @@ class _AuthScreenState extends State<AuthScreen> {
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'Kata Sandi'),
               ),
+              if (_isDaftar) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _kodeAktivasiController,
+                  decoration: const InputDecoration(
+                    labelText: 'Kode Aktivasi Kontributor (opsional)',
+                    helperText: 'Kosongkan kalau cuma mau daftar sebagai pengguna biasa.',
+                  ),
+                ),
+              ],
               if (_error != null) ...[
                 const SizedBox(height: 12),
                 Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12.5)),

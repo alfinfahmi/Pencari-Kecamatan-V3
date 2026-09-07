@@ -37,8 +37,20 @@ class SupabaseService {
   bool get isLoggedIn => _initialized && _client.auth.currentUser != null;
   String? get userId => _initialized ? _client.auth.currentUser?.id : null;
 
-  Future<void> daftar({required String email, required String password, required String nama}) async {
-    await _client.auth.signUp(email: email, password: password, data: {'nama': nama});
+  Future<void> daftar({
+    required String email,
+    required String password,
+    required String nama,
+    String? kodeAktivasi,
+  }) async {
+    await _client.auth.signUp(
+      email: email,
+      password: password,
+      data: {
+        'nama': nama,
+        if (kodeAktivasi != null && kodeAktivasi.isNotEmpty) 'kode_aktivasi': kodeAktivasi,
+      },
+    );
   }
 
   Future<void> masuk({required String email, required String password}) async {
