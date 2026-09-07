@@ -17,6 +17,7 @@ import 'moderation_panel_screen.dart';
 import 'adzan_settings_screen.dart';
 import 'tabel_ijtimak_screen.dart';
 import 'hijri_calendar_screen.dart';
+import 'hisab_awal_bulan_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -354,9 +355,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (_memuatMenuLokasi)
                   const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2))
                 else
-                  Icon(icon, color: AppColors.emerald, size: 22),
+                  Icon(icon, color: AppColors.emerald, size: 19),
                 const SizedBox(height: 6),
-                Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600)),
+                Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600)),
               ],
             ),
           ),
@@ -402,6 +403,16 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const HijriCalendarScreen()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+          tile(
+            icon: Icons.description_outlined,
+            label: 'Hisab\nAwal Bulan',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const HisabAwalBulanScreen()),
               );
             },
           ),

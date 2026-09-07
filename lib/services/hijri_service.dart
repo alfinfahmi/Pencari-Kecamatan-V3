@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart' show rootBundle;
+import 'as_syahru_service.dart';
 
 /// Pilihan kriteria imkan rukyat (ambang batas lolos/tidaknya hilal),
 /// TERPISAH dari mesin hitung posisi bulan/matahari itu sendiri --
@@ -17,6 +18,20 @@ enum KriteriaImkanRukyat {
         KriteriaImkanRukyat.irtifa2UsiaHilal6Jam => 'Irtifa 2°, Usia Hilal 6 Jam',
         KriteriaImkanRukyat.irtifa2UsiaHilal8Jam => 'Irtifa 2°, Usia Hilal 8 Jam',
         KriteriaImkanRukyat.irtifa2Saja => 'Irtifa 2° Saja',
+      };
+}
+
+/// Metode hisab yang dipakai untuk menghitung keadaan hilal (tinggi,
+/// elongasi) yang menentukan awal bulan Hijriah -- BUKAN cuma tampilan,
+/// tapi benar-benar mempengaruhi hasil di seluruh aplikasi (badge
+/// tanggal, kalender, waktu shalat) kalau dipilih sebagai metode aktif.
+enum MetodeHisab {
+  jeanMeeus,
+  asySyahru;
+
+  String get label => switch (this) {
+        MetodeHisab.jeanMeeus => 'Jean Meeus',
+        MetodeHisab.asySyahru => 'As-Syahru',
       };
 }
 
@@ -357,36 +372,67 @@ class HijriService {
     required double lat,
     required double lng,
     required int utcOffset,
+    double elevasiM = 0,
+    MetodeHisab? paksaMetode,
   }) {
     final ijtimakUtc = ijtimakWib.subtract(const Duration(hours: 7));
     final jdeUt = 2451544.5 + ijtimakUtc.difference(DateTime.utc(2000, 1, 1)).inMicroseconds / (86400 * 1000000);
-    return _hilalMemenuhiMabims(ijtimakJde: jdeUt, lat: lat, lng: lng, utcOffset: utcOffset);
+    return _hilalMemenuhiMabims(
+      ijtimakJde: jdeUt, lat: lat, lng: lng, utcOffset: utcOffset, elevasiM: elevasiM, paksaMetode: paksaMetode,
+    );
   }
 
   /// Kriteria imkan rukyat yang aktif -- diisi HisabPreferenceService saat
   /// aplikasi start, default MABIMS 2021 kalau belum pernah diatur.
   static KriteriaImkanRukyat kriteriaAktif = KriteriaImkanRukyat.mabims2021;
 
+  /// Metode hisab aktif -- kalau MetodeHisab.asySyahru, penentuan awal
+  /// bulan (di seluruh aplikasi) memakai tinggi hilal MAR'I + elongasi
+  /// dari AsSyahruService, BUKAN posisi Meeus. Diisi HisabPreferenceService
+  /// saat aplikasi start, default Jean Meeus kalau belum pernah diatur.
+  static MetodeHisab metodeAktif = MetodeHisab.jeanMeeus;
+
   static ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) _hilalMemenuhiMabims({
     required double ijtimakJde,
     required double lat,
     required double lng,
     required int utcOffset,
+    double elevasiM = 0,
+    MetodeHisab? paksaMetode,
   }) {
+    final metode = paksaMetode ?? metodeAktif;
     final ijtimakUtc = _jdeToDateTimeUtc(ijtimakJde);
     final tanggalLokal = ijtimakUtc.add(Duration(hours: utcOffset));
     final maghribUtc = _cariMaghribUtc(tanggalLokal, lat, lng, utcOffset);
-
-    final jd = _julianDay(maghribUtc);
-    final (declS, raS) = _sunEquatorial(jd);
-    final (declM, raM) = _moonEquatorial(jd);
-    final haM = _hourAngleFromRa(jd, raM, lng);
-    final altM = _altitude(declM, lat, haM);
-
-    final cosElong = (_sind(declS) * _sind(declM) + _cosd(declS) * _cosd(declM) * _cosd(raS - raM))
-        .clamp(-1.0, 1.0);
-    final elongasi = acos(cosElong) * 180 / pi;
     final usiaHilalJam = maghribUtc.difference(ijtimakUtc).inMinutes / 60.0;
+
+    late final double altM;
+    late final double elongasi;
+
+    if (metode == MetodeHisab.asySyahru) {
+      // Metode As-Syahru: pakai tinggi hilal MAR'I (dikoreksi refraksi +
+      // paralaks + elevasi), bukan Hakiki -- lihat AsSyahruService untuk
+      // penjelasan lengkap & validasi terhadap file sumber aslinya.
+      final hasilAsSyahru = AsSyahruService.hitung(
+        ijtimakUtc: ijtimakUtc,
+        lat: lat,
+        lng: lng,
+        elevasiM: elevasiM,
+        utcOffset: utcOffset,
+      );
+      altM = hasilAsSyahru.tinggiHilalMari;
+      elongasi = hasilAsSyahru.elongasi;
+    } else {
+      final jd = _julianDay(maghribUtc);
+      final (declS, raS) = _sunEquatorial(jd);
+      final (declM, raM) = _moonEquatorial(jd);
+      final haM = _hourAngleFromRa(jd, raM, lng);
+      altM = _altitude(declM, lat, haM);
+
+      final cosElong = (_sind(declS) * _sind(declM) + _cosd(declS) * _cosd(declM) * _cosd(raS - raM))
+          .clamp(-1.0, 1.0);
+      elongasi = acos(cosElong) * 180 / pi;
+    }
 
     final memenuhi = switch (kriteriaAktif) {
       KriteriaImkanRukyat.mabims2021 => altM >= 3.0 && elongasi >= 6.4,
@@ -404,13 +450,14 @@ class HijriService {
     required double lat,
     required double lng,
     required int utcOffset,
+    double elevasiM = 0,
   }) {
     final jde = _ijtimakJde(tahunH, bulanH);
     final ijtimakUtc = _jdeToDateTimeUtc(jde);
     final ijtimakLokal = ijtimakUtc.add(Duration(hours: utcOffset));
     final hariIjtimak = DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day);
 
-    final hasil = _hilalMemenuhiMabims(ijtimakJde: jde, lat: lat, lng: lng, utcOffset: utcOffset);
+    final hasil = _hilalMemenuhiMabims(ijtimakJde: jde, lat: lat, lng: lng, utcOffset: utcOffset, elevasiM: elevasiM);
     final tanggal1 = hasil.memenuhi
         ? hariIjtimak.add(const Duration(days: 1))
         : hariIjtimak.add(const Duration(days: 2));
@@ -430,6 +477,7 @@ class HijriService {
     required double lat,
     required double lng,
     required int utcOffset,
+    double elevasiM = 0,
   }) {
     final tgl = DateTime(tanggal.year, tanggal.month, tanggal.day);
 
@@ -439,14 +487,14 @@ class HijriService {
     int bulanH = 1 + _modInt(estimasiBulanKe, 12);
     if (bulanH < 1) { bulanH += 12; tahunH -= 1; }
 
-    var awalIni = tentukanAwalBulan(tahunH: tahunH, bulanH: bulanH, lat: lat, lng: lng, utcOffset: utcOffset);
+    var awalIni = tentukanAwalBulan(tahunH: tahunH, bulanH: bulanH, lat: lat, lng: lng, utcOffset: utcOffset, elevasiM: elevasiM);
 
     (int, int) bulanBerikutnya(int y, int m) => m < 12 ? (y, m + 1) : (y + 1, 1);
     (int, int) bulanSebelumnya(int y, int m) => m > 1 ? (y, m - 1) : (y - 1, 12);
 
     for (int guard = 0; guard < 36; guard++) {
       final next = bulanBerikutnya(tahunH, bulanH);
-      final awalNext = tentukanAwalBulan(tahunH: next.$1, bulanH: next.$2, lat: lat, lng: lng, utcOffset: utcOffset);
+      final awalNext = tentukanAwalBulan(tahunH: next.$1, bulanH: next.$2, lat: lat, lng: lng, utcOffset: utcOffset, elevasiM: elevasiM);
       if (!tgl.isBefore(awalNext.tanggal1)) {
         tahunH = next.$1; bulanH = next.$2; awalIni = awalNext;
       } else {
@@ -457,7 +505,7 @@ class HijriService {
       if (tgl.isBefore(awalIni.tanggal1)) {
         final prev = bulanSebelumnya(tahunH, bulanH);
         tahunH = prev.$1; bulanH = prev.$2;
-        awalIni = tentukanAwalBulan(tahunH: tahunH, bulanH: bulanH, lat: lat, lng: lng, utcOffset: utcOffset);
+        awalIni = tentukanAwalBulan(tahunH: tahunH, bulanH: bulanH, lat: lat, lng: lng, utcOffset: utcOffset, elevasiM: elevasiM);
       } else {
         break;
       }

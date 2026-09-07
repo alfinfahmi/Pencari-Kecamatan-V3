@@ -192,8 +192,8 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
 
     final hari1 = _bulanTampil;
     final hariTerakhir = DateTime(_bulanTampil.year, _bulanTampil.month + 1, 0);
-    final hijriAwal = HijriService.instance.konversi(hari1, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!);
-    final hijriAkhir = HijriService.instance.konversi(hariTerakhir, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!);
+    final hijriAwal = HijriService.instance.konversi(hari1, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!, elevasiM: (lokasi.elevasiM ?? 0).toDouble());
+    final hijriAkhir = HijriService.instance.konversi(hariTerakhir, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!, elevasiM: (lokasi.elevasiM ?? 0).toDouble());
 
     if (hijriAwal.bulanH == hijriAkhir.bulanH && hijriAwal.tahunH == hijriAkhir.tahunH) {
       return '${hijriAwal.namaBulanH} ${hijriAwal.tahunH}';
@@ -279,7 +279,7 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
               TanggalHijriah? hijri;
               String? namaPenting;
               if (lokasi != null && lokasi.utcOffset != null) {
-                hijri = HijriService.instance.konversi(tanggalMasehi, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!);
+                hijri = HijriService.instance.konversi(tanggalMasehi, lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!, elevasiM: (lokasi.elevasiM ?? 0).toDouble());
                 namaPenting = _hariPenting[(hijri.bulanH, hijri.hari)];
               }
 
@@ -342,6 +342,40 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
     );
   }
 
+  Widget _kolomMetodeDialog(String namaMetode, ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) hilal) {
+    final warna = hilal.memenuhi ? AppColors.emerald : Colors.deepOrange.shade700;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: warna.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: warna.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(namaMetode, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text('Tinggi: ${hilal.tinggiHilal.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
+          Text('Elongasi: ${hilal.elongasi.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(hilal.memenuhi ? Icons.check_circle_rounded : Icons.cancel_rounded, size: 13, color: warna),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  hilal.memenuhi ? 'Terpenuhi' : 'Istikmal',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: warna),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _barisDetailKalender(String label, String nilai) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -359,6 +393,36 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
   }
 
   void _tampilkanDetailHari(DateTime tanggalMasehi, TanggalHijriah? hijri, String? namaPenting) {
+    // Hitung KEDUA metode untuk perbandingan, terlepas dari metode mana
+    // yang sedang "aktif" secara global. Konversi manual (bukan lewat
+    // hitungKeadaanHilalPadaIjtimak langsung) karena hijri.ijtimakAwalBulan
+    // ada dalam zona waktu LOKASI (bisa WITA/WIT), sedangkan fungsi itu
+    // mengasumsikan WIB tetap -- jadi kita "bungkus ulang" jadi setara WIB
+    // dulu supaya konversinya benar untuk zona waktu apa pun.
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
+    final lokasi = _lokasi;
+    if (hijri != null && lokasi != null && lokasi.utcOffset != null) {
+      final ijtimakUtc = hijri.ijtimakAwalBulan.subtract(Duration(hours: lokasi.utcOffset!));
+      final ijtimakSetaraWib = ijtimakUtc.add(const Duration(hours: 7));
+      hilalMeeus = HijriService.hitungKeadaanHilalPadaIjtimak(
+        ijtimakWib: ijtimakSetaraWib,
+        lat: lokasi.lat,
+        lng: lokasi.lng,
+        utcOffset: lokasi.utcOffset!,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+        paksaMetode: MetodeHisab.jeanMeeus,
+      );
+      hilalAsSyahru = HijriService.hitungKeadaanHilalPadaIjtimak(
+        ijtimakWib: ijtimakSetaraWib,
+        lat: lokasi.lat,
+        lng: lokasi.lng,
+        utcOffset: lokasi.utcOffset!,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+        paksaMetode: MetodeHisab.asySyahru,
+      );
+    }
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
@@ -392,35 +456,29 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
                 ),
               ),
             ],
-            if (hijri != null) ...[
+            if (hijri != null && hilalMeeus != null && hilalAsSyahru != null) ...[
               const Divider(height: 24),
-              Text('Keadaan Hilal Awal ${hijri.namaBulanH}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
+              Text('Keadaan Hilal Awal ${hijri.namaBulanH} -- Perbandingan Metode',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
               const SizedBox(height: 6),
               _barisDetailKalender(
                 'Waktu ijtimak',
                 '${hijri.ijtimakAwalBulan.day}/${hijri.ijtimakAwalBulan.month}/${hijri.ijtimakAwalBulan.year} '
                 '${hijri.ijtimakAwalBulan.hour.toString().padLeft(2, '0')}:${hijri.ijtimakAwalBulan.minute.toString().padLeft(2, '0')} WIB',
               ),
-              _barisDetailKalender('Tinggi hilal saat maghrib', '${hijri.tinggiHilalDerajat.toStringAsFixed(2)}\u00b0'),
-              _barisDetailKalender('Elongasi', '${hijri.elongasiDerajat.toStringAsFixed(2)}\u00b0'),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    hijri.mabimsTerpenuhi ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                    size: 15,
-                    color: hijri.mabimsTerpenuhi ? AppColors.emerald : Colors.deepOrange.shade700,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    hijri.mabimsTerpenuhi ? 'Kriteria MABIMS terpenuhi' : 'Kriteria MABIMS tidak terpenuhi (istikmal)',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12.5,
-                      color: hijri.mabimsTerpenuhi ? AppColors.emerald : Colors.deepOrange.shade700,
-                    ),
-                  ),
+                  Expanded(child: _kolomMetodeDialog('Jean Meeus', hilalMeeus)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _kolomMetodeDialog('As-Syahru', hilalAsSyahru)),
                 ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Metode aktif saat ini (dipakai untuk menentukan tanggal Hijriah di atas): ${HijriService.metodeAktif.label}.',
+                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500, fontStyle: FontStyle.italic),
               ),
             ],
             const SizedBox(height: 12),

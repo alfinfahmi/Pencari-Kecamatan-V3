@@ -23,7 +23,8 @@ class KriteriaHilalSettingsSheet extends StatefulWidget {
 
 class _KriteriaHilalSettingsSheetState extends State<KriteriaHilalSettingsSheet> {
   final _service = HisabPreferenceService();
-  KriteriaImkanRukyat _terpilih = KriteriaImkanRukyat.mabims2021;
+  KriteriaImkanRukyat _kriteriaTerpilih = KriteriaImkanRukyat.mabims2021;
+  MetodeHisab _metodeTerpilih = MetodeHisab.jeanMeeus;
   bool _loading = true;
   bool _berubah = false;
 
@@ -35,16 +36,26 @@ class _KriteriaHilalSettingsSheetState extends State<KriteriaHilalSettingsSheet>
 
   Future<void> _muat() async {
     final k = await _service.getKriteria();
+    final m = await _service.getMetode();
     setState(() {
-      _terpilih = k;
+      _kriteriaTerpilih = k;
+      _metodeTerpilih = m;
       _loading = false;
     });
   }
 
-  Future<void> _pilih(KriteriaImkanRukyat k) async {
+  Future<void> _pilihKriteria(KriteriaImkanRukyat k) async {
     await _service.setKriteria(k);
     setState(() {
-      _terpilih = k;
+      _kriteriaTerpilih = k;
+      _berubah = true;
+    });
+  }
+
+  Future<void> _pilihMetode(MetodeHisab m) async {
+    await _service.setMetode(m);
+    setState(() {
+      _metodeTerpilih = m;
       _berubah = true;
     });
   }
@@ -65,7 +76,7 @@ class _KriteriaHilalSettingsSheetState extends State<KriteriaHilalSettingsSheet>
                     Row(
                       children: [
                         Expanded(
-                          child: Text('Kriteria Imkan Rukyat', style: AppTypography.headlineMd()),
+                          child: Text('Pengaturan Hisab Hilal', style: AppTypography.headlineMd()),
                         ),
                         IconButton(
                           icon: const Icon(Icons.close_rounded),
@@ -73,19 +84,38 @@ class _KriteriaHilalSettingsSheetState extends State<KriteriaHilalSettingsSheet>
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
+                    Text('Metode Hisab', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
                     Text(
-                      'Menentukan ambang batas lolos/tidaknya hilal, berlaku untuk seluruh '
-                      'perhitungan awal bulan Hijriah di aplikasi ini (badge tanggal, kalender, Tabel Ijtimak).',
+                      'Menentukan rumus posisi bulan/matahari yang dipakai untuk keputusan '
+                      'awal bulan resmi (badge tanggal, kalender, Tabel Ijtimak). Kedua metode '
+                      'tetap ditampilkan berdampingan untuk perbandingan, apa pun yang dipilih di sini.',
                       style: AppTypography.bodyMd(color: Colors.grey.shade600),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
+                    ...MetodeHisab.values.map((m) => RadioListTile<MetodeHisab>(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(m.label, style: const TextStyle(fontSize: 14)),
+                          value: m,
+                          groupValue: _metodeTerpilih,
+                          activeColor: AppColors.emerald,
+                          onChanged: (v) => _pilihMetode(v!),
+                        )),
+                    const Divider(height: 28),
+                    Text('Kriteria Imkan Rukyat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
+                    Text(
+                      'Menentukan ambang batas lolos/tidaknya hilal, berlaku untuk seluruh '
+                      'perhitungan awal bulan Hijriah di aplikasi ini.',
+                      style: AppTypography.bodyMd(color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 8),
                     ...KriteriaImkanRukyat.values.map((k) => RadioListTile<KriteriaImkanRukyat>(
                           contentPadding: EdgeInsets.zero,
                           title: Text(k.label, style: const TextStyle(fontSize: 14)),
                           value: k,
-                          groupValue: _terpilih,
+                          groupValue: _kriteriaTerpilih,
                           activeColor: AppColors.emerald,
-                          onChanged: (v) => _pilih(v!),
+                          onChanged: (v) => _pilihKriteria(v!),
                         )),
                     const SizedBox(height: 8),
                     Container(

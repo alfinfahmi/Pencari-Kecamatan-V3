@@ -147,6 +147,23 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   ///   memenuhi ambang MABIMS -- lebih "dekat" daripada kasus negatif
   /// - Oranye: hilal masih di BAWAH ufuk (tinggi negatif) -- jelas belum
   ///   mungkin terlihat
+  Widget _barisMetode(String namaMetode, ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam}) hilal) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(namaMetode, style: TextStyle(fontSize: 9.5, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+        Text(
+          '${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, elong. ${hilal.elongasi.toStringAsFixed(1)}\u00b0',
+          style: TextStyle(
+            fontSize: 10.5,
+            color: _warnaKeadaanHilal(hilal.memenuhi, hilal.tinggiHilal),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
   Color _warnaKeadaanHilal(bool memenuhi, double tinggiHilal) {
     if (memenuhi) return AppColors.emerald;
     if (tinggiHilal > 0) return Colors.amber.shade700;
@@ -367,13 +384,24 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     final ijtimakWib = HijriService.parseWibSebagaiUtc(e['ijtimak_wib'] as String);
     final lokasi = _lokasi;
 
-    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilal;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
     if (lokasi != null && lokasi.utcOffset != null) {
-      hilal = HijriService.hitungKeadaanHilalPadaIjtimak(
+      hilalMeeus = HijriService.hitungKeadaanHilalPadaIjtimak(
         ijtimakWib: ijtimakWib,
         lat: lokasi.lat,
         lng: lokasi.lng,
         utcOffset: lokasi.utcOffset!,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+        paksaMetode: MetodeHisab.jeanMeeus,
+      );
+      hilalAsSyahru = HijriService.hitungKeadaanHilalPadaIjtimak(
+        ijtimakWib: ijtimakWib,
+        lat: lokasi.lat,
+        lng: lokasi.lng,
+        utcOffset: lokasi.utcOffset!,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+        paksaMetode: MetodeHisab.asySyahru,
       );
     }
 
@@ -395,16 +423,15 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
             '${_formatTanggalJam(e['ijtimak_wib'] as String)} \u2022 ${_formatHariPasaran(ijtimakWib)}',
             style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
           ),
-          if (hilal != null) ...[
-            const SizedBox(height: 3),
-            Text(
-              'Tinggi hilal ${hilal.tinggiHilal.toStringAsFixed(1)}\u00b0, '
-              'elongasi ${hilal.elongasi.toStringAsFixed(1)}\u00b0',
-              style: TextStyle(
-                fontSize: 10.5,
-                color: _warnaKeadaanHilal(hilal.memenuhi, hilal.tinggiHilal),
-                fontWeight: FontWeight.w600,
-              ),
+          if (hilalMeeus != null && hilalAsSyahru != null) ...[
+            const SizedBox(height: 4),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _barisMetode('Jean Meeus', hilalMeeus)),
+                const SizedBox(width: 10),
+                Expanded(child: _barisMetode('As-Syahru', hilalAsSyahru)),
+              ],
             ),
           ],
         ],

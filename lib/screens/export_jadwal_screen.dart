@@ -137,6 +137,7 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
       lat: _lokasi.lat,
       lng: _lokasi.lng,
       utcOffset: _lokasi.utcOffset ?? 7,
+      elevasiM: (_lokasi.elevasiM ?? 0).toDouble(),
     );
     return awal.tanggal1.add(Duration(days: tanggalH - 1));
   }
@@ -226,7 +227,7 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
 
     if (_tampilan == _TampilanTanggal.masehi) return labelMasehi;
 
-    final hijri = HijriService.instance.konversi(tgl, lat: data.lat, lng: data.lng, utcOffset: data.utcOffset!);
+    final hijri = HijriService.instance.konversi(tgl, lat: data.lat, lng: data.lng, utcOffset: data.utcOffset!, elevasiM: (data.elevasiM ?? 0).toDouble());
     final labelHijri = '${hijri.hari} ${hijri.namaBulanH} ${hijri.tahunH} H';
 
     if (_tampilan == _TampilanTanggal.hijriah) return labelHijri;

@@ -230,7 +230,7 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
     final labelMasehi = '${tanggal.day} ${_namaBulanMasehi[tanggal.month]} ${tanggal.year}';
     final lokasi = _lokasi;
     if (lokasi?.utcOffset == null) return labelMasehi;
-    final hijri = HijriService.instance.konversi(tanggal, lat: lokasi!.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!);
+    final hijri = HijriService.instance.konversi(tanggal, lat: lokasi!.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!, elevasiM: (lokasi.elevasiM ?? 0).toDouble());
     return '$labelMasehi / ${hijri.hari} ${hijri.namaBulanH} ${hijri.tahunH}';
   }
 

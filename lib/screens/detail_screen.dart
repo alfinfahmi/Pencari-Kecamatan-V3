@@ -630,6 +630,7 @@ class _DetailScreenState extends State<DetailScreen> {
       lat: data.lat,
       lng: data.lng,
       utcOffset: data.utcOffset!,
+      elevasiM: (data.elevasiM ?? 0).toDouble(),
     );
     return InkWell(
       onTap: () => _tampilkanDetailHilal(hijri),
