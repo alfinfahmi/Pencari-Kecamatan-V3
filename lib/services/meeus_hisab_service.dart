@@ -131,12 +131,20 @@ class MeeusHisabService {
   /// (selisih Terrestrial Time ke UT) yang tanpanya hasilnya meleset
   /// beberapa menit.
   ///
-  /// `k` = indeks bulan sinodis sejak epoch Meeus (2000.0); k=232 adalah
-  /// ijtimak akhir Dzulhijjah 1439H / awal Muharram 1440H (9 Okt 2018),
-  /// dipakai sebagai jangkar. Karena tiap bulan Hijriah = tepat satu
-  /// siklus sinodis berurutan, k bertambah 1 setiap kali bulanH maju 1.
+  /// `bulanH` di sini berarti "bulan yang DIMULAI oleh ijtimak ini" --
+  /// PERSIS konvensi yang sama dipakai `HijriService.tentukanAwalBulan`
+  /// (lihat `_ijtimakJdeDariTabel`: untuk cari awal bulanH, ia mencari
+  /// entri tabel bulanH-1, karena entri tabel sendiri diberi nama sesuai
+  /// bulan yang BARU SAJA BERAKHIR -- ijtimak itu sendiri belum
+  /// mengganti nama bulan, cuma istilah, tanggalnya sama).
+  ///
+  /// `k` = indeks bulan sinodis sejak epoch Meeus (2000.0); k=231 adalah
+  /// ijtimak yang MENGAWALI Muharram 1440H (10 Sep 2018, cocok dengan
+  /// 1 Muharram 1440H yang dikenal luas jatuh ~11-12 Sep 2018), dipakai
+  /// sebagai jangkar. Karena tiap bulan Hijriah = tepat satu siklus
+  /// sinodis berurutan, k bertambah 1 setiap kali bulanH maju 1.
   static DateTime cariIjtimakUtc({required int tahunH, required int bulanH}) {
-    final k = (232 + (tahunH - 1440) * 12 + (bulanH - 1)).toDouble();
+    final k = (231 + (tahunH - 1440) * 12 + (bulanH - 1)).toDouble();
     final t = k / 1236.85;
 
     double sind(double x) => sin(x * pi / 180);
@@ -214,7 +222,7 @@ class MeeusHisabService {
     // Koreksi DeltaT (Terrestrial Time -> UT) -- polinomial Espenak/Meeus,
     // akurat untuk rentang tahun 2005-2050. Tanpa koreksi ini, hasilnya
     // meleset beberapa menit dari nilai sebenarnya.
-    final tahunPerkiraan = 2000 + (k - 232) / 12.3685 + 2018.77 - 2000;
+    final tahunPerkiraan = 2000 + (k - 231) / 12.3685 + 2018.69 - 2000;
     final y = tahunPerkiraan - 2000;
     final deltaTDetik = 62.92 + 0.32217 * y + 0.005589 * y * y;
 
