@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/hijri_service.dart';
+import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
