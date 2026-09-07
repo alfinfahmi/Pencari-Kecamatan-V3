@@ -436,7 +436,6 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
           ],
         ],
       ),
-      isThreeLine: hilal != null,
     );
   }
 }
