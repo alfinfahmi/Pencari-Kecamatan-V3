@@ -215,7 +215,13 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: Center(
+          child: ConstrainedBox(
+            // Batasi lebar maksimum -- tanpa ini, di layar lebar (desktop)
+            // seluruh isi (banner info, filter, daftar) melebar penuh ke
+            // seluruh layar, sulit dibaca.
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Column(
           children: [
             Container(
               width: double.infinity,
@@ -252,6 +258,8 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
             Expanded(child: _buildBody()),
             const WatermarkFooter(),
           ],
+            ),
+          ),
         ),
       ),
     );
@@ -406,12 +414,16 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
     DateTime? ijtimakMeeusUtc;
+    DateTime? ijtimakAsSyahruUtc;
     if (lokasi != null && lokasi.utcOffset != null) {
-      // Jean Meeus pakai waktu ijtimak HASIL PERHITUNGANNYA SENDIRI
-      // (algoritma Bab 49, tervalidasi terpisah) -- bisa beda beberapa
-      // menit dari tabel As-Syahru di atas, ini memang sengaja.
+      // Kedua metode pakai waktu ijtimak HASIL PERHITUNGANNYA SENDIRI
+      // (bukan waktu bersama dari tabel/kolom kiri) -- bisa beda
+      // beberapa menit, ini memang sengaja supaya jujur mencerminkan
+      // bahwa kedua metode punya perhitungan independen.
       ijtimakMeeusUtc =
           MeeusHisabService.cariIjtimakUtc(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH);
+      ijtimakAsSyahruUtc =
+          AsSyahruService.cariIjtimakUtc(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH);
       hilalMeeus = HijriService.hitungKeadaanHilalPadaIjtimak(
         ijtimakWib: ijtimakMeeusUtc.add(const Duration(hours: 7)),
         lat: lokasi.lat,
@@ -421,7 +433,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
         paksaMetode: MetodeHisab.jeanMeeus,
       );
       hilalAsSyahru = HijriService.hitungKeadaanHilalPadaIjtimak(
-        ijtimakWib: ijtimakWib,
+        ijtimakWib: ijtimakAsSyahruUtc.add(const Duration(hours: 7)),
         lat: lokasi.lat,
         lng: lokasi.lng,
         utcOffset: lokasi.utcOffset!,
@@ -452,7 +464,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
               children: [
                 Expanded(child: _barisMetode('Jean Meeus', hilalMeeus, ijtimakBerbeda: ijtimakMeeusUtc?.add(const Duration(hours: 7)))),
                 const SizedBox(width: 10),
-                Expanded(child: _barisMetode('As-Syahru', hilalAsSyahru)),
+                Expanded(child: _barisMetode('As-Syahru', hilalAsSyahru, ijtimakBerbeda: ijtimakAsSyahruUtc?.add(const Duration(hours: 7)))),
               ],
             ),
           ],
