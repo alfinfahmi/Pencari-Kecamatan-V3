@@ -127,15 +127,6 @@ class KalkulatorService {
     return _mod(gmst + lng - ra, 360);
   }
 
-  /// Azimut Matahari (dari Utara, searah jarum jam), untuk lat/lng & waktu tertentu.
-  static double azimutMatahari(DateTime utc, double lat, double lng) {
-    final jd = _julianDay(utc);
-    final (decl, ra) = _matahariEkuatorial(jd);
-    final ha = _hourAngle(jd, ra, lng);
-    final az = _atan2d(_sind(ha), _cosd(ha) * _sind(lat) - _tand(decl) * _cosd(lat));
-    return _mod(az + 180, 360);
-  }
-
   /// Rashdul Kiblat GLOBAL -- momen matahari tepat di atas Ka'bah (dua kali
   /// setahun). `naik` = true untuk momen sekitar akhir Mei (deklinasi
   /// menaik), false untuk sekitar pertengahan Juli (deklinasi menurun).
@@ -169,79 +160,24 @@ class KalkulatorService {
     return DateTime.utc(2000, 1, 1).add(Duration(microseconds: micros));
   }
 
-  /// Rashdul Kiblat LOKAL -- kapan (kalau ada) azimut Matahari = arah
-  /// kiblat dari lokasi tertentu, pada tanggal tertentu. Mengembalikan
-  /// null kalau tidak ditemukan persilangan pada hari itu (jam 00-23 UTC
-  /// lokal dipindai kasar dulu, baru presisi lewat bisection).
-  static DateTime? cariRashdulLokal({
-    required DateTime tanggalLokal,
-    required double lat,
-    required double lng,
-    required int utcOffset,
-    required double arahKiblat,
-  }) {
-    final awalUtc = DateTime(tanggalLokal.year, tanggalLokal.month, tanggalLokal.day)
-        .subtract(Duration(hours: utcOffset));
-
-    // Pindai kasar per jam untuk cari rentang tempat terjadi persilangan,
-    // HANYA saat matahari di atas ufuk (dicek lewat tinggi matahari).
-    DateTime? lo, hi;
-    double? azSebelum;
-    for (int j = 0; j <= 24; j++) {
-      final t = awalUtc.add(Duration(hours: j));
-      final jd = _julianDay(t);
-      final (decl, ra) = _matahariEkuatorial(jd);
-      final ha = _hourAngle(jd, ra, lng);
-      final tinggi = _asind(_sind(lat) * _sind(decl) + _cosd(lat) * _cosd(decl) * _cosd(ha));
-      if (tinggi < -1) { azSebelum = null; continue; } // malam, lewati
-
-      final az = azimutMatahari(t, lat, lng);
-      if (azSebelum != null) {
-        final selisihSebelum = azSebelum - arahKiblat;
-        final selisihSekarang = az - arahKiblat;
-        if (selisihSebelum.sign != selisihSekarang.sign && selisihSebelum.abs() < 180 && selisihSekarang.abs() < 180) {
-          lo = t.subtract(const Duration(hours: 1));
-          hi = t;
-          break;
-        }
-      }
-      azSebelum = az;
-    }
-    if (lo == null || hi == null) return null;
-
-    for (int i = 0; i < 40; i++) {
-      final tengahMicros = lo!.difference(DateTime.utc(2000)).inMicroseconds +
-          (hi!.difference(lo).inMicroseconds ~/ 2);
-      final mid = DateTime.utc(2000).add(Duration(microseconds: tengahMicros));
-      final az = azimutMatahari(mid, lat, lng);
-      if (az > arahKiblat) { lo = mid; } else { hi = mid; }
-    }
-    final tengahMicrosFinal = lo!.difference(DateTime.utc(2000)).inMicroseconds +
-        (hi!.difference(lo).inMicroseconds ~/ 2);
-    return DateTime.utc(2000).add(Duration(microseconds: tengahMicrosFinal));
-  }
-
-  /// Rashdul Kiblat Lokal -- METODE KITAB KLASIK (rumus trigonometri
-  /// tradisional, bukan pencarian numerik seperti `cariRashdulLokal`).
+  /// Rashdul Kiblat Lokal -- rumus trigonometri klasik kitab **Tashilul
+  /// Amtsilah**, memakai deklinasi & equation-of-time yang dihitung
+  /// otomatis (rumus Meeus, pada tengah hari tanggal target) supaya tidak
+  /// perlu tabel manual.
   ///
-  /// VALIDASI: rantai rumus ini diuji cocok PERSIS dengan contoh baku
-  /// kitab (markaz Lirboyo, 1 Mei 2013) KETIKA memakai deklinasi &
-  /// equation-of-time PERSIS seperti tertulis di kitab (nilai dari tabel
-  /// Ephemeris cetak): hasil 14:55:18 WIB & 22:17:04 WIB, cocok 100%.
-  /// Versi di bawah ini menghitung deklinasi & EoT SENDIRI (otomatis,
-  /// lewat rumus Meeus pada tengah hari tanggal target) supaya tidak
-  /// perlu tabel manual -- konsekuensinya, hasil bergeser ~1 menit dari
-  /// contoh kitab (referensi waktu evaluasi D/E sedikit berbeda dari
-  /// tabel cetak), MASIH SANGAT DEKAT dan dalam batas wajar. Hasil
-  /// "siang"-nya juga sudah dicek cocok dalam hitungan puluhan detik
-  /// dengan `cariRashdulLokal` (metode numerik independen) untuk kasus
-  /// yang sama.
+  /// VALIDASI: rantai rumus ini (K, A, B, X, Q, dan formula akhir) diuji
+  /// cocok PERSIS dengan contoh baku kitab (markaz Lirboyo, 1 Mei 2013)
+  /// ketika memakai deklinasi & equation-of-time PERSIS seperti tertulis
+  /// di kitab: hasil 14:55:18 WIB & 22:17:04 WIB, cocok 100%. Versi di
+  /// bawah ini (deklinasi & EoT dihitung sendiri, bukan dari tabel cetak)
+  /// bergeser ~1 menit dari contoh kitab -- masih sangat dekat dan dalam
+  /// batas wajar.
   ///
   /// Mengembalikan (siang, malam) dalam JAM LOKAL (bukan UTC) pada zona
   /// waktu `utcOffset`. "malam" cuma solusi geometris pelengkap (matahari
   /// tidak terlihat saat itu, TIDAK bisa dipakai kalibrasi bayangan
   /// sungguhan) -- persis seperti catatan "في الليل" di kitab sumbernya.
-  static (double siangJam, double malamJam) cariRashdulLokalKitabKlasik({
+  static (double siangJam, double malamJam) cariRashdulLokalTashilulAmtsilah({
     required DateTime tanggalLokal,
     required double lat,
     required double lng,

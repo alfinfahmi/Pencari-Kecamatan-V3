@@ -147,20 +147,6 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
       lat1: lokasi.lat, lng1: lokasi.lng,
       lat2: KalkulatorService.kabahLat, lng2: KalkulatorService.kabahLng,
     );
-    final hasil = KalkulatorService.cariRashdulLokal(
-      tanggalLokal: _tanggalLokal,
-      lat: lokasi.lat, lng: lokasi.lng,
-      utcOffset: lokasi.utcOffset!,
-      arahKiblat: arahKiblat,
-    );
-
-    if (hasil == null) {
-      return Text(
-        'Tidak ditemukan persilangan azimut matahari dengan arah kiblat (${arahKiblat.toStringAsFixed(2)}\u00b0) pada tanggal ini di lokasi Anda.',
-        style: TextStyle(fontSize: 12.5, color: Colors.deepOrange.shade700),
-      );
-    }
-    final lokal = hasil.add(Duration(hours: lokasi.utcOffset!));
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: AppColors.emerald.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
@@ -168,21 +154,15 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Arah kiblat dari lokasi ini: ${arahKiblat.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-          const SizedBox(height: 4),
-          Text('Metode numerik (pencarian langsung):', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
-          Text(
-            '${lokal.hour.toString().padLeft(2, '0')}:${lokal.minute.toString().padLeft(2, '0')}:${lokal.second.toString().padLeft(2, '0')} ${lokasi.zonaWaktu ?? ''}',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.emerald),
-          ),
-          const Divider(height: 16),
-          _hasilKitabKlasik(lokasi, arahKiblat),
+          const SizedBox(height: 6),
+          _hasilTashilulAmtsilah(lokasi, arahKiblat),
         ],
       ),
     );
   }
 
-  Widget _hasilKitabKlasik(KecamatanModel lokasi, double arahKiblat) {
-    final (siangJam, malamJam) = KalkulatorService.cariRashdulLokalKitabKlasik(
+  Widget _hasilTashilulAmtsilah(KecamatanModel lokasi, double arahKiblat) {
+    final (siangJam, malamJam) = KalkulatorService.cariRashdulLokalTashilulAmtsilah(
       tanggalLokal: _tanggalLokal,
       lat: lokasi.lat, lng: lokasi.lng,
       utcOffset: lokasi.utcOffset!,
@@ -197,7 +177,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Metode kitab klasik (rumus tradisional):', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
+        Text('Metode kitab Tashilul Amtsilah:', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
         const SizedBox(height: 2),
         Text(
           '${jamKeString(siangJam)} ${lokasi.zonaWaktu ?? ''}  (siang -- bisa dipakai kalibrasi)',
