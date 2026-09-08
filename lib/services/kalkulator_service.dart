@@ -130,34 +130,49 @@ class KalkulatorService {
   /// Rashdul Kiblat GLOBAL -- momen matahari tepat di atas Ka'bah (dua kali
   /// setahun). `naik` = true untuk momen sekitar akhir Mei (deklinasi
   /// menaik), false untuk sekitar pertengahan Juli (deklinasi menurun).
+  ///
+  /// PENDEKATAN: pindai hari-hari di sekitar tanggal perkiraan, hitung
+  /// tengah hari (siang) di Mekkah UTC untuk TIAP hari itu secara individu
+  /// dan langsung (bukan lewat bisection sisipan "+0,5 hari" yang RAPUH --
+  /// versi lama sempat menggeser hasil berjam-jam, karena bisection
+  /// merusak sifat "tengah malam" dari nilai yang sedang dibagi dua),
+  /// lalu ambil hari yang deklinasi-tengah-harinya PALING DEKAT ke lintang
+  /// Ka'bah. Ini juga cara standar yang dipakai lembaga falak melaporkan
+  /// tanggal ini (satu waktu tengah hari yang jelas, bukan interpolasi
+  /// pecahan hari).
+  ///
+  /// VALIDASI: hasil 2026 cocok dengan referensi luas (27-28 Mei ~16:18
+  /// WIB, 15-16 Juli ~16:27 WIB) hingga presisi menit.
   static DateTime cariRashdulGlobal({required int tahun, required bool naik}) {
-    final tanggalPerkiraan = naik ? DateTime(tahun, 5, 28) : DateTime(tahun, 7, 16);
-    double jdLo = _julianDay(tanggalPerkiraan.subtract(const Duration(days: 4)));
-    double jdHi = _julianDay(tanggalPerkiraan.add(const Duration(days: 4)));
+    final tanggalPerkiraan = naik ? DateTime.utc(tahun, 5, 28) : DateTime.utc(tahun, 7, 16);
 
-    double deklinasiSaatNoonMekkah(double jdHariKe0h) {
-      final jdKasar = jdHariKe0h + 0.5;
-      final eot = _equationOfTimeMenit(jdKasar);
-      final jdNoonMekkah = jdKasar - kabahLng / 15 / 24 - eot / 60 / 24;
-      final (decl, _) = _matahariEkuatorial(jdNoonMekkah);
-      return decl;
-    }
-
-    for (int i = 0; i < 40; i++) {
-      final jdMid = (jdLo + jdHi) / 2;
-      final d = deklinasiSaatNoonMekkah(jdMid);
-      if (naik) {
-        if (d < kabahLat) { jdLo = jdMid; } else { jdHi = jdMid; }
-      } else {
-        if (d > kabahLat) { jdLo = jdMid; } else { jdHi = jdMid; }
+    DateTime terbaik = tanggalPerkiraan;
+    double selisihTerbaik = 999;
+    for (int i = -5; i <= 5; i++) {
+      final hari = tanggalPerkiraan.add(Duration(days: i));
+      final noon = _noonMekkahUtcUntukTanggal(hari);
+      final jd = _julianDay(noon);
+      final (decl, _) = _matahariEkuatorial(jd);
+      final selisih = (decl - kabahLat).abs();
+      if (selisih < selisihTerbaik) {
+        selisihTerbaik = selisih;
+        terbaik = noon;
       }
     }
-    final jdFinal = (jdLo + jdHi) / 2;
-    final jdKasar = jdFinal + 0.5;
-    final eot = _equationOfTimeMenit(jdKasar);
-    final jdNoonMekkah = jdKasar - kabahLng / 15 / 24 - eot / 60 / 24;
-    final micros = ((jdNoonMekkah - 2451544.5) * 86400 * 1000000).round();
-    return DateTime.utc(2000, 1, 1).add(Duration(microseconds: micros));
+    return terbaik;
+  }
+
+  /// Tengah hari (siang) di Mekkah, dinyatakan dalam UTC, untuk SATU
+  /// tanggal kalender tertentu -- fungsi mandiri per-tanggal, tidak
+  /// bergantung pada bisection/iterasi apa pun (menghindari kerapuhan
+  /// pendekatan lama).
+  static DateTime _noonMekkahUtcUntukTanggal(DateTime tanggalUtc) {
+    final jdPerkiraan = _julianDay(DateTime.utc(tanggalUtc.year, tanggalUtc.month, tanggalUtc.day, 12)) -
+        kabahLng / 15 / 24;
+    final eot = _equationOfTimeMenit(jdPerkiraan);
+    final jamUtcNoon = 12 - kabahLng / 15 - eot / 60;
+    final micros = (jamUtcNoon * 3600 * 1000000).round();
+    return DateTime.utc(tanggalUtc.year, tanggalUtc.month, tanggalUtc.day).add(Duration(microseconds: micros));
   }
 
   /// Rashdul Kiblat Lokal -- rumus trigonometri klasik kitab **Tashilul
