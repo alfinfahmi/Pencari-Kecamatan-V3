@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/hijri_service.dart';
+import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
+import '../services/meeus_presisi_tinggi_service.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
@@ -390,24 +392,21 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
 
 
   void _tampilkanDetailHari(DateTime tanggalMasehi, TanggalHijriah? hijri, String? namaPenting) {
-    // Hitung KEDUA metode untuk perbandingan, terlepas dari metode mana
-    // yang sedang "aktif" secara global.
-    //
-    // PENTING: waktu ijtimak Jean Meeus & As-Syahru TIDAK SELALU SAMA
-    // (bisa beda beberapa menit) -- untuk Jean Meeus kita pakai
-    // MeeusHisabService.cariIjtimakUtc() (algoritma Bab 49, tervalidasi
-    // terpisah terhadap tabel referensi independen), bukan ijtimak
-    // bersama dari HijriService. Untuk As-Syahru, kita BELUM punya
-    // sumber tervalidasi untuk ijtimak khas metode itu sendiri, jadi
-    // sementara tetap pakai ijtimak bersama (hijri.ijtimakAwalBulan).
+    // Hitung KETIGA metode untuk perbandingan, terlepas dari metode mana
+    // yang sedang "aktif" secara global. Ketiganya pakai ijtimak hasil
+    // perhitungannya SENDIRI (bisa beda beberapa menit satu sama lain,
+    // ini memang sengaja).
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalPresisiTinggi;
     DateTime? ijtimakMeeusUtc;
     DateTime? ijtimakAsSyahruUtc;
+    DateTime? ijtimakPresisiTinggiUtc;
     final lokasi = _lokasi;
     if (hijri != null && lokasi != null && lokasi.utcOffset != null) {
       ijtimakMeeusUtc = MeeusHisabService.cariIjtimakUtc(tahunH: hijri.tahunH, bulanH: hijri.bulanH);
-      ijtimakAsSyahruUtc = hijri.ijtimakAwalBulan.subtract(Duration(hours: lokasi.utcOffset!));
+      ijtimakAsSyahruUtc = AsSyahruService.cariIjtimakUtc(tahunH: hijri.tahunH, bulanH: hijri.bulanH);
+      ijtimakPresisiTinggiUtc = MeeusPresisiTinggiService.cariIjtimakUtc(tahunH: hijri.tahunH, bulanH: hijri.bulanH);
 
       hilalMeeus = HijriService.hitungKeadaanHilalPadaIjtimak(
         ijtimakWib: ijtimakMeeusUtc.add(const Duration(hours: 7)),
@@ -424,6 +423,19 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
         utcOffset: lokasi.utcOffset!,
         elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
         paksaMetode: MetodeHisab.asySyahru,
+      );
+      final hasilPresisiTinggi = MeeusPresisiTinggiService.hitung(
+        ijtimakUtc: ijtimakPresisiTinggiUtc,
+        lat: lokasi.lat,
+        lng: lokasi.lng,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+        utcOffset: lokasi.utcOffset!,
+      );
+      hilalPresisiTinggi = (
+        memenuhi: hasilPresisiTinggi.memenuhiMabims2021,
+        tinggiHilal: hasilPresisiTinggi.tinggiHilalMari,
+        elongasi: hasilPresisiTinggi.elongasi,
+        usiaHilalJam: hasilPresisiTinggi.lamaHilalJam,
       );
     }
 
@@ -460,17 +472,18 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
                 ),
               ),
             ],
-            if (hijri != null && hilalMeeus != null && hilalAsSyahru != null) ...[
+            if (hijri != null && hilalMeeus != null && hilalAsSyahru != null && hilalPresisiTinggi != null) ...[
               const Divider(height: 24),
               Text('Keadaan Hilal Awal ${hijri.namaBulanH} -- Perbandingan Metode',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey.shade700)),
               const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
                 children: [
-                  Expanded(child: _kolomMetodeDialog('Jean Meeus', hilalMeeus, ijtimakMeeusUtc!.add(const Duration(hours: 7)))),
-                  const SizedBox(width: 12),
-                  Expanded(child: _kolomMetodeDialog('As-Syahru', hilalAsSyahru, ijtimakAsSyahruUtc!.add(const Duration(hours: 7)))),
+                  SizedBox(width: 160, child: _kolomMetodeDialog('Jean Meeus', hilalMeeus, ijtimakMeeusUtc!.add(const Duration(hours: 7)))),
+                  SizedBox(width: 160, child: _kolomMetodeDialog('As-Syahru', hilalAsSyahru, ijtimakAsSyahruUtc!.add(const Duration(hours: 7)))),
+                  SizedBox(width: 160, child: _kolomMetodeDialog('Meeus Presisi Tinggi', hilalPresisiTinggi, ijtimakPresisiTinggiUtc!.add(const Duration(hours: 7)))),
                 ],
               ),
               const SizedBox(height: 6),

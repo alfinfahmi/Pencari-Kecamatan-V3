@@ -6,6 +6,7 @@ import '../models/kecamatan_model.dart';
 import '../services/hijri_service.dart';
 import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
+import '../services/meeus_presisi_tinggi_service.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
@@ -412,17 +413,21 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
 
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalPresisiTinggi;
     DateTime? ijtimakMeeusUtc;
     DateTime? ijtimakAsSyahruUtc;
+    DateTime? ijtimakPresisiTinggiUtc;
     if (lokasi != null && lokasi.utcOffset != null) {
-      // Kedua metode pakai waktu ijtimak HASIL PERHITUNGANNYA SENDIRI
+      // Ketiga metode pakai waktu ijtimak HASIL PERHITUNGANNYA SENDIRI
       // (bukan waktu bersama dari tabel/kolom kiri) -- bisa beda
       // beberapa menit, ini memang sengaja supaya jujur mencerminkan
-      // bahwa kedua metode punya perhitungan independen.
+      // bahwa tiap metode punya perhitungan independen.
       ijtimakMeeusUtc =
           MeeusHisabService.cariIjtimakUtc(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH);
       ijtimakAsSyahruUtc =
           AsSyahruService.cariIjtimakUtc(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH);
+      ijtimakPresisiTinggiUtc =
+          MeeusPresisiTinggiService.cariIjtimakUtc(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH);
       hilalMeeus = HijriService.hitungKeadaanHilalPadaIjtimak(
         ijtimakWib: ijtimakMeeusUtc.add(const Duration(hours: 7)),
         lat: lokasi.lat,
@@ -438,6 +443,19 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
         utcOffset: lokasi.utcOffset!,
         elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
         paksaMetode: MetodeHisab.asySyahru,
+      );
+      final hasilPresisiTinggi = MeeusPresisiTinggiService.hitung(
+        ijtimakUtc: ijtimakPresisiTinggiUtc,
+        lat: lokasi.lat,
+        lng: lokasi.lng,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+        utcOffset: lokasi.utcOffset!,
+      );
+      hilalPresisiTinggi = (
+        memenuhi: hasilPresisiTinggi.memenuhiMabims2021,
+        tinggiHilal: hasilPresisiTinggi.tinggiHilalMari,
+        elongasi: hasilPresisiTinggi.elongasi,
+        usiaHilalJam: hasilPresisiTinggi.lamaHilalJam,
       );
     }
 
@@ -456,14 +474,15 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
             '${_formatTanggalSaja(e['ijtimak_wib'] as String)} \u2022 ${_formatHariPasaran(ijtimakWib)}',
             style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
           ),
-          if (hilalMeeus != null && hilalAsSyahru != null) ...[
+          if (hilalMeeus != null && hilalAsSyahru != null && hilalPresisiTinggi != null) ...[
             const SizedBox(height: 4),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Wrap(
+              spacing: 16,
+              runSpacing: 8,
               children: [
-                Expanded(child: _barisMetode('Jean Meeus', hilalMeeus, ijtimakBerbeda: ijtimakMeeusUtc?.add(const Duration(hours: 7)))),
-                const SizedBox(width: 10),
-                Expanded(child: _barisMetode('As-Syahru', hilalAsSyahru, ijtimakBerbeda: ijtimakAsSyahruUtc?.add(const Duration(hours: 7)))),
+                SizedBox(width: 150, child: _barisMetode('Jean Meeus', hilalMeeus, ijtimakBerbeda: ijtimakMeeusUtc?.add(const Duration(hours: 7)))),
+                SizedBox(width: 150, child: _barisMetode('As-Syahru', hilalAsSyahru, ijtimakBerbeda: ijtimakAsSyahruUtc?.add(const Duration(hours: 7)))),
+                SizedBox(width: 150, child: _barisMetode('Meeus Presisi Tinggi', hilalPresisiTinggi, ijtimakBerbeda: ijtimakPresisiTinggiUtc?.add(const Duration(hours: 7)))),
               ],
             ),
           ],

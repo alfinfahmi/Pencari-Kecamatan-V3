@@ -4,6 +4,7 @@ import '../models/kecamatan_model.dart';
 import '../services/hijri_service.dart';
 import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
+import '../services/meeus_presisi_tinggi_service.dart';
 import '../services/hisab_detail.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
@@ -59,6 +60,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
   )>[
     ('Jean Meeus', MeeusHisabService.hitung, MeeusHisabService.cariIjtimakUtc),
     ('As-Syahru', AsSyahruService.hitung, AsSyahruService.cariIjtimakUtc),
+    ('Meeus Presisi Tinggi', MeeusPresisiTinggiService.hitung, MeeusPresisiTinggiService.cariIjtimakUtc),
   ];
 
   static const _namaBulanHijriah = {
