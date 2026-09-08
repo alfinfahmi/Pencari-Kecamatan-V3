@@ -19,6 +19,7 @@ import 'tabel_ijtimak_screen.dart';
 import 'hijri_calendar_screen.dart';
 import 'hisab_awal_bulan_screen.dart';
 import 'kalkulator_screen.dart';
+import 'kamera_rukyat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -392,10 +393,12 @@ class _HomeScreenState extends State<HomeScreen> {
       // tinggi kotak yang paling tinggi -- tanpa ini, kotak "Kalender"
       // (teks 1 baris) jadi lebih pendek daripada kotak lain (teks 2
       // baris), membuat sudut border-nya terlihat tidak seragam.
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      child: Column(
+        children: [
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
           tile(
             icon: Icons.access_time_rounded,
             label: 'Waktu\nShalat',
@@ -427,7 +430,14 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          const SizedBox(width: 8),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
           tile(
             icon: Icons.description_outlined,
             label: 'Hisab\nAwal Bulan',
@@ -447,8 +457,24 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          ],
-        ),
+          const SizedBox(width: 8),
+          tile(
+            icon: Icons.camera_alt_outlined,
+            label: 'Kamera\nRukyat',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const KameraRukyatScreen()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+          // Kotak kosong (tak terlihat) supaya baris kedua tetap rata 4
+          // kolom seperti baris pertama, bukan 3 tile melebar tak rapi.
+          const Expanded(child: SizedBox()),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

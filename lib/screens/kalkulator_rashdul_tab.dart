@@ -169,12 +169,45 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
         children: [
           Text('Arah kiblat dari lokasi ini: ${arahKiblat.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
           const SizedBox(height: 4),
+          Text('Metode numerik (pencarian langsung):', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
           Text(
             '${lokal.hour.toString().padLeft(2, '0')}:${lokal.minute.toString().padLeft(2, '0')}:${lokal.second.toString().padLeft(2, '0')} ${lokasi.zonaWaktu ?? ''}',
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.emerald),
           ),
+          const Divider(height: 16),
+          _hasilKitabKlasik(lokasi, arahKiblat),
         ],
       ),
+    );
+  }
+
+  Widget _hasilKitabKlasik(KecamatanModel lokasi, double arahKiblat) {
+    final (siangJam, malamJam) = KalkulatorService.cariRashdulLokalKitabKlasik(
+      tanggalLokal: _tanggalLokal,
+      lat: lokasi.lat, lng: lokasi.lng,
+      utcOffset: lokasi.utcOffset!,
+      arahKiblat: arahKiblat,
+    );
+    String jamKeString(double jam) {
+      final h = jam.floor();
+      final m = ((jam - h) * 60).floor();
+      final s = (((jam - h) * 60 - m) * 60).round();
+      return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Metode kitab klasik (rumus tradisional):', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
+        const SizedBox(height: 2),
+        Text(
+          '${jamKeString(siangJam)} ${lokasi.zonaWaktu ?? ''}  (siang -- bisa dipakai kalibrasi)',
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.emerald),
+        ),
+        Text(
+          '${jamKeString(malamJam)} ${lokasi.zonaWaktu ?? ''}  (malam -- cuma solusi geometris, matahari tidak terlihat)',
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+        ),
+      ],
     );
   }
 

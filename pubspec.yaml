@@ -55,6 +55,13 @@ dependencies:
   # Kompas kiblat live — heading dari sensor magnetometer perangkat
   flutter_compass: ^0.8.0
 
+  # Kamera Rukyat -- live preview kamera + overlay AR posisi hilal
+  camera: ^0.12.1
+  # Sensor kemiringan (pitch) perangkat, untuk overlay AR Kamera Rukyat --
+  # flutter_compass di atas cuma kasih arah horizontal (heading), BUKAN
+  # kemiringan vertikal (butuh accelerometer terpisah).
+  sensors_plus: ^7.0.0
+
   # Format angka/tanggal Indonesia
   intl: ^0.19.0
 

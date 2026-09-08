@@ -73,6 +73,61 @@ jobs:
               print("PERINGATAN: AndroidManifest.xml tidak ditemukan!")
           PYEOF
 
+      - name: Tambahkan izin Kamera (Android) untuk fitur Kamera Rukyat
+        # `flutter create` TIDAK menyertakan izin kamera secara default --
+        # tanpa ini, package `camera` gagal total saat runtime (bukan error
+        # build, tapi crash/exception begitu CameraController.initialize()
+        # dipanggil di device sungguhan).
+        run: |
+          python3 << 'PYEOF'
+          import pathlib, re
+
+          p = pathlib.Path("android/app/src/main/AndroidManifest.xml")
+          if not p.exists():
+              print("PERINGATAN: AndroidManifest.xml tidak ditemukan!")
+          else:
+              text = p.read_text()
+              tambahan = ''
+              if 'android.permission.CAMERA' not in text:
+                  tambahan += '    <uses-permission android:name="android.permission.CAMERA" />\n'
+              if 'android.hardware.camera"' not in text:
+                  tambahan += '    <uses-feature android:name="android.hardware.camera" android:required="false" />\n'
+              if tambahan:
+                  text = re.sub(r'(<manifest[^>]*>)', r'\1\n' + tambahan, text, count=1)
+                  p.write_text(text)
+                  print("Izin kamera berhasil ditambahkan ke AndroidManifest.xml")
+              else:
+                  print("Izin kamera sudah ada, tidak perlu ditambahkan.")
+          PYEOF
+
+      - name: Tambahkan deskripsi izin Kamera (iOS) untuk fitur Kamera Rukyat
+        # iOS WAJIB punya deskripsi alasan pemakaian kamera di Info.plist --
+        # tanpa ini, App Store menolak build & aplikasi crash saat kamera
+        # diakses. camera plugin juga selalu minta izin mikrofon (untuk
+        # rekam video), meski Kamera Rukyat kita cuma pakai foto/preview.
+        run: |
+          python3 << 'PYEOF'
+          import pathlib
+
+          p = pathlib.Path("ios/Runner/Info.plist")
+          if not p.exists():
+              print("PERINGATAN: Info.plist tidak ditemukan!")
+          else:
+              text = p.read_text()
+              if 'NSCameraUsageDescription' not in text:
+                  tambahan = (
+                      '\t<key>NSCameraUsageDescription</key>\n'
+                      '\t<string>Dipakai fitur Kamera Rukyat untuk menampilkan perkiraan posisi hilal di atas live view kamera.</string>\n'
+                      '\t<key>NSMicrophoneUsageDescription</key>\n'
+                      '\t<string>Diminta otomatis oleh modul kamera, tidak dipakai aktif oleh Kamera Rukyat.</string>\n'
+                  )
+                  text = text.replace('</dict>', tambahan + '</dict>', 1)
+                  p.write_text(text)
+                  print("Deskripsi izin kamera berhasil ditambahkan ke Info.plist")
+              else:
+                  print("Deskripsi izin kamera sudah ada, tidak perlu ditambahkan.")
+          PYEOF
+
       - name: Paksa compileSdk seragam di SEMUA modul (app + plugin pihak ketiga)
         run: |
           python3 << 'PYEOF'

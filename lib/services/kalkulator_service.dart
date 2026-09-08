@@ -20,6 +20,7 @@ class KalkulatorService {
   static double _asind(double x) => asin(x.clamp(-1.0, 1.0)) * 180 / pi;
   static double _acosd(double x) => acos(x.clamp(-1.0, 1.0)) * 180 / pi;
   static double _atan2d(double y, double x) => atan2(y, x) * 180 / pi;
+  static double _atand(double x) => atan(x) * 180 / pi;
   static double _mod(double a, double b) => a - b * (a / b).floor();
 
   // ======================================================================
@@ -218,6 +219,58 @@ class KalkulatorService {
     final tengahMicrosFinal = lo!.difference(DateTime.utc(2000)).inMicroseconds +
         (hi!.difference(lo).inMicroseconds ~/ 2);
     return DateTime.utc(2000).add(Duration(microseconds: tengahMicrosFinal));
+  }
+
+  /// Rashdul Kiblat Lokal -- METODE KITAB KLASIK (rumus trigonometri
+  /// tradisional, bukan pencarian numerik seperti `cariRashdulLokal`).
+  ///
+  /// VALIDASI: rantai rumus ini diuji cocok PERSIS dengan contoh baku
+  /// kitab (markaz Lirboyo, 1 Mei 2013) KETIKA memakai deklinasi &
+  /// equation-of-time PERSIS seperti tertulis di kitab (nilai dari tabel
+  /// Ephemeris cetak): hasil 14:55:18 WIB & 22:17:04 WIB, cocok 100%.
+  /// Versi di bawah ini menghitung deklinasi & EoT SENDIRI (otomatis,
+  /// lewat rumus Meeus pada tengah hari tanggal target) supaya tidak
+  /// perlu tabel manual -- konsekuensinya, hasil bergeser ~1 menit dari
+  /// contoh kitab (referensi waktu evaluasi D/E sedikit berbeda dari
+  /// tabel cetak), MASIH SANGAT DEKAT dan dalam batas wajar. Hasil
+  /// "siang"-nya juga sudah dicek cocok dalam hitungan puluhan detik
+  /// dengan `cariRashdulLokal` (metode numerik independen) untuk kasus
+  /// yang sama.
+  ///
+  /// Mengembalikan (siang, malam) dalam JAM LOKAL (bukan UTC) pada zona
+  /// waktu `utcOffset`. "malam" cuma solusi geometris pelengkap (matahari
+  /// tidak terlihat saat itu, TIDAK bisa dipakai kalibrasi bayangan
+  /// sungguhan) -- persis seperti catatan "في الليل" di kitab sumbernya.
+  static (double siangJam, double malamJam) cariRashdulLokalKitabKlasik({
+    required DateTime tanggalLokal,
+    required double lat,
+    required double lng,
+    required int utcOffset,
+    required double arahKiblat,
+  }) {
+    final tengahHariUtc = DateTime(tanggalLokal.year, tanggalLokal.month, tanggalLokal.day, 12)
+        .subtract(Duration(hours: utcOffset));
+    final jd = _julianDay(tengahHariUtc);
+    final (deklinasiMatahari, _) = _matahariEkuatorial(jd);
+    final eotJam = _equationOfTimeMenit(jd) / 60;
+
+    // K = "tamam samt kiblat" gaya kitab -- sudut kiblat diukur dari titik
+    // Utara ke arah Barat (BUKAN bearing 0-360 standar dari Utara searah
+    // jarum jam yang dipakai QiblaService). Konversi: K = 360 - bearing.
+    final k = 360 - arahKiblat;
+    final a = 90 - deklinasiMatahari;
+    final b = 90 - lat;
+    final x = _atand(1 / (_sind(lat) * _tand(k)));
+    final q = _acosd(_tand(b) * _cosd(x) / _tand(a));
+
+    // "105" pada rumus asli itu meridian acuan WIB (UTC+7 x 15) --
+    // digeneralisasi di sini supaya benar juga untuk WITA/WIT.
+    final meridianAcuan = utcOffset * 15.0;
+
+    final siang = 12 - eotJam + (meridianAcuan - lng + q + x) / 15;
+    final malam = 12 - eotJam + (meridianAcuan - lng - q + x) / 15;
+
+    return (_mod(siang, 24), _mod(malam, 24));
   }
 
   // ======================================================================
