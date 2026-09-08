@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import '../models/kecamatan_model.dart';
 import '../services/kalkulator_service.dart';
+import '../services/hijri_service.dart';
+import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
+import '../widgets/location_picker_sheet.dart';
+
+const _namaBulanHijriahKonversi = {
+  1: 'Muharram', 2: 'Safar', 3: 'Rabiul Awwal', 4: 'Rabiul Akhir',
+  5: 'Jumadil Awwal', 6: 'Jumadil Akhir', 7: 'Rajab', 8: "Sya'ban",
+  9: 'Ramadhan', 10: 'Syawal', 11: "Dzulqa'dah", 12: 'Dzulhijjah',
+};
 
 class KalkulatorKonversiTab extends StatefulWidget {
   const KalkulatorKonversiTab({super.key});
@@ -19,6 +30,100 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
   DateTime _tanggalUntukJd = DateTime.now();
   final _jdController = TextEditingController();
 
+  // --- Masehi <-> Hijriyah ---
+  KecamatanModel? _lokasi;
+  bool _memuatLokasi = false;
+  DateTime _tanggalMasehiUntukHijri = DateTime.now();
+  TanggalHijriah? _hasilHijri;
+  final _tahunHController = TextEditingController();
+  int _bulanHDipilih = 1;
+  final _tanggalHController = TextEditingController();
+  DateTime? _hasilMasehi;
+  String? _errorHijriKeMasehi;
+
+  @override
+  void initState() {
+    super.initState();
+    _muatLokasiDariGps();
+  }
+
+  Future<void> _muatLokasiDariGps() async {
+    setState(() => _memuatLokasi = true);
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
+      if (!await Geolocator.isLocationServiceEnabled()) return;
+      final pos = await Geolocator.getCurrentPosition();
+      final utcOffsetJam = DateTime.now().timeZoneOffset.inHours;
+      final namaZona = switch (utcOffsetJam) {
+        7 => 'WIB', 8 => 'WITA', 9 => 'WIT',
+        _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
+      };
+      final lokasi = await lengkapiInfoLokasiGps(
+        lat: pos.latitude, lng: pos.longitude,
+        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
+        zonaWaktu: namaZona, utcOffset: utcOffsetJam,
+      );
+      if (mounted) setState(() => _lokasi = lokasi);
+    } catch (_) {
+      // Diamkan -- pengguna tetap bisa pilih lokasi manual.
+    } finally {
+      if (mounted) setState(() => _memuatLokasi = false);
+    }
+  }
+
+  Future<void> _gantiLokasi() async {
+    final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi');
+    if (terpilih == kPilihGpsSentinel) {
+      await _muatLokasiDariGps();
+    } else if (terpilih is KecamatanModel) {
+      setState(() => _lokasi = terpilih);
+    }
+  }
+
+  Future<void> _pilihTanggalMasehiUntukHijri() async {
+    final terpilih = await showDatePicker(
+      context: context, initialDate: _tanggalMasehiUntukHijri,
+      firstDate: DateTime(1, 1, 1), lastDate: DateTime(2200),
+    );
+    if (terpilih != null) setState(() { _tanggalMasehiUntukHijri = terpilih; _hasilHijri = null; });
+  }
+
+  void _konversiKeHijri() {
+    final lokasi = _lokasi;
+    if (lokasi == null || lokasi.utcOffset == null) return;
+    setState(() {
+      _hasilHijri = HijriService.instance.konversi(
+        _tanggalMasehiUntukHijri,
+        lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+      );
+    });
+  }
+
+  void _konversiKeMasehi() {
+    final lokasi = _lokasi;
+    if (lokasi == null || lokasi.utcOffset == null) return;
+    final tahunH = int.tryParse(_tahunHController.text);
+    final tanggalH = int.tryParse(_tanggalHController.text);
+    if (tahunH == null || tanggalH == null || tanggalH < 1 || tanggalH > 30) {
+      setState(() { _errorHijriKeMasehi = 'Isi Tahun H dan Tanggal H dengan angka yang valid (Tanggal H: 1-30).'; _hasilMasehi = null; });
+      return;
+    }
+    setState(() {
+      _errorHijriKeMasehi = null;
+      final awalBulan = HijriService.tentukanAwalBulan(
+        tahunH: tahunH, bulanH: _bulanHDipilih,
+        lat: lokasi.lat, lng: lokasi.lng, utcOffset: lokasi.utcOffset!,
+        elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+      );
+      _hasilMasehi = awalBulan.tanggal1.add(Duration(days: tanggalH - 1));
+    });
+  }
+
   @override
   void dispose() {
     _desimalController.dispose();
@@ -26,6 +131,8 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
     _mController.dispose();
     _sController.dispose();
     _jdController.dispose();
+    _tahunHController.dispose();
+    _tanggalHController.dispose();
     super.dispose();
   }
 
@@ -144,6 +251,119 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
                 'Julian Day dihitung untuk jam 00:00 UTC pada tanggal tersebut.',
                 style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _kartuSeksi(
+            judul: 'Tanggal Masehi \u2194 Hijriyah',
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.location_on_outlined, size: 13, color: Colors.grey.shade500),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      _lokasi != null ? _lokasi!.kecamatan : (_memuatLokasi ? 'Mengambil lokasi...' : 'Lokasi belum tersedia'),
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  TextButton(onPressed: _memuatLokasi ? null : _gantiLokasi, child: const Text('Ganti', style: TextStyle(fontSize: 12))),
+                ],
+              ),
+              Text(
+                'Hasil bergantung lokasi (kriteria hilal/imkan rukyat berbeda tiap tempat) -- '
+                'sama seperti mesin hisab utama aplikasi, bukan kalender tabular generik.',
+                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
+              ),
+              const SizedBox(height: 10),
+              Text('Masehi \u2192 Hijriyah', style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade500),
+                  const SizedBox(width: 6),
+                  Text('${_tanggalMasehiUntukHijri.day}/${_tanggalMasehiUntukHijri.month}/${_tanggalMasehiUntukHijri.year}', style: const TextStyle(fontSize: 13)),
+                  const Spacer(),
+                  TextButton(onPressed: _pilihTanggalMasehiUntukHijri, child: const Text('Pilih Tanggal', style: TextStyle(fontSize: 12))),
+                ],
+              ),
+              const SizedBox(height: 4),
+              FilledButton(
+                onPressed: (_lokasi != null && _lokasi!.utcOffset != null) ? _konversiKeHijri : null,
+                style: FilledButton.styleFrom(backgroundColor: AppColors.emerald),
+                child: const Text('Ubah ke Hijriyah'),
+              ),
+              if (_hasilHijri != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(color: AppColors.emerald.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+                  child: Text(
+                    '${_hasilHijri!.hari} ${_hasilHijri!.namaBulanH} ${_hasilHijri!.tahunH} H'
+                    '${_hasilHijri!.istikmal ? ' (istikmal)' : ''}',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.emerald),
+                  ),
+                ),
+              ],
+              const Divider(height: 24),
+              Text('Hijriyah \u2192 Masehi', style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: _tahunHController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Tahun H', isDense: true),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 3,
+                    child: DropdownButtonFormField<int>(
+                      initialValue: _bulanHDipilih,
+                      isExpanded: true,
+                      decoration: const InputDecoration(labelText: 'Bulan H', isDense: true),
+                      items: _namaBulanHijriahKonversi.entries
+                          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value, overflow: TextOverflow.ellipsis)))
+                          .toList(),
+                      onChanged: (v) => setState(() => _bulanHDipilih = v!),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: _tanggalHController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Tgl H', isDense: true),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              FilledButton(
+                onPressed: (_lokasi != null && _lokasi!.utcOffset != null) ? _konversiKeMasehi : null,
+                style: FilledButton.styleFrom(backgroundColor: AppColors.emerald),
+                child: const Text('Ubah ke Masehi'),
+              ),
+              if (_errorHijriKeMasehi != null) ...[
+                const SizedBox(height: 8),
+                Text(_errorHijriKeMasehi!, style: const TextStyle(color: Colors.red, fontSize: 12)),
+              ],
+              if (_hasilMasehi != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(color: AppColors.emerald.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+                  child: Text(
+                    '${_hasilMasehi!.day}/${_hasilMasehi!.month}/${_hasilMasehi!.year} M',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.emerald),
+                  ),
+                ),
+              ],
             ],
           ),
         ],
