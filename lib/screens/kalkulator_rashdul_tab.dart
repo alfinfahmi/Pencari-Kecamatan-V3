@@ -104,9 +104,9 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
             ikon: Icons.location_on_outlined,
             children: [
               Text(
-                'Kapan (hari ini, di lokasi Anda) matahari persis berada di arah '
-                'kiblat -- kalau ada, cara paling presisi kalibrasi arah kiblat '
-                'tanpa kompas.',
+                'Waktu bayangan matahari menunjukkan arah kiblat presisi '
+                '(hari ini, di lokasi Anda) -- cara kalibrasi arah kiblat '
+                'paling akurat, tanpa perlu kompas.',
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 10),
@@ -227,7 +227,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
           Row(children: [
             Icon(ikon, size: 17, color: AppColors.emerald),
             const SizedBox(width: 6),
-            Text(judul, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            Expanded(child: Text(judul, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
           ]),
           const SizedBox(height: 8),
           ...children,
