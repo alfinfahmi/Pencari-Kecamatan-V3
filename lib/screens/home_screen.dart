@@ -147,7 +147,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          // Batasi lebar maksimum -- tanpa ini, di layar lebar (desktop)
+          // jam/kalender/menu melebar penuh ke seluruh layar, sulit dibaca.
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Column(
         children: [
           Expanded(
             child: ListView(
@@ -164,6 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
           // permanen di bawah layar, tidak ikut ter-scroll bersama konten.
           const WatermarkFooter(),
         ],
+          ),
+        ),
       ),
     );
   }
