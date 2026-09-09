@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/kecamatan_model.dart';
 import '../services/kamera_rukyat_service.dart';
-import '../services/reverse_geocode_helper.dart';
+import '../services/lokasi_cache_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home_button.dart';
 import '../widgets/location_picker_sheet.dart';
@@ -55,6 +54,7 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
     WidgetsBinding.instance.addObserver(this);
     _inisialisasiKamera();
     _dengarkanSensor();
+    _lokasi = LokasiCacheService.instance.lokasiCache;
     _muatLokasi();
     _timerJam = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _sekarangUtc = DateTime.now().toUtc());
@@ -100,31 +100,17 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
     }
   }
 
-  Future<void> _muatLokasi() async {
-    try {
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
-      if (!await Geolocator.isLocationServiceEnabled()) return;
-      final pos = await Geolocator.getCurrentPosition();
-      final lokasi = await lengkapiInfoLokasiGps(
-        lat: pos.latitude, lng: pos.longitude,
-        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
-        zonaWaktu: 'WIB', utcOffset: 7,
-      );
-      if (mounted) setState(() => _lokasi = lokasi);
-    } catch (_) {
-      // Diamkan -- pengguna tetap bisa pilih lokasi manual.
-    }
+  Future<void> _muatLokasi({bool paksaRefresh = false}) async {
+    final lokasi = await LokasiCacheService.instance.ambilLokasi(paksaRefresh: paksaRefresh);
+    if (mounted && lokasi != null) setState(() => _lokasi = lokasi);
   }
 
   Future<void> _gantiLokasi() async {
     final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi Pengamatan');
     if (terpilih == kPilihGpsSentinel) {
-      await _muatLokasi();
+      await _muatLokasi(paksaRefresh: true);
     } else if (terpilih is KecamatanModel) {
+      LokasiCacheService.instance.simpan(terpilih);
       setState(() => _lokasi = terpilih);
     }
   }

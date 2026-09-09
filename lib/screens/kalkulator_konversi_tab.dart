@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/kalkulator_service.dart';
 import '../services/hijri_service.dart';
-import '../services/reverse_geocode_helper.dart';
+import '../services/lokasi_cache_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/location_picker_sheet.dart';
 
@@ -44,32 +43,15 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
   @override
   void initState() {
     super.initState();
+    _lokasi = LokasiCacheService.instance.lokasiCache;
     _muatLokasiDariGps();
   }
 
-  Future<void> _muatLokasiDariGps() async {
-    setState(() => _memuatLokasi = true);
+  Future<void> _muatLokasiDariGps({bool paksaRefresh = false}) async {
+    if (_lokasi == null) setState(() => _memuatLokasi = true);
     try {
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
-      if (!await Geolocator.isLocationServiceEnabled()) return;
-      final pos = await Geolocator.getCurrentPosition();
-      final utcOffsetJam = DateTime.now().timeZoneOffset.inHours;
-      final namaZona = switch (utcOffsetJam) {
-        7 => 'WIB', 8 => 'WITA', 9 => 'WIT',
-        _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
-      };
-      final lokasi = await lengkapiInfoLokasiGps(
-        lat: pos.latitude, lng: pos.longitude,
-        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
-        zonaWaktu: namaZona, utcOffset: utcOffsetJam,
-      );
-      if (mounted) setState(() => _lokasi = lokasi);
-    } catch (_) {
-      // Diamkan -- pengguna tetap bisa pilih lokasi manual.
+      final lokasi = await LokasiCacheService.instance.ambilLokasi(paksaRefresh: paksaRefresh);
+      if (mounted && lokasi != null) setState(() => _lokasi = lokasi);
     } finally {
       if (mounted) setState(() => _memuatLokasi = false);
     }
@@ -78,8 +60,9 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
   Future<void> _gantiLokasi() async {
     final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi');
     if (terpilih == kPilihGpsSentinel) {
-      await _muatLokasiDariGps();
+      await _muatLokasiDariGps(paksaRefresh: true);
     } else if (terpilih is KecamatanModel) {
+      LokasiCacheService.instance.simpan(terpilih);
       setState(() => _lokasi = terpilih);
     }
   }
@@ -177,6 +160,10 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final abuSekunder = isDark ? Colors.grey.shade400 : abuSekunder;
+    final abuTersier = isDark ? abuTersier : abuTersier;
+    final abuLabel = isDark ? Colors.grey.shade300 : abuLabel;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -225,7 +212,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade500),
+                  Icon(Icons.calendar_today_outlined, size: 14, color: abuTersier),
                   const SizedBox(width: 6),
                   Text('${_tanggalUntukJd.day}/${_tanggalUntukJd.month}/${_tanggalUntukJd.year} 00:00 UTC', style: const TextStyle(fontSize: 13)),
                   const Spacer(),
@@ -249,7 +236,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
               ),
               Text(
                 'Julian Day dihitung untuk jam 00:00 UTC pada tanggal tersebut.',
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                style: TextStyle(fontSize: 11, color: abuTersier),
               ),
             ],
           ),
@@ -259,12 +246,12 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.location_on_outlined, size: 13, color: Colors.grey.shade500),
+                  Icon(Icons.location_on_outlined, size: 13, color: abuTersier),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       _lokasi != null ? _lokasi!.kecamatan : (_memuatLokasi ? 'Mengambil lokasi...' : 'Lokasi belum tersedia'),
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                      style: TextStyle(fontSize: 12, color: abuLabel),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -274,14 +261,14 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
               Text(
                 'Hasil bergantung lokasi (kriteria hilal/imkan rukyat berbeda tiap tempat) -- '
                 'sama seperti mesin hisab utama aplikasi, bukan kalender tabular generik.',
-                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
+                style: TextStyle(fontSize: 10.5, color: abuTersier),
               ),
               const SizedBox(height: 10),
-              Text('Masehi \u2192 Hijriyah', style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+              Text('Masehi \u2192 Hijriyah', style: TextStyle(fontSize: 11.5, color: abuSekunder, fontWeight: FontWeight.w600)),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade500),
+                  Icon(Icons.calendar_today_outlined, size: 14, color: abuTersier),
                   const SizedBox(width: 6),
                   Text('${_tanggalMasehiUntukHijri.day}/${_tanggalMasehiUntukHijri.month}/${_tanggalMasehiUntukHijri.year}', style: const TextStyle(fontSize: 13)),
                   const Spacer(),
@@ -307,7 +294,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
                 ),
               ],
               const Divider(height: 24),
-              Text('Hijriyah \u2192 Masehi', style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+              Text('Hijriyah \u2192 Masehi', style: TextStyle(fontSize: 11.5, color: abuSekunder, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -372,11 +359,12 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
   }
 
   Widget _kartuSeksi({required String judul, required List<Widget> children}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.withOpacity(0.15)),
+        border: Border.all(color: isDark ? Colors.white12 : Colors.black.withOpacity(0.08)),
       ),
       padding: const EdgeInsets.all(14),
       child: Column(

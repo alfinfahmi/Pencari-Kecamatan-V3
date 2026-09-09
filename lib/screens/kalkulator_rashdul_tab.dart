@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../models/kecamatan_model.dart';
 import '../services/kalkulator_service.dart';
 import '../services/qibla_service.dart';
-import '../services/reverse_geocode_helper.dart';
+import '../services/lokasi_cache_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/location_picker_sheet.dart';
 
@@ -21,33 +20,18 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
   @override
   void initState() {
     super.initState();
+    // Tampilkan cache dulu (instan, kalau ada) sambil tetap coba
+    // menyegarkan di latar belakang -- lebih responsif daripada
+    // selalu menunggu GPS baru tiap layar dibuka.
+    _lokasi = LokasiCacheService.instance.lokasiCache;
     _muatLokasiDariGps();
   }
 
-  Future<void> _muatLokasiDariGps() async {
-    setState(() => _memuatLokasi = true);
+  Future<void> _muatLokasiDariGps({bool paksaRefresh = false}) async {
+    if (_lokasi == null) setState(() => _memuatLokasi = true);
     try {
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
-      if (!await Geolocator.isLocationServiceEnabled()) return;
-
-      final pos = await Geolocator.getCurrentPosition();
-      final utcOffsetJam = DateTime.now().timeZoneOffset.inHours;
-      final namaZona = switch (utcOffsetJam) {
-        7 => 'WIB', 8 => 'WITA', 9 => 'WIT',
-        _ => 'UTC${utcOffsetJam >= 0 ? '+' : ''}$utcOffsetJam',
-      };
-      final lokasi = await lengkapiInfoLokasiGps(
-        lat: pos.latitude, lng: pos.longitude,
-        elevasiM: pos.altitude > 0 ? pos.altitude.round() : 0,
-        zonaWaktu: namaZona, utcOffset: utcOffsetJam,
-      );
-      if (mounted) setState(() => _lokasi = lokasi);
-    } catch (_) {
-      // Diamkan -- pengguna tetap bisa pilih lokasi manual.
+      final lokasi = await LokasiCacheService.instance.ambilLokasi(paksaRefresh: paksaRefresh);
+      if (mounted && lokasi != null) setState(() => _lokasi = lokasi);
     } finally {
       if (mounted) setState(() => _memuatLokasi = false);
     }
@@ -56,8 +40,9 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
   Future<void> _gantiLokasi() async {
     final terpilih = await LocationPickerSheet.show(context, judul: 'Pilih Lokasi');
     if (terpilih == kPilihGpsSentinel) {
-      await _muatLokasiDariGps();
+      await _muatLokasiDariGps(paksaRefresh: true);
     } else if (terpilih is KecamatanModel) {
+      LokasiCacheService.instance.simpan(terpilih);
       setState(() => _lokasi = terpilih);
     }
   }
@@ -78,6 +63,11 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
     final globalNaik = KalkulatorService.cariRashdulGlobal(tahun: tahun, naik: true);
     final globalTurun = KalkulatorService.cariRashdulGlobal(tahun: tahun, naik: false);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final abuSekunder = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final abuTersier = isDark ? Colors.grey.shade500 : Colors.grey.shade500;
+    final abuLabel = isDark ? Colors.grey.shade300 : Colors.grey.shade700;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -90,12 +80,12 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
               Text(
                 'Momen matahari tepat di atas Ka\'bah -- bayangan benda tegak di '
                 'seluruh dunia (yang siang hari) saat itu otomatis menunjuk arah kiblat.',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 12, color: abuSekunder),
               ),
               const SizedBox(height: 10),
-              _barisWaktuUtc('Momen I (deklinasi menaik)', globalNaik),
+              _barisWaktuUtc('Momen I (deklinasi menaik)', globalNaik, isDark),
               const SizedBox(height: 6),
-              _barisWaktuUtc('Momen II (deklinasi menurun)', globalTurun),
+              _barisWaktuUtc('Momen II (deklinasi menurun)', globalTurun, isDark),
             ],
           ),
           const SizedBox(height: 16),
@@ -107,18 +97,18 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
                 'Waktu bayangan matahari menunjukkan arah kiblat presisi '
                 '(hari ini, di lokasi Anda) -- cara kalibrasi arah kiblat '
                 'paling akurat, tanpa perlu kompas.',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 12, color: abuSekunder),
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.location_on_outlined, size: 15, color: Colors.grey.shade500),
+                  Icon(Icons.location_on_outlined, size: 15, color: abuTersier),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       _lokasi != null ? _lokasi!.kecamatan : (_memuatLokasi ? 'Mengambil lokasi...' : 'Lokasi belum tersedia'),
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12.5, color: Colors.grey.shade700),
+                      style: TextStyle(fontSize: 12.5, color: abuLabel),
                     ),
                   ),
                   TextButton(onPressed: _memuatLokasi ? null : _gantiLokasi, child: const Text('Ganti', style: TextStyle(fontSize: 12))),
@@ -126,14 +116,14 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
               ),
               Row(
                 children: [
-                  Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey.shade500),
+                  Icon(Icons.calendar_today_outlined, size: 14, color: abuTersier),
                   const SizedBox(width: 6),
-                  Text('${_tanggalLokal.day}/${_tanggalLokal.month}/${_tanggalLokal.year}', style: const TextStyle(fontSize: 12.5)),
+                  Text('${_tanggalLokal.day}/${_tanggalLokal.month}/${_tanggalLokal.year}', style: TextStyle(fontSize: 12.5, color: isDark ? AppColors.textDark : AppColors.textLight)),
                   TextButton(onPressed: _pilihTanggal, child: const Text('Ganti Tanggal', style: TextStyle(fontSize: 12))),
                 ],
               ),
               const SizedBox(height: 8),
-              if (_lokasi != null && _lokasi!.utcOffset != null) _hasilRashdulLokal(),
+              if (_lokasi != null && _lokasi!.utcOffset != null) _hasilRashdulLokal(isDark),
             ],
           ),
         ],
@@ -141,7 +131,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
     );
   }
 
-  Widget _hasilRashdulLokal() {
+  Widget _hasilRashdulLokal(bool isDark) {
     final lokasi = _lokasi!;
     final arahKiblat = QiblaService.bearingDerajat(
       lat1: lokasi.lat, lng1: lokasi.lng,
@@ -149,19 +139,19 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
     );
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: AppColors.emerald.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: AppColors.emerald.withOpacity(isDark ? 0.14 : 0.08), borderRadius: BorderRadius.circular(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Arah kiblat dari lokasi ini: ${arahKiblat.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+          Text('Arah kiblat dari lokasi ini: ${arahKiblat.toStringAsFixed(2)}\u00b0', style: TextStyle(fontSize: 12, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
           const SizedBox(height: 6),
-          _hasilTashilulAmtsilah(lokasi, arahKiblat),
+          _hasilTashilulAmtsilah(lokasi, arahKiblat, isDark),
         ],
       ),
     );
   }
 
-  Widget _hasilTashilulAmtsilah(KecamatanModel lokasi, double arahKiblat) {
+  Widget _hasilTashilulAmtsilah(KecamatanModel lokasi, double arahKiblat, bool isDark) {
     final (siangJam, malamJam) = KalkulatorService.cariRashdulLokalTashilulAmtsilah(
       tanggalLokal: _tanggalLokal,
       lat: lokasi.lat, lng: lokasi.lng,
@@ -177,7 +167,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Metode kitab Tashilul Amtsilah:', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
+        Text('Metode kitab Tashilul Amtsilah:', style: TextStyle(fontSize: 10.5, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
         const SizedBox(height: 2),
         Text(
           '${jamKeString(siangJam)} ${lokasi.zonaWaktu ?? ''}  (siang -- bisa dipakai kalibrasi)',
@@ -185,28 +175,28 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
         ),
         Text(
           '${jamKeString(malamJam)} ${lokasi.zonaWaktu ?? ''}  (malam -- cuma solusi geometris, matahari tidak terlihat)',
-          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+          style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade500 : Colors.grey.shade500),
         ),
       ],
     );
   }
 
-  Widget _barisWaktuUtc(String label, DateTime utc) {
+  Widget _barisWaktuUtc(String label, DateTime utc, bool isDark) {
     final wib = utc.add(const Duration(hours: 7));
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.06) : Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
+          Text(label, style: TextStyle(fontSize: 11.5, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
           Text(
             '${wib.day}/${wib.month}/${wib.year}  ${wib.hour.toString().padLeft(2, '0')}:${wib.minute.toString().padLeft(2, '0')}:${wib.second.toString().padLeft(2, '0')} WIB',
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? AppColors.textDark : AppColors.textLight),
           ),
           Text(
             '(${utc.day}/${utc.month}/${utc.year}  ${utc.hour.toString().padLeft(2, '0')}:${utc.minute.toString().padLeft(2, '0')}:${utc.second.toString().padLeft(2, '0')} UTC -- sesuaikan zona waktu Anda kalau di luar WIB)',
-            style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
+            style: TextStyle(fontSize: 10.5, color: isDark ? Colors.grey.shade500 : Colors.grey.shade500),
           ),
         ],
       ),
@@ -214,11 +204,12 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
   }
 
   Widget _kartuSeksi({required String judul, required IconData ikon, required List<Widget> children}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.withOpacity(0.15)),
+        border: Border.all(color: isDark ? Colors.white12 : Colors.black.withOpacity(0.08)),
       ),
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -227,7 +218,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
           Row(children: [
             Icon(ikon, size: 17, color: AppColors.emerald),
             const SizedBox(width: 6),
-            Expanded(child: Text(judul, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+            Expanded(child: Text(judul, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? AppColors.textDark : AppColors.textLight))),
           ]),
           const SizedBox(height: 8),
           ...children,

@@ -58,8 +58,8 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     }),
     DateTime Function({required int tahunH, required int bulanH})?,
   )>[
-    ('Jean Meeus', MeeusHisabService.hitung, MeeusHisabService.cariIjtimakUtc),
     ('As-Syahru', AsSyahruService.hitung, AsSyahruService.cariIjtimakUtc),
+    ('Jean Meeus', MeeusHisabService.hitung, MeeusHisabService.cariIjtimakUtc),
     ('Meeus Presisi Tinggi', MeeusPresisiTinggiService.hitung, MeeusPresisiTinggiService.cariIjtimakUtc),
   ];
 

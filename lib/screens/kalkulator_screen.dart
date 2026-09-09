@@ -41,9 +41,9 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> with SingleTickerPr
           labelColor: AppColors.emerald,
           indicatorColor: AppColors.emerald,
           tabs: const [
-            Tab(text: 'Segitiga Bola'),
             Tab(text: 'Rashdul Kiblat'),
             Tab(text: 'Konversi Umum'),
+            Tab(text: 'Segitiga Bola'),
           ],
         ),
       ),
@@ -54,9 +54,9 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> with SingleTickerPr
             child: TabBarView(
               controller: _tabController,
               children: const [
-                _TabSegitigaBola(),
                 KalkulatorRashdulTab(),
                 KalkulatorKonversiTab(),
+                _TabSegitigaBola(),
               ],
             ),
           ),
@@ -123,6 +123,7 @@ class _TabSegitigaBolaState extends State<_TabSegitigaBola> {
   @override
   Widget build(BuildContext context) {
     final (l1, l2, l3) = _labelInput;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -132,7 +133,7 @@ class _TabSegitigaBolaState extends State<_TabSegitigaBola> {
             'Alat bantu klasik ilmu falak: masukkan 3 unsur yang diketahui '
             'dari segitiga bola (sisi a,b,c berhadapan dengan sudut A,B,C), '
             'aplikasi hitung 3 unsur sisanya.',
-            style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: 12.5, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
           ),
           const SizedBox(height: 14),
           DropdownButtonFormField<_JenisDiketahui>(
