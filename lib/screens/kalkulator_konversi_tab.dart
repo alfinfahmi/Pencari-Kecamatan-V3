@@ -161,9 +161,9 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final abuSekunder = isDark ? Colors.grey.shade400 : abuSekunder;
-    final abuTersier = isDark ? abuTersier : abuTersier;
-    final abuLabel = isDark ? Colors.grey.shade300 : abuLabel;
+    final abuSekunder = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final abuTersier = isDark ? Colors.grey.shade500 : Colors.grey.shade500;
+    final abuLabel = isDark ? Colors.grey.shade300 : Colors.grey.shade700;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
