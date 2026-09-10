@@ -5,6 +5,7 @@ import '../main.dart' show themeModeNotifier;
 import '../services/reverse_geocode_helper.dart';
 import '../services/supabase_service.dart';
 import '../services/ota_update_service.dart';
+import '../services/home_widget_sync_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home_prayer_widget.dart';
 import '../widgets/waktu_clock_widget.dart';
@@ -48,6 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
     OtaUpdateService.cekPembaruan().then((status) {
       if (mounted && status != null) setState(() => _statusOta = status);
     });
+    // Fire-and-forget juga -- sinkronkan data ke 3 widget Android home
+    // screen (Jam/Waktu Shalat/Kalender, kalau pengguna sudah
+    // menambahkannya) setiap kali Home dibuka. Aman dipanggil di web/iOS
+    // juga (lihat HomeWidgetSyncService: langsung berhenti di awal kalau
+    // kIsWeb, dan di iOS cuma jadi no-op kalau widget iOS belum disiapkan).
+    HomeWidgetSyncService.instance.sinkronkanSemua();
   }
 
   Future<void> _terapkanOta() async {

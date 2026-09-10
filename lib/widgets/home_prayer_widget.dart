@@ -356,6 +356,11 @@ class _HomePrayerWidgetState extends State<HomePrayerWidget> {
               ),
               const SizedBox(height: 4),
               Text(
+                'WIs ${fmt(berikutnya.jamIstiwa)}',
+                style: AppTypography.bodyMd(color: Colors.white60).copyWith(fontSize: 12.5),
+              ),
+              const SizedBox(height: 4),
+              Text(
                 '- ${_formatDurasi(sisaWaktu)}',
                 style: AppTypography.dataDisplay(color: Colors.white60, fontSize: 15),
               ),

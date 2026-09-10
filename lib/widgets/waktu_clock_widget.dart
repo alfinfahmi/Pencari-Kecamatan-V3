@@ -189,7 +189,7 @@ class _WaktuClockWidgetState extends State<WaktuClockWidget> {
                     children: [
                       Text('Istiwa\'', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
-                      Text(istiwa, style: TextStyle(fontSize: _format24Jam ? 22 : 17, fontWeight: FontWeight.bold, color: isDark ? AppColors.primaryDark : AppColors.emerald)),
+                      Text(istiwa, style: TextStyle(fontSize: _format24Jam ? 22 : 17, fontWeight: FontWeight.bold, color: AppColors.gold)),
                     ],
                   ),
                 ),

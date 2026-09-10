@@ -129,7 +129,7 @@ class _MiniCalendarWidgetState extends State<MiniCalendarWidget> {
                   if (!valid) {
                     warnaAngka = Colors.transparent;
                   } else if (iniHariIni) {
-                    warnaAngka = Colors.white;
+                    warnaAngka = AppColors.textLight; // teks gelap -- kontras lebih baik di atas lingkaran emas
                   } else if (iniAhad) {
                     warnaAngka = Colors.red.shade300;
                   } else if (iniJumat) {
@@ -144,7 +144,7 @@ class _MiniCalendarWidgetState extends State<MiniCalendarWidget> {
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Container(
                         decoration: iniHariIni
-                            ? BoxDecoration(color: AppColors.emerald, borderRadius: BorderRadius.circular(8))
+                            ? BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(8))
                             : null,
                         padding: const EdgeInsets.symmetric(vertical: 3),
                         child: valid
@@ -152,12 +152,12 @@ class _MiniCalendarWidgetState extends State<MiniCalendarWidget> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   if (hijri != null)
-                                    Text(_keAngkaArabMini(hijri.hari), style: TextStyle(fontSize: 8.5, color: iniHariIni ? Colors.white70 : warnaKecil)),
+                                    Text(_keAngkaArabMini(hijri.hari), style: TextStyle(fontSize: 8.5, color: iniHariIni ? AppColors.textLight.withOpacity(0.7) : warnaKecil)),
                                   Text(
                                     '$tanggal',
                                     style: TextStyle(fontSize: 12.5, fontWeight: iniHariIni ? FontWeight.bold : FontWeight.normal, color: warnaAngka),
                                   ),
-                                  Text(HijriService.hitungPasaran(tanggalMasehi!), style: TextStyle(fontSize: 7.5, color: iniHariIni ? Colors.white70 : warnaKecil)),
+                                  Text(HijriService.hitungPasaran(tanggalMasehi!), style: TextStyle(fontSize: 7.5, color: iniHariIni ? AppColors.textLight.withOpacity(0.7) : warnaKecil)),
                                 ],
                               )
                             : const SizedBox(height: 1),

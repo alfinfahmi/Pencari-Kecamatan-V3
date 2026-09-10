@@ -133,6 +133,322 @@ jobs:
                   print("Deskripsi izin kamera sudah ada, tidak perlu ditambahkan.")
           PYEOF
 
+      - name: Buat 3 Widget Android Home Screen (Jam, Waktu Shalat, Kalender)
+        # Widget launcher Android -- BEDA dari tampilan "Home" DI DALAM
+        # aplikasi. Ini kode native Kotlin + XML yang TIDAK BISA diuji di
+        # lingkungan pengembangan (tidak ada emulator/device Android) --
+        # WAJIB diuji di HP sungguhan sebelum dipakai. Lihat WIDGET_ANDROID.md
+        # untuk penjelasan lengkap & keterbatasannya.
+        run: |
+          python3 << 'PYEOF'
+          import pathlib
+
+          PKG = "com.lflirboyo.pencari_kecamatan"
+          PKG_PATH = "com/lflirboyo/pencari_kecamatan"
+          RES = pathlib.Path("android/app/src/main/res")
+          KOTLIN = pathlib.Path(f"android/app/src/main/kotlin/{PKG_PATH}")
+          KOTLIN.mkdir(parents=True, exist_ok=True)
+          (RES / "layout").mkdir(parents=True, exist_ok=True)
+          (RES / "xml").mkdir(parents=True, exist_ok=True)
+
+          # ================= LAYOUT: widget_jam.xml =================
+          (RES / "layout" / "widget_jam.xml").write_text('''<?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/widget_jam_root"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="#0D5B3E"
+              android:padding="12dp">
+              <TextView
+                  android:id="@+id/label_lokasi"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:textColor="#CCFFFFFF"
+                  android:textSize="10sp"
+                  android:maxLines="1"
+                  android:ellipsize="end" />
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="4dp"
+                  android:orientation="horizontal">
+                  <LinearLayout
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:orientation="vertical">
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="WIB"
+                          android:textColor="#99FFFFFF"
+                          android:textSize="10sp" />
+                      <TextClock
+                          android:id="@+id/clock_wib"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:format12Hour="HH:mm:ss"
+                          android:format24Hour="HH:mm:ss"
+                          android:textColor="#FFFFFF"
+                          android:textSize="18sp"
+                          android:textStyle="bold" />
+                  </LinearLayout>
+                  <LinearLayout
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:orientation="vertical">
+                      <TextView
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="Istiwa'"
+                          android:textColor="#99FFFFFF"
+                          android:textSize="10sp" />
+                      <TextView
+                          android:id="@+id/text_istiwa"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="--:--:--"
+                          android:textColor="#FFD700"
+                          android:textSize="18sp"
+                          android:textStyle="bold" />
+                  </LinearLayout>
+              </LinearLayout>
+          </LinearLayout>
+          ''')
+
+          # ================= LAYOUT: widget_shalat.xml =================
+          (RES / "layout" / "widget_shalat.xml").write_text('''<?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/widget_shalat_root"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="#0D5B3E"
+              android:padding="12dp"
+              android:gravity="center_vertical">
+              <TextView
+                  android:id="@+id/label_lokasi_shalat"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:textColor="#CCFFFFFF"
+                  android:textSize="10sp"
+                  android:maxLines="1"
+                  android:ellipsize="end" />
+              <TextView
+                  android:id="@+id/text_nama_shalat"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="4dp"
+                  android:text="--"
+                  android:textColor="#FFFFFF"
+                  android:textSize="20sp"
+                  android:textStyle="bold" />
+              <TextView
+                  android:id="@+id/text_jam_shalat"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="--:--"
+                  android:textColor="#FFD700"
+                  android:textSize="16sp" />
+          </LinearLayout>
+          ''')
+
+          # ================= LAYOUT: widget_kalender.xml =================
+          (RES / "layout" / "widget_kalender.xml").write_text('''<?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/widget_kalender_root"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="#0D5B3E"
+              android:padding="12dp"
+              android:gravity="center_vertical">
+              <TextView
+                  android:id="@+id/text_tanggal_masehi"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="--"
+                  android:textColor="#CCFFFFFF"
+                  android:textSize="11sp" />
+              <TextView
+                  android:id="@+id/text_tanggal_hijri"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="2dp"
+                  android:text="--"
+                  android:textColor="#FFFFFF"
+                  android:textSize="16sp"
+                  android:textStyle="bold" />
+              <TextView
+                  android:id="@+id/text_pasaran"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="--"
+                  android:textColor="#FFD700"
+                  android:textSize="11sp" />
+          </LinearLayout>
+          ''')
+
+          # ================= WIDGET INFO (metadata) XML =================
+          def info_xml(min_w, min_h):
+              return f'''<?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:minWidth="{min_w}dp"
+              android:minHeight="{min_h}dp"
+              android:updatePeriodMillis="1800000"
+              android:resizeMode="horizontal|vertical"
+              android:widgetCategory="home_screen">
+          </appwidget-provider>
+          '''
+          (RES / "xml" / "widget_jam_info.xml").write_text(info_xml(180, 60).replace(
+              'android:widgetCategory="home_screen">', 'android:widgetCategory="home_screen"\n    android:initialLayout="@layout/widget_jam">'))
+          (RES / "xml" / "widget_shalat_info.xml").write_text(info_xml(180, 100).replace(
+              'android:widgetCategory="home_screen">', 'android:widgetCategory="home_screen"\n    android:initialLayout="@layout/widget_shalat">'))
+          (RES / "xml" / "widget_kalender_info.xml").write_text(info_xml(180, 90).replace(
+              'android:widgetCategory="home_screen">', 'android:widgetCategory="home_screen"\n    android:initialLayout="@layout/widget_kalender">'))
+
+          # ================= KOTLIN PROVIDERS =================
+          (KOTLIN / "WidgetJamProvider.kt").write_text(f'''package {PKG}
+
+          import android.appwidget.AppWidgetManager
+          import android.content.Context
+          import android.content.SharedPreferences
+          import android.widget.RemoteViews
+          import es.antonborri.home_widget.HomeWidgetLaunchIntent
+          import es.antonborri.home_widget.HomeWidgetProvider
+          import java.util.Calendar
+          import java.util.Locale
+
+          class WidgetJamProvider : HomeWidgetProvider() {{
+              override fun onUpdate(
+                  context: Context,
+                  appWidgetManager: AppWidgetManager,
+                  appWidgetIds: IntArray,
+                  widgetData: SharedPreferences
+              ) {{
+                  appWidgetIds.forEach {{ widgetId ->
+                      val views = RemoteViews(context.packageName, R.layout.widget_jam)
+
+                      val lokasiLabel = widgetData.getString("jam_lokasi_label", "") ?: ""
+                      views.setTextViewText(R.id.label_lokasi, lokasiLabel)
+
+                      val offsetMenit = widgetData.getString("jam_istiwa_offset_menit", "0")?.toDoubleOrNull() ?: 0.0
+                      val cal = Calendar.getInstance()
+                      cal.add(Calendar.SECOND, (offsetMenit * 60).toInt())
+                      val istiwaStr = String.format(
+                          Locale.US, "%02d:%02d:%02d",
+                          cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND)
+                      )
+                      views.setTextViewText(R.id.text_istiwa, istiwaStr)
+
+                      val pendingIntent = HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
+                      views.setOnClickPendingIntent(R.id.widget_jam_root, pendingIntent)
+
+                      appWidgetManager.updateAppWidget(widgetId, views)
+                  }}
+              }}
+          }}
+          ''')
+
+          (KOTLIN / "WidgetShalatProvider.kt").write_text(f'''package {PKG}
+
+          import android.appwidget.AppWidgetManager
+          import android.content.Context
+          import android.content.SharedPreferences
+          import android.widget.RemoteViews
+          import es.antonborri.home_widget.HomeWidgetLaunchIntent
+          import es.antonborri.home_widget.HomeWidgetProvider
+
+          class WidgetShalatProvider : HomeWidgetProvider() {{
+              override fun onUpdate(
+                  context: Context,
+                  appWidgetManager: AppWidgetManager,
+                  appWidgetIds: IntArray,
+                  widgetData: SharedPreferences
+              ) {{
+                  appWidgetIds.forEach {{ widgetId ->
+                      val views = RemoteViews(context.packageName, R.layout.widget_shalat)
+
+                      views.setTextViewText(R.id.label_lokasi_shalat, widgetData.getString("shalat_lokasi_label", "") ?: "")
+                      views.setTextViewText(R.id.text_nama_shalat, widgetData.getString("shalat_nama", "--") ?: "--")
+                      val jam = widgetData.getString("shalat_jam", "--:--") ?: "--:--"
+                      val zona = widgetData.getString("shalat_zona", "WIB") ?: "WIB"
+                      views.setTextViewText(R.id.text_jam_shalat, "$jam $zona")
+
+                      val pendingIntent = HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
+                      views.setOnClickPendingIntent(R.id.widget_shalat_root, pendingIntent)
+
+                      appWidgetManager.updateAppWidget(widgetId, views)
+                  }}
+              }}
+          }}
+          ''')
+
+          (KOTLIN / "WidgetKalenderProvider.kt").write_text(f'''package {PKG}
+
+          import android.appwidget.AppWidgetManager
+          import android.content.Context
+          import android.content.SharedPreferences
+          import android.widget.RemoteViews
+          import es.antonborri.home_widget.HomeWidgetLaunchIntent
+          import es.antonborri.home_widget.HomeWidgetProvider
+
+          class WidgetKalenderProvider : HomeWidgetProvider() {{
+              override fun onUpdate(
+                  context: Context,
+                  appWidgetManager: AppWidgetManager,
+                  appWidgetIds: IntArray,
+                  widgetData: SharedPreferences
+              ) {{
+                  appWidgetIds.forEach {{ widgetId ->
+                      val views = RemoteViews(context.packageName, R.layout.widget_kalender)
+
+                      views.setTextViewText(R.id.text_tanggal_masehi, widgetData.getString("kal_tanggal_masehi", "--") ?: "--")
+                      views.setTextViewText(R.id.text_tanggal_hijri, widgetData.getString("kal_tanggal_hijri", "--") ?: "--")
+                      views.setTextViewText(R.id.text_pasaran, widgetData.getString("kal_pasaran", "--") ?: "--")
+
+                      val pendingIntent = HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
+                      views.setOnClickPendingIntent(R.id.widget_kalender_root, pendingIntent)
+
+                      appWidgetManager.updateAppWidget(widgetId, views)
+                  }}
+              }}
+          }}
+          ''')
+
+          # ================= ANDROIDMANIFEST.XML: daftarkan 3 receiver =================
+          import re
+          manifest_path = pathlib.Path("android/app/src/main/AndroidManifest.xml")
+          text = manifest_path.read_text()
+
+          def receiver_block(nama_provider, nama_info_xml):
+              return f'''        <receiver android:name=".{nama_provider}" android:exported="false">
+                  <intent-filter>
+                      <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                  </intent-filter>
+                  <meta-data android:name="android.appwidget.provider" android:resource="@xml/{nama_info_xml}" />
+              </receiver>
+          '''
+
+          tambahan_receiver = (
+              receiver_block("WidgetJamProvider", "widget_jam_info") +
+              receiver_block("WidgetShalatProvider", "widget_shalat_info") +
+              receiver_block("WidgetKalenderProvider", "widget_kalender_info")
+          )
+
+          if "WidgetJamProvider" not in text:
+              # Sisipkan tepat sebelum penutup </application>
+              text = text.replace("</application>", tambahan_receiver + "    </application>")
+              manifest_path.write_text(text)
+              print("3 widget receiver berhasil ditambahkan ke AndroidManifest.xml")
+          else:
+              print("Widget receiver sudah ada, tidak ditambahkan ulang.")
+
+          print("Semua file widget Android berhasil dibuat.")
+          PYEOF
+
       - name: Paksa compileSdk seragam di SEMUA modul (app + plugin pihak ketiga)
         run: |
           python3 << 'PYEOF'

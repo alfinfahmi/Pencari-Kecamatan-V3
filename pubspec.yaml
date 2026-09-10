@@ -33,6 +33,7 @@ dependencies:
   # Buka Google Maps / Waze
   url_launcher: ^6.3.0
   package_info_plus: ^10.2.1
+  home_widget: ^0.9.4
 
   # Backend Supabase untuk crowdsourcing koreksi data & panel moderasi
   supabase_flutter: ^2.6.0
