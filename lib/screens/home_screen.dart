@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../widgets/home_prayer_widget.dart';
 import '../widgets/waktu_clock_widget.dart';
 import '../widgets/mini_calendar_widget.dart';
+import '../widgets/update_banner_widget.dart';
 import '../widgets/kompas_kiblat_card_widget.dart';
 import '../widgets/watermark_footer.dart';
 import 'detail_screen.dart';
@@ -228,6 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: ListView(
               children: [
+                const UpdateBannerWidget(),
                 const WaktuClockWidget(),
                 if (bannerOta != null) bannerOta,
                 const HomePrayerWidget(),

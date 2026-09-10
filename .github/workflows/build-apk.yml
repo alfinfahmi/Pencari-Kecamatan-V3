@@ -13,6 +13,11 @@ jobs:
   # ==========================================
   build-apk:
     runs-on: ubuntu-latest
+    # Wajib untuk langkah "Buat GitHub Release" di bawah -- GITHUB_TOKEN
+    # bawaan butuh izin tulis eksplisit untuk membuat release & unggah
+    # aset (APK). Tanpa ini, langkah rilis akan gagal dengan 403.
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout kode
@@ -311,6 +316,27 @@ jobs:
           name: pencari-kecamatan-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+
+      - name: Buat GitHub Release + lampirkan APK
+        # Dipakai fitur "cek update" di dalam aplikasi (lib/services/
+        # update_checker_service.dart) -- aplikasi membandingkan versi
+        # terpasang dengan tag rilis TERBARU di sini lewat GitHub API,
+        # dan mengarahkan pengguna unduh APK dari sini kalau ada versi
+        # baru. Versi diambil dari pubspec.yaml (format "1.2.3+4" ->
+        # tag "v1.2.3"). Kalau tag itu SUDAH ada (mis. build ulang tanpa
+        # naikkan versi), --clobber akan menimpa rilis yang sama, bukan
+        # gagal.
+        run: |
+          VERSI=$(grep '^version:' pubspec.yaml | sed 's/version:\s*//' | cut -d'+' -f1 | tr -d '[:space:]')
+          TAG="v$VERSI"
+          echo "Membuat/memperbarui release $TAG"
+          gh release create "$TAG" \
+            build/app/outputs/flutter-apk/app-release.apk \
+            --title "Aplikasi Falak $TAG" \
+            --notes "Build otomatis dari commit ${GITHUB_SHA::7} (LF Ma'had 'Aly Lirboyo -- MHM Kediri)." \
+            --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ==========================================
   # (Job build-ios DIHAPUS dari sini)
