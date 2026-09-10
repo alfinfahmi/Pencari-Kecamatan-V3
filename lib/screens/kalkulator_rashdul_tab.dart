@@ -171,7 +171,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
         const SizedBox(height: 2),
         Text(
           '${jamKeString(siangJam)} ${lokasi.zonaWaktu ?? ''}  (siang -- bisa dipakai kalibrasi)',
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.emerald),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? AppColors.primaryDark : AppColors.emerald),
         ),
         Text(
           '${jamKeString(malamJam)} ${lokasi.zonaWaktu ?? ''}  (malam -- cuma solusi geometris, matahari tidak terlihat)',
@@ -216,7 +216,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Icon(ikon, size: 17, color: AppColors.emerald),
+            Icon(ikon, size: 17, color: isDark ? AppColors.primaryDark : AppColors.emerald),
             const SizedBox(width: 6),
             Expanded(child: Text(judul, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? AppColors.textDark : AppColors.textLight))),
           ]),

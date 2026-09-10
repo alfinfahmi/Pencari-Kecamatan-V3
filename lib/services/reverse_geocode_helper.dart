@@ -33,6 +33,17 @@ class _HasilGeocoding {
 ///    7.274 kecamatan milik sendiri, yang MEMANG terindeks per kecamatan
 ///    sehingga lebih bisa diandalkan untuk level ini dibanding menebak
 ///    dari field geocoding yang ambigu.
+///
+///    BUG YANG PERNAH TERJADI (khusus web): versi web memuat data
+///    kecamatan per-provinsi secara bertahap di background (lihat
+///    WebDataRepository) -- kalau "kecamatan terdekat" dicari SEBELUM
+///    provinsi pengguna selesai dimuat, hasilnya bisa provinsi yang
+///    SALAH SAMA SEKALI (pernah kejadian: pengguna di Demak, Jawa
+///    Tengah, tapi dapat "Ciputat Timur" dari Banten, karena Banten
+///    kebetulan sudah termuat duluan sementara Jawa Tengah belum).
+///    Makanya sekarang nama provinsi dari geocoding dikirim sebagai
+///    petunjuk ke kecamatanTerdekat(), supaya provinsi yang benar
+///    dipastikan termuat dulu sebelum mencari.
 /// 3. Kabupaten/provinsi: pakai hasil geocoding kalau berhasil (biasanya
 ///    akurat), fallback ke kecamatan terdekat kalau geocoding gagal.
 ///
@@ -52,7 +63,7 @@ Future<KecamatanModel> lengkapiInfoLokasiGps({
   }
   geo ??= await _cobaNominatim(lat, lng);
 
-  final terdekat = AppDataService.instance.kecamatanTerdekat(lat, lng);
+  final terdekat = await AppDataService.instance.kecamatanTerdekat(lat, lng, provinsiPetunjuk: geo?.provinsi);
 
   return KecamatanModel(
     id: 'gps_lokasi_saat_ini',

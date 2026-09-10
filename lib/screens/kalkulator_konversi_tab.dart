@@ -289,7 +289,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
                   child: Text(
                     '${_hasilHijri!.hari} ${_hasilHijri!.namaBulanH} ${_hasilHijri!.tahunH} H'
                     '${_hasilHijri!.istikmal ? ' (istikmal)' : ''}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.emerald),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? AppColors.primaryDark : AppColors.emerald),
                   ),
                 ),
               ],
@@ -347,7 +347,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
                   decoration: BoxDecoration(color: AppColors.emerald.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
                   child: Text(
                     '${_hasilMasehi!.day}/${_hasilMasehi!.month}/${_hasilMasehi!.year} M',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.emerald),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? AppColors.primaryDark : AppColors.emerald),
                   ),
                 ),
               ],
@@ -370,7 +370,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(judul, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.emerald)),
+          Text(judul, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? AppColors.primaryDark : AppColors.emerald)),
           const SizedBox(height: 10),
           ...children,
         ],

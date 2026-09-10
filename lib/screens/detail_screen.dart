@@ -203,7 +203,7 @@ class _DetailScreenState extends State<DetailScreen> {
       appBar: AppBar(
         title: Text(switch (widget.initialSection) {
           DetailSection.geografis => 'Rincian Geografis',
-          DetailSection.kiblat => 'Arah Kiblat',
+          DetailSection.kiblat => 'Kompas Kiblat',
           DetailSection.waktuShalat => 'Waktu Shalat',
           null => '',
         }),
@@ -398,7 +398,7 @@ class _DetailScreenState extends State<DetailScreen> {
     double jarakLirboyo,
   ) {
     return _blokCard(
-      title: 'Arah Kiblat',
+      title: 'Kompas Kiblat',
       icon: Icons.explore_outlined,
       badge: 'Terverifikasi',
       children: [

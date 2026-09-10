@@ -89,7 +89,16 @@ class AppDataService {
   /// administratif sesungguhnya kalau posisi pengguna dekat perbatasan
   /// atau kecamatannya secara geografis luas. Cukup akurat untuk label
   /// deskriptif ("Sekitar Kec. X"), TIDAK untuk kepastian administratif.
-  KecamatanModel? kecamatanTerdekat(double lat, double lng) {
+  ///
+  /// [provinsiPetunjuk] (opsional, biasanya hasil geocoding) dipakai KHUSUS
+  /// di web untuk memastikan provinsi yang relevan sudah termuat sebelum
+  /// mencari -- tanpa ini, hasil bisa salah total kalau baru sebagian
+  /// provinsi selesai dimuat di background (lihat catatan di
+  /// WebDataRepository.pastikanProvinsiTermuat).
+  Future<KecamatanModel?> kecamatanTerdekat(double lat, double lng, {String? provinsiPetunjuk}) async {
+    if (kIsWeb) {
+      await WebDataRepository.instance.pastikanProvinsiTermuat(provinsiPetunjuk);
+    }
     final Iterable<KecamatanModel> semua = kIsWeb
         ? WebDataRepository.instance.loadedKecamatan.expand((l) => l)
         : DataRepository.instance.semuaKecamatan;

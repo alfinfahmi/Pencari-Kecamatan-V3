@@ -24,6 +24,7 @@ class _WaktuClockWidgetState extends State<WaktuClockWidget> {
   Timer? _timer;
   DateTime _sekarang = DateTime.now();
   KecamatanModel? _lokasi;
+  bool _format24Jam = true;
 
   @override
   void initState() {
@@ -100,11 +101,61 @@ class _WaktuClockWidgetState extends State<WaktuClockWidget> {
     return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
+  /// Format 12 jam standar (AM/PM) -- dipakai untuk jam WIB.
+  String _formatJam12(int h24, int m, int s) {
+    final periode = h24 < 12 ? 'AM' : 'PM';
+    var h12 = h24 % 12;
+    if (h12 == 0) h12 = 12;
+    return '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')} $periode';
+  }
+
+  /// Label periode hari gaya Indonesia untuk Istiwa' -- BUKAN AM/PM,
+  /// tapi Pagi/Siang/Sore/Malam sesuai batas yang diminta pengguna:
+  ///   Pagi  : 00:00 - 09:59
+  ///   Siang : 10:00 - 14:59
+  ///   Sore  : 15:00 - 18:00
+  ///   Malam : 18:01 - 23:59
+  /// Dihitung dalam total menit sejak tengah malam supaya batas "18:00
+  /// vs 18:01" (presisi menit, bukan cuma jam) tepat.
+  String _labelPeriodeIstiwa(int h24, int m) {
+    final totalMenit = h24 * 60 + m;
+    if (totalMenit <= 9 * 60 + 59) return 'Pagi';
+    if (totalMenit <= 14 * 60 + 59) return 'Siang';
+    if (totalMenit <= 18 * 60) return 'Sore';
+    return 'Malam';
+  }
+
+  /// Format 12 jam untuk Istiwa' -- pakai label Pagi/Siang/Sore/Malam,
+  /// jamnya sendiri tetap ditulis 1-12 (bukan 0-23).
+  String _formatIstiwa12(double jamDesimal) {
+    final h24 = jamDesimal.floor() % 24;
+    final m = ((jamDesimal - jamDesimal.floor()) * 60).floor();
+    final s = (((jamDesimal - jamDesimal.floor()) * 60 - m) * 60).round();
+    var h12 = h24 % 12;
+    if (h12 == 0) h12 = 12;
+    final jamStr = '${h12.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    return '${_labelPeriodeIstiwa(h24, m)} $jamStr';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final jamWib = '${_sekarang.hour.toString().padLeft(2, '0')}:${_sekarang.minute.toString().padLeft(2, '0')}:${_sekarang.second.toString().padLeft(2, '0')}';
-    final istiwa = _lokasi != null ? _formatJam(_hitungIstiwa()) : '--:--:--';
+
+    final String jamWib;
+    if (_format24Jam) {
+      jamWib = '${_sekarang.hour.toString().padLeft(2, '0')}:${_sekarang.minute.toString().padLeft(2, '0')}:${_sekarang.second.toString().padLeft(2, '0')}';
+    } else {
+      jamWib = _formatJam12(_sekarang.hour, _sekarang.minute, _sekarang.second);
+    }
+
+    final String istiwa;
+    if (_lokasi == null) {
+      istiwa = '--:--:--';
+    } else if (_format24Jam) {
+      istiwa = _formatJam(_hitungIstiwa());
+    } else {
+      istiwa = _formatIstiwa12(_hitungIstiwa());
+    }
 
     return Container(
       margin: const EdgeInsets.fromLTRB(14, 10, 14, 4),
@@ -114,29 +165,53 @@ class _WaktuClockWidgetState extends State<WaktuClockWidget> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: isDark ? Colors.white12 : Colors.black.withOpacity(0.06)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('WIB', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 2),
-                Text(jamWib, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? AppColors.textDark : AppColors.textLight)),
-              ],
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('WIB', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 2),
+                    Text(jamWib, style: TextStyle(fontSize: _format24Jam ? 22 : 18, fontWeight: FontWeight.bold, color: isDark ? AppColors.textDark : AppColors.textLight)),
+                  ],
+                ),
+              ),
+              Container(width: 1, height: 36, color: isDark ? Colors.white12 : Colors.black12),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Istiwa\'', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 2),
+                      Text(istiwa, style: TextStyle(fontSize: _format24Jam ? 22 : 17, fontWeight: FontWeight.bold, color: isDark ? AppColors.primaryDark : AppColors.emerald)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          Container(width: 1, height: 36, color: isDark ? Colors.white12 : Colors.black12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Istiwa\'', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 2),
-                  Text(istiwa, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.emerald)),
-                ],
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(9999),
+              onTap: () => setState(() => _format24Jam = !_format24Jam),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(9999),
+                ),
+                child: Text(
+                  _format24Jam ? '24 jam  \u2022  ganti ke 12 jam' : '12 jam  \u2022  ganti ke 24 jam',
+                  style: TextStyle(fontSize: 10.5, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+                ),
               ),
             ),
           ),

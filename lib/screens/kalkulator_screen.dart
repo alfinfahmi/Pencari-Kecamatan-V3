@@ -171,22 +171,22 @@ class _TabSegitigaBolaState extends State<_TabSegitigaBola> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.emerald.withOpacity(0.06),
+                color: (isDark ? AppColors.primaryDark : AppColors.emerald).withOpacity(isDark ? 0.10 : 0.06),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.emerald.withOpacity(0.3)),
+                border: Border.all(color: (isDark ? AppColors.primaryDark : AppColors.emerald).withOpacity(0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Hasil', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Hasil', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? AppColors.textDark : AppColors.textLight)),
                   const SizedBox(height: 8),
-                  _barisHasil('Sisi a', _hasil!.$1),
-                  _barisHasil('Sisi b', _hasil!.$2),
-                  _barisHasil('Sisi c', _hasil!.$3),
+                  _barisHasil('Sisi a', _hasil!.$1, isDark),
+                  _barisHasil('Sisi b', _hasil!.$2, isDark),
+                  _barisHasil('Sisi c', _hasil!.$3, isDark),
                   const Divider(height: 16),
-                  _barisHasil('Sudut A', _hasil!.$4),
-                  _barisHasil('Sudut B', _hasil!.$5),
-                  _barisHasil('Sudut C', _hasil!.$6),
+                  _barisHasil('Sudut A', _hasil!.$4, isDark),
+                  _barisHasil('Sudut B', _hasil!.$5, isDark),
+                  _barisHasil('Sudut C', _hasil!.$6, isDark),
                 ],
               ),
             ),
@@ -196,15 +196,15 @@ class _TabSegitigaBolaState extends State<_TabSegitigaBola> {
     );
   }
 
-  Widget _barisHasil(String label, double nilai) {
+  Widget _barisHasil(String label, double nilai, bool isDark) {
     final (d, m, s) = KalkulatorService.desimalKeDms(nilai);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey.shade700)),
-          Text("${nilai.toStringAsFixed(4)}\u00b0  ($d\u00b0 $m' ${s.toStringAsFixed(1)}\")", style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(label, style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700)),
+          Text("${nilai.toStringAsFixed(4)}\u00b0  ($d\u00b0 $m' ${s.toStringAsFixed(1)}\")", style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? AppColors.textDark : AppColors.textLight)),
         ],
       ),
     );

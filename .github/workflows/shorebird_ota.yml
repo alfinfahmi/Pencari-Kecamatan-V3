@@ -1,0 +1,63 @@
+name: Shorebird OTA (Release/Patch Android)
+
+# BELUM BISA DIPAKAI sebelum prasyarat berikut dipenuhi (lihat
+# lib/services/ota_update_service.dart untuk penjelasan lengkap):
+#   1. Jalankan `shorebird init` di root project (lokal, komputer Anda)
+#      -- ini membuat file shorebird.yaml, WAJIB di-commit ke repo ini.
+#   2. Buat token API: Console Shorebird -> Account -> API Keys
+#   3. Simpan token itu sebagai GitHub Secret bernama SHOREBIRD_TOKEN
+#      (Settings -> Secrets and variables -> Actions -> New repository secret)
+#
+# Dipicu MANUAL lewat tab "Actions" (bukan otomatis tiap push seperti
+# build-apk.yml) -- SENGAJA, supaya patch OTA tidak langsung terkirim ke
+# pengguna tanpa sempat diuji dulu. Pilih "release" HANYA untuk rilis
+# pertama kali (base release yang nanti dibagikan APK-nya ke pengguna);
+# untuk pembaruan berikutnya pilih "patch" (jauh lebih cepat, cuma
+# mengirim selisih kode Dart, biasanya <1MB).
+#
+# CATATAN PENTING: Shorebird CUMA bisa menambal kode Dart. Kalau
+# perubahan Anda menyentuh izin aplikasi (AndroidManifest.xml),
+# menambah package native baru, atau apa pun di luar kode Dart murni --
+# job ini TIDAK CUKUP, tetap perlu build-apk.yml biasa (APK baru,
+# dibagikan ulang manual ke pengguna).
+
+on:
+  workflow_dispatch:
+    inputs:
+      jenis:
+        description: "release (pertama kali) atau patch (pembaruan)"
+        required: true
+        type: choice
+        options:
+          - patch
+          - release
+
+jobs:
+  shorebird-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Setup Java (dibutuhkan Android Gradle build)
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: 🐦 Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          cache: true
+
+      - name: 🚀 Shorebird Release (rilis pertama kali)
+        if: ${{ inputs.jenis == 'release' }}
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: shorebird release android --artifact apk
+
+      - name: 🩹 Shorebird Patch (pembaruan OTA)
+        if: ${{ inputs.jenis == 'patch' }}
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: shorebird patch android --artifact apk

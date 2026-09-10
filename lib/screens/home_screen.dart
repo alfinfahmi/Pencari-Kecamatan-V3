@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 import '../main.dart' show themeModeNotifier;
 import '../services/reverse_geocode_helper.dart';
 import '../services/supabase_service.dart';
+import '../services/ota_update_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/home_prayer_widget.dart';
 import '../widgets/waktu_clock_widget.dart';
 import '../widgets/mini_calendar_widget.dart';
+import '../widgets/kompas_kiblat_card_widget.dart';
 import '../widgets/watermark_footer.dart';
 import 'detail_screen.dart';
 import 'geografis_pencarian_screen.dart';
@@ -33,6 +36,73 @@ class _HomeScreenState extends State<HomeScreen> {
   late final Future<String> _roleFuture = SupabaseService.instance.getRole();
 
   bool _memuatMenuLokasi = false;
+  UpdateStatus? _statusOta;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fire-and-forget SENGAJA -- jangan di-await, supaya Home tidak
+    // menunggu jaringan Shorebird untuk tampil (lihat peringatan resmi
+    // paket ini soal jangan gating startup pada checkForUpdate()).
+    OtaUpdateService.cekPembaruan().then((status) {
+      if (mounted && status != null) setState(() => _statusOta = status);
+    });
+  }
+
+  Future<void> _terapkanOta() async {
+    final berhasil = await OtaUpdateService.terapkanPembaruan();
+    if (!mounted) return;
+    if (berhasil) {
+      setState(() => _statusOta = UpdateStatus.restartRequired);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menerapkan pembaruan -- coba lagi nanti')),
+      );
+    }
+  }
+
+  /// Kartu kecil pemberitahuan OTA -- null (tidak tampil apa-apa) kalau
+  /// aplikasi sudah versi terbaru atau OTA belum ter-setup di build ini.
+  Widget? _bannerOta(bool isDark) {
+    if (_statusOta == UpdateStatus.outdated) {
+      return _kartuBannerOta(
+        isDark: isDark,
+        pesan: 'Pembaruan aplikasi tersedia',
+        teksTombol: 'Terapkan',
+        onTombol: _terapkanOta,
+      );
+    }
+    if (_statusOta == UpdateStatus.restartRequired) {
+      return _kartuBannerOta(
+        isDark: isDark,
+        pesan: 'Pembaruan sudah diunduh -- mulai ulang aplikasi untuk mengaktifkan',
+        teksTombol: null,
+        onTombol: null,
+      );
+    }
+    return null;
+  }
+
+  Widget _kartuBannerOta({required bool isDark, required String pesan, String? teksTombol, VoidCallback? onTombol}) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 4, 14, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.gold.withOpacity(isDark ? 0.16 : 0.12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.gold.withOpacity(0.4)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.system_update_rounded, size: 18, color: AppColors.gold),
+          const SizedBox(width: 8),
+          Expanded(child: Text(pesan, style: const TextStyle(fontSize: 12.5))),
+          if (teksTombol != null)
+            TextButton(onPressed: onTombol, child: Text(teksTombol, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+        ],
+      ),
+    );
+  }
 
   /// Ambil lokasi GPS (dengan fallback nama tempat berlapis, lihat
   /// reverse_geocode_helper.dart), lalu buka DetailScreen langsung ke
@@ -94,6 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bannerOta = _bannerOta(isDark);
 
     return Scaffold(
       appBar: AppBar(
@@ -158,8 +229,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListView(
               children: [
                 const WaktuClockWidget(),
+                if (bannerOta != null) bannerOta,
                 const HomePrayerWidget(),
                 const MiniCalendarWidget(),
+                const KompasKiblatCardWidget(),
                 _buildMenuCepat(isDark),
                 const SizedBox(height: 12),
               ],
@@ -198,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (_memuatMenuLokasi)
                   const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2))
                 else
-                  Icon(icon, color: AppColors.emerald, size: 19),
+                  Icon(icon, color: isDark ? AppColors.primaryDark : AppColors.emerald, size: 19),
                 const SizedBox(height: 6),
                 Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600)),
               ],

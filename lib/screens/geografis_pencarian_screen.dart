@@ -207,7 +207,7 @@ class _GeografisPencarianScreenState extends State<GeografisPencarianScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Pencarian Koordinat Geografis',
-                    style: AppTypography.headlineMd(color: AppColors.emerald).copyWith(fontSize: 15)),
+                    style: AppTypography.headlineMd(color: isDark ? AppColors.primaryDark : AppColors.emerald).copyWith(fontSize: 15)),
                 const SizedBox(height: 10),
               ],
             ),

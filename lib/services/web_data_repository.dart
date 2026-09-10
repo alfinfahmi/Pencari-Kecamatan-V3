@@ -75,6 +75,36 @@ class WebDataRepository {
     }
   }
 
+  /// Pastikan provinsi yang cocok [namaPetunjuk] (biasanya hasil geocoding)
+  /// SUDAH termuat sebelum mencari "kecamatan terdekat" -- tanpa ini,
+  /// pencarian terdekat bisa salah total kalau baru SEBAGIAN provinsi
+  /// selesai dimuat di background saat pencarian dipanggil (mis. pengguna
+  /// GPS di Demak, tapi provinsi Jawa Tengah belum ter-load, sementara
+  /// Banten kebetulan sudah -- hasil "terdekat" jadi salah pilih dari
+  /// provinsi yang salah).
+  ///
+  /// Kalau petunjuk kosong/tidak cocok provinsi manapun di manifest,
+  /// fallback aman: tunggu SEMUA provinsi (idempotent -- yang sudah
+  /// termuat dari preload sebelumnya dilewati, jadi tidak dobel-load).
+  Future<void> pastikanProvinsiTermuat(String? namaPetunjuk) async {
+    if (namaPetunjuk != null && namaPetunjuk.trim().isNotEmpty) {
+      final petunjuk = namaPetunjuk.toLowerCase();
+      final cocok = _manifestProvinsi.where((p) {
+        final nama = (p['nama'] as String).toLowerCase();
+        return nama.contains(petunjuk) || petunjuk.contains(nama);
+      });
+      if (cocok.isNotEmpty) {
+        for (final p in cocok) {
+          await _loadProvinsi(p['slug'] as String, p['file'] as String);
+        }
+        return;
+      }
+    }
+    // Petunjuk tidak ada/tidak cocok provinsi manapun -- demi kebenaran
+    // hasil (bukan cuma kecepatan), tunggu semua provinsi selesai.
+    await preloadAllInBackground();
+  }
+
   /// Pencarian: menyaring provinsi yang relevan dari manifest dulu (nama
   /// provinsi cocok query, atau semua provinsi jika query tidak cocok nama
   /// provinsi manapun — lalu memuat file yang belum ada di cache.

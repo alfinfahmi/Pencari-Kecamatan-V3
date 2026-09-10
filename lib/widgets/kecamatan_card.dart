@@ -161,7 +161,7 @@ class _KecamatanCardState extends State<KecamatanCard> {
                             child: _menuButton(
                               context, isDark,
                               icon: Icons.explore_rounded,
-                              label: 'Arah\nKiblat',
+                              label: 'Kompas\nKiblat',
                               onTap: () => _bukaDetail(context, DetailSection.kiblat),
                             ),
                           ),

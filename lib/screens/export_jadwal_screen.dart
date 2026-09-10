@@ -185,6 +185,7 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
     final sudutSubuh = await _prayerSettings.getSudutSubuh();
 
     final baris = <List<String>>[];
+    final tanggalBaris = <DateTime>[];
     for (int i = 0; i < jumlahHari; i++) {
       final tgl = tglMulai.add(Duration(days: i));
       final waktu = HisabService.hitung(
@@ -212,9 +213,10 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
         fmt(waktu[6].waktuDaerah), // Maghrib
         fmt(waktu[7].waktuDaerah), // Isya
       ]);
+      tanggalBaris.add(tgl);
     }
 
-    final pdfBytes = await _generatePdf(baris, data);
+    final pdfBytes = await _generatePdf(baris, tanggalBaris, data);
 
     setState(() => _memproses = false);
     if (!mounted) return;
@@ -234,59 +236,155 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
     return '$labelMasehi\n$labelHijri'; // keduanya
   }
 
-  Future<Uint8List> _generatePdf(List<List<String>> baris, KecamatanModel data) async {
+  Future<Uint8List> _generatePdf(List<List<String>> baris, List<DateTime> tanggalBaris, KecamatanModel data) async {
     final doc = pw.Document();
     const headers = ['Tanggal', 'Imsak', 'Subuh', 'Terbit', 'Dhuha', 'Dzuhur', 'Ashar', 'Maghrib', "Isya'"];
+
+    const warnaEmerald = PdfColor(13 / 255, 92 / 255, 58 / 255);
+    const warnaEmeraldMuda = PdfColor(0.90, 0.96, 0.93);
+    const warnaGold = PdfColor(212 / 255, 175 / 255, 55 / 255);
+    const warnaJumatBg = PdfColor(0.88, 0.95, 0.90);
+    const warnaHariIniLatar = PdfColor(0.99, 0.94, 0.78); // gold pudar, aman (bukan bergantung method .shade() yang belum tentu ada)
+    const warnaAbuTeks = PdfColor(0.35, 0.38, 0.36);
+    final sekarang = DateTime.now();
+
+    pw.Widget selHeader(String teks) => pw.Container(
+          alignment: pw.Alignment.center,
+          padding: const pw.EdgeInsets.symmetric(vertical: 8),
+          child: pw.Text(teks, style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.white)),
+        );
+
+    pw.Widget selData(String teks, {bool tebal = false, bool kiri = false}) => pw.Container(
+          alignment: kiri ? pw.Alignment.centerLeft : pw.Alignment.center,
+          padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+          child: pw.Text(teks, style: pw.TextStyle(fontSize: kiri ? 8 : 9, fontWeight: tebal ? pw.FontWeight.bold : pw.FontWeight.normal)),
+        );
+
+    final barisTabel = <pw.TableRow>[
+      pw.TableRow(decoration: const pw.BoxDecoration(color: warnaEmerald), children: headers.map(selHeader).toList()),
+    ];
+    for (int i = 0; i < baris.length; i++) {
+      final tgl = tanggalBaris[i];
+      final iniJumat = tgl.weekday == DateTime.friday;
+      final iniHariIni = tgl.year == sekarang.year && tgl.month == sekarang.month && tgl.day == sekarang.day;
+      final warnaLatar = iniHariIni
+          ? warnaHariIniLatar
+          : iniJumat
+              ? warnaJumatBg
+              : (i % 2 == 0 ? PdfColors.white : PdfColor(0.97, 0.97, 0.96));
+      final row = baris[i];
+      barisTabel.add(pw.TableRow(
+        decoration: pw.BoxDecoration(color: warnaLatar),
+        children: [
+          selData(row[0], kiri: true, tebal: iniHariIni),
+          for (int k = 1; k < row.length; k++) selData(row[k], tebal: k == 7 || iniHariIni), // Maghrib (indeks 7) sedikit ditonjolkan
+        ],
+      ));
+    }
 
     doc.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.fromLTRB(28, 24, 28, 24),
         header: (context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Jadwal Waktu Shalat', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-            pw.Text(
-              '${data.kecamatan}${data.kabupaten != null ? ', ${data.kabupaten}' : ''}, ${data.provinsi}',
-              style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+            pw.Container(
+              padding: const pw.EdgeInsets.only(bottom: 10),
+              decoration: const pw.BoxDecoration(
+                border: pw.Border(bottom: pw.BorderSide(color: warnaGold, width: 2)),
+              ),
+              child: pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('JADWAL WAKTU SHALAT',
+                          style: pw.TextStyle(fontSize: 19, fontWeight: pw.FontWeight.bold, color: warnaEmerald, letterSpacing: 0.5)),
+                      pw.SizedBox(height: 3),
+                      pw.Text(
+                        '${data.kecamatan}${data.kabupaten != null ? ', ${data.kabupaten}' : ''}, ${data.provinsi}',
+                        style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  pw.Text("Lajnah Falakiyah\nMa'had 'Aly Lirboyo",
+                      textAlign: pw.TextAlign.right,
+                      style: pw.TextStyle(fontSize: 9, color: warnaAbuTeks, fontStyle: pw.FontStyle.italic)),
+                ],
+              ),
             ),
-            pw.SizedBox(height: 4),
-            pw.Text(
-              'Koordinat: ${data.lat}, ${data.lng}  |  Elevasi: ${data.elevasiM ?? 0} m  |  Zona: ${data.zonaWaktu ?? '-'}',
-              style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+            pw.SizedBox(height: 8),
+            pw.Container(
+              padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: pw.BoxDecoration(color: warnaEmeraldMuda, borderRadius: pw.BorderRadius.circular(6)),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('Koordinat: ${data.lat.toStringAsFixed(4)}, ${data.lng.toStringAsFixed(4)}',
+                      style: pw.TextStyle(fontSize: 8.5, color: warnaEmerald)),
+                  pw.Text('Elevasi: ${data.elevasiM ?? 0} m', style: pw.TextStyle(fontSize: 8.5, color: warnaEmerald)),
+                  pw.Text('Zona: ${data.zonaWaktu ?? '-'}', style: pw.TextStyle(fontSize: 8.5, color: warnaEmerald)),
+                ],
+              ),
             ),
-            pw.Divider(),
+            pw.SizedBox(height: 10),
           ],
         ),
         footer: (context) => pw.Column(
           children: [
-            pw.Divider(),
+            pw.Divider(color: PdfColors.grey300),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text(
+                  "LF Ma'had 'Aly Lirboyo -- MHM Kediri",
+                  style: pw.TextStyle(fontSize: 7.5, color: warnaAbuTeks, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.Text('Halaman ${context.pageNumber} / ${context.pagesCount}',
+                    style: const pw.TextStyle(fontSize: 7.5, color: warnaAbuTeks)),
+              ],
+            ),
+            pw.SizedBox(height: 2),
             pw.Text(
-              "LF Ma'had 'Aly Lirboyo — MHM Kediri  |  Perkiraan hisab, validasi lanjut direkomendasikan sebelum dipakai operasional.",
-              style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500),
+              'Hasil perkiraan hisab -- direkomendasikan validasi lanjut sebelum dipakai operasional.',
+              style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500, fontStyle: pw.FontStyle.italic),
               textAlign: pw.TextAlign.center,
             ),
-            pw.SizedBox(height: 4),
-            pw.Text('Halaman ${context.pageNumber} / ${context.pagesCount}',
-                style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500)),
           ],
         ),
         build: (context) => [
-          pw.Table.fromTextArray(
-            headers: headers,
-            data: baris,
-            headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.white),
-            headerDecoration: pw.BoxDecoration(color: PdfColor(13 / 255, 92 / 255, 58 / 255)),
-            cellStyle: const pw.TextStyle(fontSize: 8),
-            cellAlignment: pw.Alignment.center,
-            cellAlignments: {0: pw.Alignment.centerLeft},
-            columnWidths: {0: const pw.FlexColumnWidth(2.4)},
-            cellPadding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+          pw.Table(
+            border: pw.TableBorder.symmetric(inside: const pw.BorderSide(color: PdfColors.grey300, width: 0.5)),
+            columnWidths: const {0: pw.FlexColumnWidth(2.6)},
+            children: barisTabel,
+          ),
+          pw.SizedBox(height: 10),
+          pw.Row(
+            children: [
+              _legendaKotak(warnaJumatBg, 'Hari Jumat'),
+              pw.SizedBox(width: 14),
+              _legendaKotak(warnaHariIniLatar, 'Hari ini'),
+            ],
           ),
         ],
       ),
     );
 
     return doc.save();
+  }
+
+  pw.Widget _legendaKotak(PdfColor warna, String label) {
+    return pw.Row(
+      mainAxisSize: pw.MainAxisSize.min,
+      children: [
+        pw.Container(width: 10, height: 10, decoration: pw.BoxDecoration(color: warna, border: pw.Border.all(color: PdfColors.grey400, width: 0.5))),
+        pw.SizedBox(width: 4),
+        pw.Text(label, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
+      ],
+    );
   }
 
   @override

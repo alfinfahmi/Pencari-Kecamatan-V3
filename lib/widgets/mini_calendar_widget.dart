@@ -95,7 +95,7 @@ class _MiniCalendarWidgetState extends State<MiniCalendarWidget> {
                         color: iniAhad
                             ? Colors.red.shade300
                             : iniJumat
-                                ? AppColors.emerald
+                                ? (isDark ? AppColors.primaryDark : AppColors.emerald)
                                 : (isDark ? Colors.grey.shade500 : Colors.grey.shade500),
                       ),
                     ),
@@ -133,7 +133,7 @@ class _MiniCalendarWidgetState extends State<MiniCalendarWidget> {
                   } else if (iniAhad) {
                     warnaAngka = Colors.red.shade300;
                   } else if (iniJumat) {
-                    warnaAngka = AppColors.emerald;
+                    warnaAngka = isDark ? AppColors.primaryDark : AppColors.emerald;
                   } else {
                     warnaAngka = isDark ? AppColors.textDark : AppColors.textLight;
                   }
