@@ -73,7 +73,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Rashdul Kiblat Global $tahun',
             ikon: Icons.public,
             children: [
@@ -89,7 +89,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
             ],
           ),
           const SizedBox(height: 16),
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Rashdul Kiblat Lokal',
             ikon: Icons.location_on_outlined,
             children: [
@@ -203,7 +203,7 @@ class _KalkulatorRashdulTabState extends State<KalkulatorRashdulTab> {
     );
   }
 
-  Widget _kartuSeksi({required String judul, required IconData ikon, required List<Widget> children}) {
+  Widget _tabelSeksi({required String judul, required IconData ikon, required List<Widget> children}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(

@@ -169,7 +169,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Derajat Desimal \u2194 DMS',
             children: [
               TextField(
@@ -207,7 +207,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
             ],
           ),
           const SizedBox(height: 16),
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Tanggal Masehi \u2194 Julian Day',
             children: [
               Row(
@@ -241,7 +241,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
             ],
           ),
           const SizedBox(height: 16),
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Tanggal Masehi \u2194 Hijriyah',
             children: [
               Row(
@@ -358,7 +358,7 @@ class _KalkulatorKonversiTabState extends State<KalkulatorKonversiTab> {
     );
   }
 
-  Widget _kartuSeksi({required String judul, required List<Widget> children}) {
+  Widget _tabelSeksi({required String judul, required List<Widget> children}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(

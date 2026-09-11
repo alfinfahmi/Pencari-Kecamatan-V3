@@ -302,9 +302,9 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _kartuKesimpulan(hasil, bulanH, tahunH, tanggal1),
+          _tabelKesimpulan(hasil, bulanH, tahunH, tanggal1),
           const SizedBox(height: 12),
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Markaz & Ijtimak',
             ikon: Icons.explore_outlined,
             children: [
@@ -321,7 +321,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
             ],
           ),
           const SizedBox(height: 12),
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Data Matahari',
             ikon: Icons.wb_sunny_outlined,
             children: [
@@ -334,9 +334,9 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
             ],
           ),
           const SizedBox(height: 12),
-          _kartuHilal(hasil),
+          _tabelHilal(hasil),
           const SizedBox(height: 12),
-          _kartuSeksi(
+          _tabelSeksi(
             judul: 'Data Bulan',
             ikon: Icons.nightlight_outlined,
             children: [
@@ -369,7 +369,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     );
   }
 
-  Widget _kartuKesimpulan(HasilHisabDetail hasil, int bulanH, int tahunH, DateTime tanggal1) {
+  Widget _tabelKesimpulan(HasilHisabDetail hasil, int bulanH, int tahunH, DateTime tanggal1) {
     final warna = hasil.memenuhiMabims2021 ? AppColors.emerald : Colors.deepOrange.shade700;
     return Container(
       decoration: BoxDecoration(
@@ -427,7 +427,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     );
   }
 
-  Widget _kartuHilal(HasilHisabDetail hasil) {
+  Widget _tabelHilal(HasilHisabDetail hasil) {
     final warna = hasil.memenuhiMabims2021 ? AppColors.emerald : Colors.deepOrange.shade700;
     return Container(
       decoration: BoxDecoration(
@@ -470,7 +470,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     );
   }
 
-  Widget _kartuSeksi({required String judul, required IconData ikon, required List<Widget> children}) {
+  Widget _tabelSeksi({required String judul, required IconData ikon, required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark ? AppColors.surfaceDark : Colors.white,

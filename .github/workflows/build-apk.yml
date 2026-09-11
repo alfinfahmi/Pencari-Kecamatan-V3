@@ -640,17 +640,22 @@ jobs:
         # dan mengarahkan pengguna unduh APK dari sini kalau ada versi
         # baru. Versi diambil dari pubspec.yaml (format "1.2.3+4" ->
         # tag "v1.2.3"). Kalau tag itu SUDAH ada (mis. build ulang tanpa
-        # naikkan versi), --clobber akan menimpa rilis yang sama, bukan
-        # gagal.
+        # naikkan versi), hapus dulu release lama sebelum buat baru --
+        # `--clobber` TIDAK BERLAKU untuk `gh release create` (cuma
+        # untuk `gh release upload`), jadi cara yang benar adalah
+        # hapus-lalu-buat-ulang, bukan menambahkan flag itu.
         run: |
           VERSI=$(grep '^version:' pubspec.yaml | sed 's/version:\s*//' | cut -d'+' -f1 | tr -d '[:space:]')
           TAG="v$VERSI"
-          echo "Membuat/memperbarui release $TAG"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG sudah ada, menghapus dulu sebelum buat ulang..."
+            gh release delete "$TAG" --yes --cleanup-tag
+          fi
+          echo "Membuat release $TAG"
           gh release create "$TAG" \
             build/app/outputs/flutter-apk/app-release.apk \
             --title "Aplikasi Falak $TAG" \
-            --notes "Build otomatis dari commit ${GITHUB_SHA::7} (LF Ma'had 'Aly Lirboyo -- MHM Kediri)." \
-            --clobber
+            --notes "Build otomatis dari commit ${GITHUB_SHA::7} (LF Ma'had 'Aly Lirboyo -- MHM Kediri)."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

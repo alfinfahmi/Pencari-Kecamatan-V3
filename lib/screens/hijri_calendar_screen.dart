@@ -489,7 +489,7 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
               const SizedBox(height: 6),
               Text(
                 'Waktu ijtimak bisa berbeda beberapa menit antar metode -- '
-                'lihat masing-masing kartu di atas.',
+                'lihat masing-masing tabel di atas.',
                 style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontStyle: FontStyle.italic),
               ),
               const SizedBox(height: 8),
