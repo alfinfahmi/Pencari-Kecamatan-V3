@@ -301,8 +301,8 @@ class _DetailScreenState extends State<DetailScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _koordinatKolom('Lintang', data.latDms, data.lat)),
-                Expanded(child: _koordinatKolom('Bujur', data.lngDms, data.lng)),
+                Expanded(child: _koordinatKolom('Lintang', data.latDmsTampil, data.lat)),
+                Expanded(child: _koordinatKolom('Bujur', data.lngDmsTampil, data.lng)),
               ],
             ),
             const Divider(height: 24),

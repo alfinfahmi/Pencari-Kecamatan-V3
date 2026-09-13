@@ -134,16 +134,14 @@ class _KecamatanCardState extends State<KecamatanCard> {
                         kiriLabel: 'Lintang', kiriNilai: '${data.lat}°',
                         kananLabel: 'Bujur', kananNilai: '${data.lng}°',
                       ),
-                      if (data.latDms != null && data.lngDms != null) ...[
-                        const SizedBox(height: 8),
-                        _kotakKoordinat(
-                          isDark: isDark,
-                          judul: 'Format DMS',
-                          icon: Icons.public_rounded,
-                          kiriLabel: 'Lintang', kiriNilai: data.latDms!,
-                          kananLabel: 'Bujur', kananNilai: data.lngDms!,
-                        ),
-                      ],
+                      const SizedBox(height: 8),
+                      _kotakKoordinat(
+                        isDark: isDark,
+                        judul: 'Format DMS',
+                        icon: Icons.public_rounded,
+                        kiriLabel: 'Lintang', kiriNilai: data.latDmsTampil,
+                        kananLabel: 'Bujur', kananNilai: data.lngDmsTampil,
+                      ),
                       const SizedBox(height: 12),
 
                       Row(

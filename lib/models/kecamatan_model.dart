@@ -59,9 +59,7 @@ class KecamatanModel {
     if (kabupaten != null) buf.writeln(kabupaten);
     buf.writeln(provinsi);
     buf.writeln('Lat: $lat, Lng: $lng');
-    if (latDms != null && lngDms != null) {
-      buf.writeln('DMS: $latDms, $lngDms');
-    }
+    buf.writeln('DMS: $latDmsTampil, $lngDmsTampil');
     if (elevasiM != null) buf.writeln('Elevasi: $elevasiM mdpl');
     if (zonaWaktu != null) buf.writeln('Zona Waktu: $zonaWaktu (UTC+$utcOffset)');
     return buf.toString().trim();
@@ -70,4 +68,24 @@ class KecamatanModel {
   /// Gabungan teks yang dipakai mesin pencari instan.
   String get searchIndex =>
       '${kecamatan.toLowerCase()} ${kabupaten?.toLowerCase() ?? ''} ${provinsi.toLowerCase()} ${elevasiM ?? ''}';
+
+  /// Format Lintang DMS -- pakai [latDms] tersimpan kalau ada, atau
+  /// DIHITUNG OTOMATIS dari [lat] kalau tidak (mis. titik kustom buatan
+  /// pengguna, atau lokasi hasil GPS/reverse-geocoding, yang memang
+  /// tidak pernah menyimpan DMS secara terpisah). Dengan ini SEMUA jenis
+  /// lokasi selalu bisa menampilkan format derajat, bukan cuma desimal.
+  String get latDmsTampil => latDms ?? _formatDms(lat, arahPositif: 'U', arahNegatif: 'S');
+
+  /// Format Bujur DMS -- lihat [latDmsTampil].
+  String get lngDmsTampil => lngDms ?? _formatDms(lng, arahPositif: 'T', arahNegatif: 'B');
+
+  static String _formatDms(double derajatDesimal, {required String arahPositif, required String arahNegatif}) {
+    final arah = derajatDesimal >= 0 ? arahPositif : arahNegatif;
+    final abs = derajatDesimal.abs();
+    final d = abs.truncate();
+    final mFull = (abs - d) * 60;
+    final m = mFull.truncate();
+    final s = (mFull - m) * 60;
+    return '${d.toString().padLeft(2, '0')}\u00b0 ${m.toString().padLeft(2, '0')}\' ${s.toStringAsFixed(2).padLeft(5, '0')}" $arah';
+  }
 }
