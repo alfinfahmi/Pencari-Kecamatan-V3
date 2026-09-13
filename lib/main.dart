@@ -38,21 +38,17 @@ void main() async {
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      // PENTING (kepatuhan syarat 100% offline): google_fonts secara default
-      // akan mencoba MENGUNDUH font dari internet saat runtime jika file font
-      // belum ada sebagai aset lokal. Ini dimatikan paksa di sini supaya TIDAK
-      // PERNAH mencoba akses jaringan.
-      //
-      // KOREKSI PENTING (ditemukan lewat crash nyata di Sentry, FLUTTER-1 &
-      // FLUTTER-2): dugaan awal "tanpa font lokal, otomatis jatuh ke font
-      // sistem dengan aman" itu SALAH -- yang benar-benar terjadi adalah
-      // GoogleFonts.hankenGrotesk()/jetBrainsMono() MELEMPAR EXCEPTION FATAL
-      // kalau file font belum ter-bundle. Supaya baris ini tetap 100% offline
-      // TANPA membuat aplikasi crash, seluruh pemanggilan GoogleFonts di
-      // lib/theme/app_theme.dart sudah dibungkus try-catch (lihat helper
-      // `_hanken()`/`_jetBrainsMono()` di file itu) yang jatuh ke font sistem
-      // kalau exception ini terjadi -- baris `allowRuntimeFetching = false`
-      // di sini TIDAK cukup sendirian, wajib dipasangkan dengan itu.
+      // RIWAYAT (untuk konteks, lihat catatan lengkap di
+      // lib/theme/app_theme.dart): baris allowRuntimeFetching=false ini
+      // awalnya dipasang demi kepatuhan 100% offline, tapi crash nyata di
+      // Sentry (FLUTTER-1, FLUTTER-2, FLUTTER-4) membuktikan try-catch pun
+      // tidak cukup menahannya (exception muncul asinkron, di luar try-catch
+      // manapun). KEPUTUSAN FINAL: lib/theme/app_theme.dart sudah TIDAK
+      // memanggil GoogleFonts.xxx() sama sekali lagi (diganti TextStyle
+      // polos) -- baris di bawah ini jadi TIDAK BERPENGARUH APA-APA lagi
+      // (tidak ada kode yang memicu pemuatan GoogleFonts untuk
+      // dikonfigurasi), tapi tetap dibiarkan sebagai jaring pengaman kalau
+      // suatu saat GoogleFonts dipakai lagi di tempat lain.
       GoogleFonts.config.allowRuntimeFetching = false;
 
       await Hive.initFlutter();

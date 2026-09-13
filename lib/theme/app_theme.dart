@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// Palet warna & tipografi resmi aplikasi, disinkronkan dengan design
 /// system Stitch: "Lajnah Falakiyah Precision" (light) & "Nocturnal
@@ -43,58 +42,50 @@ class AppColors {
 /// tidak "goyang" (layout shift) saat nilai berubah dan lebih mudah dibaca
 /// sebagai deretan angka presisi.
 ///
-/// PENTING -- pelajaran dari crash nyata yang tertangkap Sentry
-/// (FLUTTER-1, FLUTTER-2): `GoogleFonts.config.allowRuntimeFetching =
-/// false` (di main.dart, demi kepatuhan 100% offline) TERNYATA membuat
-/// `GoogleFonts.hankenGrotesk()`/`jetBrainsMono()` melempar EXCEPTION
-/// FATAL (bukan fallback diam-diam ke font sistem seperti asumsi semula)
-/// kalau file font asli belum ter-bundle sebagai aset -- ini beda dari
-/// perilaku "aman" yang diasumsikan sebelumnya. Karena itu SETIAP
-/// pemanggilan GoogleFonts di bawah ini WAJIB lewat helper `_hanken()` /
-/// `_jetBrainsMono()` yang menangkap exception itu dan baru benar-benar
-/// jatuh ke font sistem (`TextStyle` polos) -- BUKAN memanggil
-/// `GoogleFonts.xxx()` langsung di tempat lain.
+/// PENTING -- riwayat 2 percobaan perbaikan untuk crash nyata di Sentry
+/// (FLUTTER-1, FLUTTER-2, FLUTTER-4):
+/// 1. Awalnya `GoogleFonts.config.allowRuntimeFetching = false` diasumsikan
+///    aman ("kalau font tak ada, jatuh ke font sistem") -- TERNYATA salah,
+///    ini melempar exception.
+/// 2. Percobaan kedua: bungkus tiap panggilan dengan try-catch -- TERNYATA
+///    JUGA tidak cukup, karena `GoogleFonts.hankenGrotesk()` dkk. me-return
+///    TextStyle LEBIH DULU (sinkron) sebelum proses pemuatan font di latar
+///    belakang selesai/gagal (asinkron, `fire-and-forget`, lihat kode
+///    sumber paket ini di `google_fonts_base.dart`) -- exception-nya
+///    muncul BELAKANGAN, di luar try-catch manapun yang membungkus
+///    pemanggilan awal.
+/// KEPUTUSAN FINAL: karena file font Hanken Grotesk/JetBrains Mono asli
+/// belum ter-bundle sebagai aset (lihat README bagian Tipografi), dan
+/// dua percobaan defensif di atas terbukti tidak cukup, `GoogleFonts.xxx()`
+/// TIDAK DIPAKAI SAMA SEKALI di bawah ini -- diganti `TextStyle` polos
+/// (font sistem) yang TIDAK PERNAH memicu proses pemuatan apa pun, jadi
+/// TIDAK BISA gagal dengan cara apa pun. Kalau suatu saat file font asli
+/// sudah benar-benar ter-bundle di assets/fonts/, helper ini bisa
+/// dikembalikan memakai GoogleFonts.
 TextStyle _hanken({
   double? fontSize, FontWeight? fontWeight, double? height,
   Color? color, double? letterSpacing, FontStyle? fontStyle,
 }) {
-  try {
-    return GoogleFonts.hankenGrotesk(
-      fontSize: fontSize, fontWeight: fontWeight, height: height,
-      color: color, letterSpacing: letterSpacing, fontStyle: fontStyle,
-    );
-  } catch (_) {
-    return TextStyle(
-      fontSize: fontSize, fontWeight: fontWeight, height: height,
-      color: color, letterSpacing: letterSpacing, fontStyle: fontStyle,
-    );
-  }
+  return TextStyle(
+    fontSize: fontSize, fontWeight: fontWeight, height: height,
+    color: color, letterSpacing: letterSpacing, fontStyle: fontStyle,
+  );
 }
 
 TextStyle _jetBrainsMono({
   double? fontSize, FontWeight? fontWeight, double? letterSpacing, Color? color,
 }) {
-  try {
-    return GoogleFonts.jetBrainsMono(
-      fontSize: fontSize, fontWeight: fontWeight, letterSpacing: letterSpacing, color: color,
-    );
-  } catch (_) {
-    return TextStyle(
-      fontSize: fontSize, fontWeight: fontWeight, letterSpacing: letterSpacing,
-      color: color, fontFamily: 'monospace',
-    );
-  }
+  return TextStyle(
+    fontSize: fontSize, fontWeight: fontWeight, letterSpacing: letterSpacing,
+    color: color, fontFamily: 'monospace',
+  );
 }
 
 /// Sama seperti [_hanken] tapi untuk `TextTheme` penuh (dipakai
-/// `ThemeData.textTheme`) -- fallback ke `base` tanpa perubahan font
-/// kalau GoogleFonts gagal, supaya seluruh tema tetap terbentuk normal.
+/// `ThemeData.textTheme`) -- lihat catatan panjang di atas [_hanken]
+/// soal kenapa TIDAK memanggil GoogleFonts sama sekali.
 TextTheme _hankenTextTheme(TextTheme base) {
-  try {
-    return GoogleFonts.hankenGroteskTextTheme(base);
-  } catch (_) {
-    return base;
-  }
+  return base;
 }
 
 class AppTypography {
