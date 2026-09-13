@@ -460,33 +460,38 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     }
 
 
-    return ListTile(
-      dense: true,
-      leading: SizedBox(
-        width: 28,
-        child: Text('$bulanH', style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: isDark ? Colors.white12 : Colors.black.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(10),
       ),
-      title: Text('${e['nama_bulan_h']} \u2192 $namaBerikutnya', style: const TextStyle(fontSize: 13.5)),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${_formatTanggalSaja(e['ijtimak_wib'] as String)} \u2022 ${_formatHariPasaran(ijtimakWib)}',
-            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
-          ),
-          if (hilalMeeus != null && hilalAsSyahru != null && hilalPresisiTinggi != null) ...[
-            const SizedBox(height: 4),
-            Wrap(
-              spacing: 16,
-              runSpacing: 8,
-              children: [
-                SizedBox(width: 150, child: _barisMetode('Jean Meeus', hilalMeeus, ijtimakBerbeda: ijtimakMeeusUtc?.add(const Duration(hours: 7)))),
-                SizedBox(width: 150, child: _barisMetode('As-Syahru', hilalAsSyahru, ijtimakBerbeda: ijtimakAsSyahruUtc?.add(const Duration(hours: 7)))),
-                SizedBox(width: 150, child: _barisMetode('Meeus Presisi Tinggi', hilalPresisiTinggi, ijtimakBerbeda: ijtimakPresisiTinggiUtc?.add(const Duration(hours: 7)))),
-              ],
+      child: ListTile(
+        dense: true,
+        title: Text('${e['nama_bulan_h']} \u2192 $namaBerikutnya', style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${_formatTanggalSaja(e['ijtimak_wib'] as String)} \u2022 ${_formatHariPasaran(ijtimakWib)}',
+              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
             ),
+            if (hilalMeeus != null && hilalAsSyahru != null && hilalPresisiTinggi != null) ...[
+              const SizedBox(height: 4),
+              Wrap(
+                spacing: 16,
+                runSpacing: 8,
+                children: [
+                  SizedBox(width: 150, child: _barisMetode('Jean Meeus', hilalMeeus, ijtimakBerbeda: ijtimakMeeusUtc?.add(const Duration(hours: 7)))),
+                  SizedBox(width: 150, child: _barisMetode('As-Syahru', hilalAsSyahru, ijtimakBerbeda: ijtimakAsSyahruUtc?.add(const Duration(hours: 7)))),
+                  SizedBox(width: 150, child: _barisMetode('Meeus Presisi Tinggi', hilalPresisiTinggi, ijtimakBerbeda: ijtimakPresisiTinggiUtc?.add(const Duration(hours: 7)))),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

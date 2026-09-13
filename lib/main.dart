@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'models/custom_point_model.dart';
 import 'screens/splash_screen.dart';
 import 'services/adzan_notification_service.dart';
@@ -14,37 +15,60 @@ import 'theme/app_theme.dart';
 final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // Sentry membungkus SELURUH inisialisasi + runApp() lewat `appRunner` --
+  // ini pola resmi paket ini, supaya error apa pun (termasuk yang terjadi
+  // SAAT startup, sebelum UI muncul) ikut tertangkap, bukan cuma error
+  // setelah aplikasi berjalan.
+  //
+  // CATATAN soal komitmen "100% offline" aplikasi ini (lihat catatan
+  // GoogleFonts di bawah): Sentry BUTUH internet untuk MENGIRIM laporan
+  // crash, TAPI ini murni pelaporan LATAR BELAKANG, bukan syarat fungsi
+  // apa pun -- kalau offline, Sentry cuma gagal diam-diam mengirim
+  // laporannya (atau coba lagi nanti), TIDAK PERNAH membuat aplikasi
+  // gagal jalan atau menunggu jaringan. Prinsip "berfungsi penuh tanpa
+  // internet" tetap utuh.
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = 'https://f2950ee5b077f8976c72857408819715@o4512069441486848.ingest.de.sentry.io/4512069447974992';
+      // Native crash Android/Kotlin (mis. dari Kamera Rukyat, Widget Home
+      // Screen) ikut tertangkap otomatis oleh SDK ini -- tidak perlu
+      // konfigurasi tambahan.
+      options.tracesSampleRate = 0.2;
+    },
+    appRunner: () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  // PENTING (kepatuhan syarat 100% offline): google_fonts secara default
-  // akan mencoba MENGUNDUH font dari internet saat runtime jika file font
-  // belum ada sebagai aset lokal. Ini dimatikan paksa di sini -- tanpa font
-  // lokal ter-bundle, tampilan otomatis jatuh ke font sistem (aman, hanya
-  // kehilangan tipografi Hanken Grotesk/JetBrains Mono yang dimaksud), TIDAK
-  // PERNAH mencoba akses jaringan. Lihat README bagian "Tipografi" untuk cara
-  // membundel font sungguhan supaya tipografi sesuai design system penuh.
-  GoogleFonts.config.allowRuntimeFetching = false;
+      // PENTING (kepatuhan syarat 100% offline): google_fonts secara default
+      // akan mencoba MENGUNDUH font dari internet saat runtime jika file font
+      // belum ada sebagai aset lokal. Ini dimatikan paksa di sini -- tanpa font
+      // lokal ter-bundle, tampilan otomatis jatuh ke font sistem (aman, hanya
+      // kehilangan tipografi Hanken Grotesk/JetBrains Mono yang dimaksud), TIDAK
+      // PERNAH mencoba akses jaringan. Lihat README bagian "Tipografi" untuk cara
+      // membundel font sungguhan supaya tipografi sesuai design system penuh.
+      GoogleFonts.config.allowRuntimeFetching = false;
 
-  await Hive.initFlutter();
-  Hive.registerAdapter(CustomPointModelAdapter());
+      await Hive.initFlutter();
+      Hive.registerAdapter(CustomPointModelAdapter());
 
-  // Supabase hanya benar-benar aktif jika SupabaseConfig sudah diisi (lihat
-  // lib/config/supabase_config.dart). Jika belum, ini no-op -- fitur
-  // koreksi/moderasi otomatis nonaktif tanpa membuat aplikasi crash.
-  await SupabaseService.instance.initialize();
+      // Supabase hanya benar-benar aktif jika SupabaseConfig sudah diisi (lihat
+      // lib/config/supabase_config.dart). Jika belum, ini no-op -- fitur
+      // koreksi/moderasi otomatis nonaktif tanpa membuat aplikasi crash.
+      await SupabaseService.instance.initialize();
 
-  // Hanya menyiapkan plugin, TIDAK menyalakan notifikasi apa pun --
-  // default tetap mati sampai pengguna aktifkan sendiri lewat pengaturan.
-  await AdzanNotificationService.instance.initialize();
+      // Hanya menyiapkan plugin, TIDAK menyalakan notifikasi apa pun --
+      // default tetap mati sampai pengguna aktifkan sendiri lewat pengaturan.
+      await AdzanNotificationService.instance.initialize();
 
-  // Muat tabel ijtimak resmi Lirboyo ke cache memori (dipakai HijriService
-  // sebagai sumber utama, fallback ke formula kalau di luar rentang
-  // 1440H-1500H). Kalau gagal dimuat, aplikasi tetap jalan normal lewat
-  // fallback formula -- tidak crash.
-  await HijriService.muatTabelIjtimak();
-  await HisabPreferenceService.muatKeHijriService();
+      // Muat tabel ijtimak resmi Lirboyo ke cache memori (dipakai HijriService
+      // sebagai sumber utama, fallback ke formula kalau di luar rentang
+      // 1440H-1500H). Kalau gagal dimuat, aplikasi tetap jalan normal lewat
+      // fallback formula -- tidak crash.
+      await HijriService.muatTabelIjtimak();
+      await HisabPreferenceService.muatKeHijriService();
 
-  runApp(const PencariKecamatanApp());
+      runApp(const PencariKecamatanApp());
+    },
+  );
 }
 
 class PencariKecamatanApp extends StatelessWidget {
