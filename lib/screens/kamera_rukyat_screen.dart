@@ -139,8 +139,15 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final controller = _cameraController;
     if (controller == null || !controller.value.isInitialized) return;
-    if (state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      // PENTING (perbaikan crash nyata FLUTTER-3 dari Sentry): setelah
+      // dispose(), _cameraController WAJIB di-null-kan + setState() supaya
+      // build() (dipicu timer jam yang tetap berjalan) jatuh ke tampilan
+      // loading, bukan mencoba CameraPreview(_cameraController!) dengan
+      // controller yang sudah dibuang -- itulah penyebab
+      // "buildPreview() was called on a disposed CameraController".
       controller.dispose();
+      if (mounted) setState(() => _cameraController = null);
     } else if (state == AppLifecycleState.resumed) {
       _inisialisasiKamera();
     }
