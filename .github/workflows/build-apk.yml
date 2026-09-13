@@ -78,6 +78,38 @@ jobs:
               print("PERINGATAN: AndroidManifest.xml tidak ditemukan!")
           PYEOF
 
+      - name: Tambahkan izin Lokasi (Android) -- WAJIB untuk seluruh fitur GPS
+        # BUG BESAR yang baru ketahuan: `flutter create` TIDAK menyertakan izin
+        # lokasi secara default -- sama seperti kamera, tapi ini LUPUT
+        # ditambahkan sejak awal proyek. Tanpa ini, package `geolocator`
+        # GAGAL TOTAL saat runtime dengan pesan persis "No location
+        # permissions are defined in the manifest" -- ini akar penyebab
+        # SELURUH gejala "lokasi gagal/Istiwa' kosong/GPS gagal" yang
+        # muncul di banyak fitur (Waktu Shalat, Kalkulator, Kamera Rukyat,
+        # Widget Home Screen, dll.) sepanjang pengembangan aplikasi ini --
+        # BUKAN bug di rumus/logika masing-masing fitur itu sendiri.
+        run: |
+          python3 << 'PYEOF'
+          import pathlib, re
+
+          p = pathlib.Path("android/app/src/main/AndroidManifest.xml")
+          if not p.exists():
+              print("PERINGATAN: AndroidManifest.xml tidak ditemukan!")
+          else:
+              text = p.read_text()
+              tambahan = ''
+              if 'android.permission.ACCESS_FINE_LOCATION' not in text:
+                  tambahan += '    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n'
+              if 'android.permission.ACCESS_COARSE_LOCATION' not in text:
+                  tambahan += '    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n'
+              if tambahan:
+                  text = re.sub(r'(<manifest[^>]*>)', r'\1\n' + tambahan, text, count=1)
+                  p.write_text(text)
+                  print("Izin lokasi berhasil ditambahkan ke AndroidManifest.xml")
+              else:
+                  print("Izin lokasi sudah ada, tidak perlu ditambahkan.")
+          PYEOF
+
       - name: Tambahkan izin Kamera (Android) untuk fitur Kamera Rukyat
         # `flutter create` TIDAK menyertakan izin kamera secara default --
         # tanpa ini, package `camera` gagal total saat runtime (bukan error
@@ -624,7 +656,19 @@ jobs:
         run: python3 encrypt_data.py
 
       - name: Build APK (release)
-        run: flutter build apk --release --obfuscate --split-debug-info=build/symbols
+        # PENTING soal ukuran APK: sebelumnya build ini menghasilkan APK
+        # "universal" yang menyertakan SEMUA arsitektur CPU Android
+        # (arm64-v8a, armeabi-v7a, x86, x86_64) dalam satu file --
+        # setiap library native (camera, sensors_plus, geolocator,
+        # sentry_flutter, home_widget, shorebird) jadi TERDUPLIKASI 4x,
+        # salah satu penyebab utama ukuran APK membengkak (dilaporkan
+        # sampai ~75MB). `--target-platform android-arm64` membatasi ke
+        # SATU arsitektur (arm64-v8a) -- ini mencakup hampir SELURUH HP
+        # Android sungguhan yang beredar (bukan emulator) sejak sekitar
+        # 2018 ke atas, jadi aman untuk distribusi APK langsung seperti
+        # aplikasi ini (bukan lewat Play Store yang otomatis pilihkan
+        # arsitektur yang tepat per device).
+        run: flutter build apk --release --target-platform android-arm64 --obfuscate --split-debug-info=build/symbols
 
       - name: Upload APK sebagai artifact
         uses: actions/upload-artifact@v4
