@@ -42,28 +42,83 @@ class AppColors {
 /// JetBrains Mono khusus untuk data numerik (koordinat, waktu) supaya
 /// tidak "goyang" (layout shift) saat nilai berubah dan lebih mudah dibaca
 /// sebagai deretan angka presisi.
+///
+/// PENTING -- pelajaran dari crash nyata yang tertangkap Sentry
+/// (FLUTTER-1, FLUTTER-2): `GoogleFonts.config.allowRuntimeFetching =
+/// false` (di main.dart, demi kepatuhan 100% offline) TERNYATA membuat
+/// `GoogleFonts.hankenGrotesk()`/`jetBrainsMono()` melempar EXCEPTION
+/// FATAL (bukan fallback diam-diam ke font sistem seperti asumsi semula)
+/// kalau file font asli belum ter-bundle sebagai aset -- ini beda dari
+/// perilaku "aman" yang diasumsikan sebelumnya. Karena itu SETIAP
+/// pemanggilan GoogleFonts di bawah ini WAJIB lewat helper `_hanken()` /
+/// `_jetBrainsMono()` yang menangkap exception itu dan baru benar-benar
+/// jatuh ke font sistem (`TextStyle` polos) -- BUKAN memanggil
+/// `GoogleFonts.xxx()` langsung di tempat lain.
+TextStyle _hanken({
+  double? fontSize, FontWeight? fontWeight, double? height,
+  Color? color, double? letterSpacing, FontStyle? fontStyle,
+}) {
+  try {
+    return GoogleFonts.hankenGrotesk(
+      fontSize: fontSize, fontWeight: fontWeight, height: height,
+      color: color, letterSpacing: letterSpacing, fontStyle: fontStyle,
+    );
+  } catch (_) {
+    return TextStyle(
+      fontSize: fontSize, fontWeight: fontWeight, height: height,
+      color: color, letterSpacing: letterSpacing, fontStyle: fontStyle,
+    );
+  }
+}
+
+TextStyle _jetBrainsMono({
+  double? fontSize, FontWeight? fontWeight, double? letterSpacing, Color? color,
+}) {
+  try {
+    return GoogleFonts.jetBrainsMono(
+      fontSize: fontSize, fontWeight: fontWeight, letterSpacing: letterSpacing, color: color,
+    );
+  } catch (_) {
+    return TextStyle(
+      fontSize: fontSize, fontWeight: fontWeight, letterSpacing: letterSpacing,
+      color: color, fontFamily: 'monospace',
+    );
+  }
+}
+
+/// Sama seperti [_hanken] tapi untuk `TextTheme` penuh (dipakai
+/// `ThemeData.textTheme`) -- fallback ke `base` tanpa perubahan font
+/// kalau GoogleFonts gagal, supaya seluruh tema tetap terbentuk normal.
+TextTheme _hankenTextTheme(TextTheme base) {
+  try {
+    return GoogleFonts.hankenGroteskTextTheme(base);
+  } catch (_) {
+    return base;
+  }
+}
+
 class AppTypography {
-  static TextStyle headlineLg({Color? color}) => GoogleFonts.hankenGrotesk(
+  static TextStyle headlineLg({Color? color}) => _hanken(
         fontSize: 24, fontWeight: FontWeight.w700, height: 32 / 24, color: color,
       );
-  static TextStyle headlineMd({Color? color}) => GoogleFonts.hankenGrotesk(
+  static TextStyle headlineMd({Color? color}) => _hanken(
         fontSize: 20, fontWeight: FontWeight.w600, height: 28 / 20, color: color,
       );
-  static TextStyle bodyLg({Color? color}) => GoogleFonts.hankenGrotesk(
+  static TextStyle bodyLg({Color? color}) => _hanken(
         fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: color,
       );
-  static TextStyle bodyMd({Color? color}) => GoogleFonts.hankenGrotesk(
+  static TextStyle bodyMd({Color? color}) => _hanken(
         fontSize: 14, fontWeight: FontWeight.w400, height: 20 / 14, color: color,
       );
-  static TextStyle labelCaps({Color? color}) => GoogleFonts.hankenGrotesk(
+  static TextStyle labelCaps({Color? color}) => _hanken(
         fontSize: 12, fontWeight: FontWeight.w700, height: 16 / 12, letterSpacing: 0.6, color: color,
       );
-  static TextStyle captionEdu({Color? color}) => GoogleFonts.hankenGrotesk(
+  static TextStyle captionEdu({Color? color}) => _hanken(
         fontSize: 12, fontWeight: FontWeight.w400, height: 16 / 12, fontStyle: FontStyle.italic, color: color,
       );
 
   /// Khusus data numerik (koordinat, jam) — monospace, sesuai design system.
-  static TextStyle dataDisplay({Color? color, double fontSize = 15}) => GoogleFonts.jetBrainsMono(
+  static TextStyle dataDisplay({Color? color, double fontSize = 15}) => _jetBrainsMono(
         fontSize: fontSize, fontWeight: FontWeight.w500, letterSpacing: -0.3, color: color,
       );
 }
@@ -71,7 +126,7 @@ class AppTypography {
 class AppTheme {
   static ThemeData light() {
     final base = ThemeData.light(useMaterial3: true);
-    final textTheme = GoogleFonts.hankenGroteskTextTheme(base.textTheme).apply(
+    final textTheme = _hankenTextTheme(base.textTheme).apply(
       bodyColor: AppColors.textLight,
       displayColor: AppColors.textLight,
     );
@@ -91,7 +146,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: false,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.hankenGrotesk(
+        titleTextStyle: _hanken(
           fontWeight: FontWeight.w700, fontSize: 18, color: AppColors.emerald,
         ),
         iconTheme: const IconThemeData(color: AppColors.emerald),
@@ -127,7 +182,7 @@ class AppTheme {
 
   static ThemeData dark() {
     final base = ThemeData.dark(useMaterial3: true);
-    final textTheme = GoogleFonts.hankenGroteskTextTheme(base.textTheme).apply(
+    final textTheme = _hankenTextTheme(base.textTheme).apply(
       bodyColor: AppColors.textDark,
       displayColor: AppColors.textDark,
     );
@@ -146,7 +201,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: false,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.hankenGrotesk(
+        titleTextStyle: _hanken(
           fontWeight: FontWeight.w700, fontSize: 18, color: AppColors.primaryDark,
         ),
         iconTheme: const IconThemeData(color: AppColors.primaryDark),

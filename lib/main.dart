@@ -40,11 +40,19 @@ void main() async {
 
       // PENTING (kepatuhan syarat 100% offline): google_fonts secara default
       // akan mencoba MENGUNDUH font dari internet saat runtime jika file font
-      // belum ada sebagai aset lokal. Ini dimatikan paksa di sini -- tanpa font
-      // lokal ter-bundle, tampilan otomatis jatuh ke font sistem (aman, hanya
-      // kehilangan tipografi Hanken Grotesk/JetBrains Mono yang dimaksud), TIDAK
-      // PERNAH mencoba akses jaringan. Lihat README bagian "Tipografi" untuk cara
-      // membundel font sungguhan supaya tipografi sesuai design system penuh.
+      // belum ada sebagai aset lokal. Ini dimatikan paksa di sini supaya TIDAK
+      // PERNAH mencoba akses jaringan.
+      //
+      // KOREKSI PENTING (ditemukan lewat crash nyata di Sentry, FLUTTER-1 &
+      // FLUTTER-2): dugaan awal "tanpa font lokal, otomatis jatuh ke font
+      // sistem dengan aman" itu SALAH -- yang benar-benar terjadi adalah
+      // GoogleFonts.hankenGrotesk()/jetBrainsMono() MELEMPAR EXCEPTION FATAL
+      // kalau file font belum ter-bundle. Supaya baris ini tetap 100% offline
+      // TANPA membuat aplikasi crash, seluruh pemanggilan GoogleFonts di
+      // lib/theme/app_theme.dart sudah dibungkus try-catch (lihat helper
+      // `_hanken()`/`_jetBrainsMono()` di file itu) yang jatuh ke font sistem
+      // kalau exception ini terjadi -- baris `allowRuntimeFetching = false`
+      // di sini TIDAK cukup sendirian, wajib dipasangkan dengan itu.
       GoogleFonts.config.allowRuntimeFetching = false;
 
       await Hive.initFlutter();
