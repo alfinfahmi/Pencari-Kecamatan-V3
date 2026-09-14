@@ -331,6 +331,7 @@ jobs:
               android:minHeight="{min_h}dp"
               android:updatePeriodMillis="1800000"
               android:resizeMode="horizontal|vertical"
+              android:previewImage="@mipmap/ic_launcher"
               android:widgetCategory="home_screen">
           </appwidget-provider>
           '''

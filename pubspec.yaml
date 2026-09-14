@@ -1,7 +1,7 @@
 name: pencari_kecamatan
 description: "Aplikasi Falak — LF Ma'had 'Aly Lirboyo & MHM Kediri"
 publish_to: "none"
-version: 1.0.2+3
+version: 1.0.5+6
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -9,7 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.6
   # OTA (over-the-air) code push -- cek & terapkan patch Dart tanpa
   # perlu update APK lewat toko aplikasi. Cuma bekerja setelah aplikasi
   # di-build lewat `shorebird release` (bukan `flutter build apk` biasa)
@@ -22,7 +21,6 @@ dependencies:
   path_provider: ^2.1.2
 
   # Hash serial number (SHA-256), bukan disimpan sebagai teks polos
-  crypto: ^3.0.3
 
   # Dekripsi data_koordinat.enc (AES-256-CBC) di mobile/desktop
   encrypt: ^5.0.3
@@ -35,6 +33,7 @@ dependencies:
   package_info_plus: ^9.0.1
   home_widget: ^0.9.4
   sentry_flutter: ^9.29.0
+  wakelock_plus: ^1.4.0
 
   # Backend Supabase untuk crowdsourcing koreksi data & panel moderasi
   supabase_flutter: ^2.6.0

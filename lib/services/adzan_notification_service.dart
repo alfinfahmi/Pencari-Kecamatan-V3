@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -51,6 +52,13 @@ class AdzanNotificationService {
   /// Inisialisasi plugin. Dipanggil sekali saat aplikasi mulai -- TIDAK
   /// menyalakan notifikasi apa pun dengan sendirinya.
   Future<void> initialize() async {
+    // PENTING (Seer/Sentry FLUTTER-5, FLUTTER-6): flutter_local_notifications
+    // TIDAK didesain untuk web -- lihat catatan lengkap di
+    // jadwalkanUntukHariIni() di bawah. Dipanggil TANPA SYARAT dari
+    // main.dart setiap startup, jadi penjagaan di sini paling mendasar --
+    // tanpa ini seluruh method lain di bawah yang memanggil initialize()
+    // dulu (aktifkan, jadwalkanUntukHariIni) tetap berisiko di web.
+    if (kIsWeb) return;
     if (_initialized) return;
     tz_data.initializeTimeZones();
 
@@ -71,6 +79,9 @@ class AdzanNotificationService {
   /// saat app dibuka), sesuai permintaan "default mati, minta izin/aktif
   /// hanya kalau pengguna nyalakan sendiri".
   Future<bool> aktifkan() async {
+    // Notifikasi adzan (proses latar belakang terjadwal) memang tidak
+    // relevan/didukung di web -- lihat catatan di jadwalkanUntukHariIni().
+    if (kIsWeb) return false;
     await initialize();
 
     final androidPlugin = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
@@ -90,6 +101,7 @@ class AdzanNotificationService {
   Future<void> matikan() async {
     final box = await _box();
     await box.put(_keyAktif, false);
+    if (kIsWeb) return;
     await _plugin.cancelAll();
   }
 
@@ -103,6 +115,15 @@ class AdzanNotificationService {
   /// sekali per hari; kalau tidak dibuka berhari-hari, notifikasi hari-hari
   /// itu tidak akan terjadwal.
   Future<void> jadwalkanUntukHariIni(List<WaktuShalatEntry> entries) async {
+    // PENTING (ditemukan lewat analisis Seer/Sentry, FLUTTER-5 & FLUTTER-6):
+    // flutter_local_notifications TIDAK didesain untuk web -- memanggil
+    // _plugin.cancelAll()/zonedSchedule() di web memicu LateInitializationError
+    // karena plugin ini mengakses field internal yang tidak pernah
+    // diinisialisasi di platform web. Notifikasi adzan memang cuma relevan
+    // untuk Android/iOS (butuh proses latar belakang), jadi berhenti total
+    // di sini kalau berjalan di web -- bukan cuma "gagal dengan aman", tapi
+    // memang tidak seharusnya mencoba sama sekali.
+    if (kIsWeb) return;
     if (!await isAktif()) return;
     await initialize();
     await _plugin.cancelAll();

@@ -149,4 +149,21 @@ class KameraRukyatService {
     final y = tinggiLayar / 2 - fracY * (tinggiLayar / 2);
     return (x, y);
   }
+
+  /// Selisih arah (azimut & tinggi) dari kamera ke target -- dipakai untuk
+  /// menggambar panah penunjuk arah saat target di LUAR bidang pandang
+  /// kamera (proyeksiKeLayar mengembalikan null). Rumus selisih SAMA
+  /// dengan yang dipakai proyeksiKeLayar, supaya konsisten.
+  static (double selisihAzimut, double selisihTinggi) selisihArahKeTarget({
+    required double azimutTarget,
+    required double tinggiTarget,
+    required double headingKamera,
+    required double pitchKamera,
+  }) {
+    double selisihAzimut = azimutTarget - headingKamera;
+    while (selisihAzimut > 180) { selisihAzimut -= 360; }
+    while (selisihAzimut < -180) { selisihAzimut += 360; }
+    final selisihTinggi = tinggiTarget - pitchKamera;
+    return (selisihAzimut, selisihTinggi);
+  }
 }

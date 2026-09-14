@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../services/adzan_notification_service.dart';
 import '../theme/app_theme.dart';
@@ -34,6 +35,14 @@ class _AdzanSettingsScreenState extends State<AdzanSettingsScreen> {
 
   Future<void> _toggleAktif(bool value) async {
     if (value) {
+      if (kIsWeb) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Notifikasi adzan belum tersedia di versi web -- gunakan aplikasi Android/iOS.')),
+          );
+        }
+        return;
+      }
       final berhasil = await _service.aktifkan();
       if (!berhasil) {
         if (mounted) {

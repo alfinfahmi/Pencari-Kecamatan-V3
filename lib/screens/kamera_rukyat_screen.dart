@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import '../models/kecamatan_model.dart';
 import '../services/kamera_rukyat_service.dart';
 import '../services/lokasi_cache_service.dart';
@@ -52,6 +54,12 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Layar HARUS tetap menyala selama sesi rukyat -- pengamatan bisa
+    // berlangsung lama, dan layar mati di tengah pengamatan (mengikuti
+    // pengaturan timeout HP biasa) sangat mengganggu. Dimatikan lagi di
+    // dispose() begitu pengguna keluar dari layar ini, supaya tidak
+    // menguras baterai HP di luar sesi rukyat.
+    WakelockPlus.enable();
     _inisialisasiKamera();
     _dengarkanSensor();
     _lokasi = LokasiCacheService.instance.lokasiCache;
@@ -156,6 +164,7 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    WakelockPlus.disable();
     _cameraController?.dispose();
     _compassSub?.cancel();
     _accelSub?.cancel();
@@ -349,7 +358,15 @@ class _OverlayPainter extends CustomPainter {
         headingKamera: headingDerajat, pitchKamera: pitchDerajat,
         lebarLayar: size.width, tinggiLayar: size.height,
       );
-      if (p != null) _gambarMarker(canvas, Offset(p.$1, p.$2), Colors.orange, 'Matahari');
+      if (p != null) {
+        _gambarMarker(canvas, Offset(p.$1, p.$2), Colors.orange, 'Matahari');
+      } else {
+        final (selAz, selTinggi) = KameraRukyatService.selisihArahKeTarget(
+          azimutTarget: az, tinggiTarget: tinggi,
+          headingKamera: headingDerajat, pitchKamera: pitchDerajat,
+        );
+        _gambarPanahTepi(canvas, size, selAz, selTinggi, Colors.orange, 'Matahari');
+      }
     }
 
     if (posisiHilal != null) {
@@ -359,8 +376,70 @@ class _OverlayPainter extends CustomPainter {
         headingKamera: headingDerajat, pitchKamera: pitchDerajat,
         lebarLayar: size.width, tinggiLayar: size.height,
       );
-      if (p != null) _gambarMarker(canvas, Offset(p.$1, p.$2), Colors.greenAccent, 'Hilal');
+      if (p != null) {
+        _gambarMarker(canvas, Offset(p.$1, p.$2), Colors.greenAccent, 'Hilal');
+      } else {
+        final (selAz, selTinggi) = KameraRukyatService.selisihArahKeTarget(
+          azimutTarget: az, tinggiTarget: tinggi,
+          headingKamera: headingDerajat, pitchKamera: pitchDerajat,
+        );
+        _gambarPanahTepi(canvas, size, selAz, selTinggi, Colors.greenAccent, 'Hilal');
+      }
     }
+  }
+
+  /// Panah di tepi layar menunjuk ke arah target yang berada di LUAR
+  /// bidang pandang kamera saat ini -- membantu pengguna tahu ke mana
+  /// harus memutar/mengarahkan HP tanpa perlu menebak-nebak. Sudut
+  /// putar panah dihitung dari selisih azimut (kiri/kanan) & tinggi
+  /// (atas/bawah) gabungan, diproyeksikan ke tepi persegi panjang layar
+  /// (bukan lingkaran) supaya panahnya selalu pas di pinggir, di sisi
+  /// yang benar (atas/bawah/kiri/kanan/pojok).
+  void _gambarPanahTepi(Canvas canvas, Size size, double selisihAzimut, double selisihTinggi, Color warna, String label) {
+    final pusat = Offset(size.width / 2, size.height / 2);
+    // Sumbu Y layar terbalik dari "tinggi" (naik = nilai Y makin kecil).
+    final arahX = selisihAzimut;
+    final arahY = -selisihTinggi;
+    if (arahX == 0 && arahY == 0) return;
+
+    // Proyeksikan arah (arahX, arahY) ke tepi kotak layar (bukan lingkaran)
+    // -- cari faktor skala terkecil supaya titik (arahX*t, arahY*t) tepat
+    // menyentuh salah satu dari 4 sisi kotak (dengan margin dari tepi).
+    const margin = 36.0;
+    final batasX = size.width / 2 - margin;
+    final batasY = size.height / 2 - margin;
+    final tX = arahX == 0 ? double.infinity : (batasX / arahX.abs());
+    final tY = arahY == 0 ? double.infinity : (batasY / arahY.abs());
+    final t = tX < tY ? tX : tY;
+    final titikTepi = pusat.translate(arahX * t, arahY * t);
+
+    final sudutRotasi = atan2(arahY, arahX);
+    final jarakDerajat = sqrt(selisihAzimut * selisihAzimut + selisihTinggi * selisihTinggi);
+
+    canvas.save();
+    canvas.translate(titikTepi.dx, titikTepi.dy);
+    canvas.rotate(sudutRotasi);
+    final path = Path()
+      ..moveTo(14, 0)
+      ..lineTo(-8, -9)
+      ..lineTo(-8, 9)
+      ..close();
+    canvas.drawPath(path, Paint()..color = warna.withOpacity(0.9));
+    canvas.restore();
+
+    final tp = TextPainter(
+      text: TextSpan(
+        text: '$label  ${jarakDerajat.toStringAsFixed(0)}\u00b0',
+        style: TextStyle(color: warna, fontSize: 10.5, fontWeight: FontWeight.bold, shadows: const [Shadow(color: Colors.black, blurRadius: 3)]),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    tp.layout();
+    // Label diletakkan agak menjauh dari ujung panah ke arah pusat layar,
+    // supaya tidak terpotong tepi layar.
+    final arahPanjang = sqrt(arahX * arahX + arahY * arahY);
+    final offsetLabel = titikTepi.translate(-arahX / arahPanjang * 30 - tp.width / 2, -arahY / arahPanjang * 30 - tp.height / 2);
+    tp.paint(canvas, offsetLabel);
   }
 
   void _gambarMarker(Canvas canvas, Offset pos, Color warna, String label) {
