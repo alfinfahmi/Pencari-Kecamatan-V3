@@ -104,7 +104,7 @@ jobs:
               print("PERINGATAN: AndroidManifest.xml tidak ditemukan!")
           PYEOF
 
-      - name: Tambahkan izin Lokasi (Android) -- WAJIB untuk seluruh fitur GPS
+      - name: Tambahkan izin Lokasi & Internet (Android) -- WAJIB untuk GPS & Shorebird
         # BUG BESAR yang baru ketahuan: `flutter create` TIDAK menyertakan izin
         # lokasi secara default -- sama seperti kamera, tapi ini LUPUT
         # ditambahkan sejak awal proyek. Tanpa ini, package `geolocator`
@@ -114,6 +114,14 @@ jobs:
         # muncul di banyak fitur (Waktu Shalat, Kalkulator, Kamera Rukyat,
         # Widget Home Screen, dll.) sepanjang pengembangan aplikasi ini --
         # BUKAN bug di rumus/logika masing-masing fitur itu sendiri.
+        #
+        # Izin INTERNET juga ditambahkan di sini (ditemukan lewat validasi
+        # `shorebird release` yang menolak build tanpa ini -- Shorebird
+        # perlu internet untuk unduh patch). Sebenarnya SUDAH lama
+        # dibutuhkan diam-diam oleh banyak fitur lain juga (http, Supabase,
+        # Sentry, url_launcher, home_widget) -- APK biasa (`flutter build
+        # apk`) kebetulan tidak memvalidasi ini seketat Shorebird, jadi
+        # luput ketahuan sampai sekarang.
         run: |
           python3 << 'PYEOF'
           import pathlib, re
@@ -128,10 +136,12 @@ jobs:
                   tambahan += '    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n'
               if 'android.permission.ACCESS_COARSE_LOCATION' not in text:
                   tambahan += '    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n'
+              if 'android.permission.INTERNET' not in text:
+                  tambahan += '    <uses-permission android:name="android.permission.INTERNET" />\n'
               if tambahan:
                   text = re.sub(r'(<manifest[^>]*>)', r'\1\n' + tambahan, text, count=1)
                   p.write_text(text)
-                  print("Izin lokasi berhasil ditambahkan ke AndroidManifest.xml")
+                  print("Izin lokasi/internet berhasil ditambahkan ke AndroidManifest.xml")
               else:
                   print("Izin lokasi sudah ada, tidak perlu ditambahkan.")
           PYEOF
