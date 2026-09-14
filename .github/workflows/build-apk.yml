@@ -5,7 +5,27 @@ name: Build APK & Web
 on:
   push:
     branches: [main]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      shorebird_mode:
+        description: >
+          Mode build Shorebird (code push). "tidak_dipakai" = build biasa
+          seperti sekarang (flutter build apk, tidak menyentuh Shorebird
+          sama sekali). "release" = HANYA untuk rilis PERTAMA kali via
+          Shorebird, atau setelah ada perubahan native (izin baru, plugin
+          baru, dll.) -- ini membuat baseline baru yang jadi acuan patch
+          berikutnya. "patch" = update kode Dart saja (bug fix, tampilan,
+          logika) yang terpasang OTOMATIS & DIAM-DIAM ke HP pengguna yang
+          sudah pasang rilis Shorebird sebelumnya, TANPA perlu unduh APK
+          baru -- tapi HANYA valid kalau sudah pernah ada "release"
+          Shorebird sebelumnya untuk versi yang sama di pubspec.yaml.
+        required: true
+        type: choice
+        options:
+          - tidak_dipakai
+          - release
+          - patch
+        default: tidak_dipakai
 
 jobs:
   # ==========================================
@@ -33,6 +53,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          cache: true
+
+      - name: Setup Shorebird CLI (hanya kalau shorebird_mode dipilih)
+        if: github.event.inputs.shorebird_mode == 'release' || github.event.inputs.shorebird_mode == 'patch'
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
           cache: true
 
       - name: Setup Python (untuk skrip enkripsi data)
@@ -669,9 +695,42 @@ jobs:
         # 2018 ke atas, jadi aman untuk distribusi APK langsung seperti
         # aplikasi ini (bukan lewat Play Store yang otomatis pilihkan
         # arsitektur yang tepat per device).
-        run: flutter build apk --release --target-platform android-arm64 --obfuscate --split-debug-info=build/symbols
+        #
+        # MODE SHOREBIRD (opsional, lewat "Run workflow" manual):
+        # - tidak_dipakai (default, termasuk SEMUA push otomatis ke main):
+        #   `flutter build apk` biasa, TIDAK menyentuh Shorebird sama
+        #   sekali -- perilaku asli, tidak berubah.
+        # - release: `shorebird release android` -- bikin baseline baru
+        #   di Shorebird untuk versi (pubspec.yaml) saat ini. WAJIB
+        #   dijalankan pertama kali sebelum "patch" bisa dipakai, dan
+        #   wajib diulang tiap kali ada perubahan NATIVE (izin baru,
+        #   plugin baru, dll.) -- bukan cuma kode Dart.
+        # - patch: `shorebird patch android` -- update kode Dart yang
+        #   TERPASANG OTOMATIS & DIAM-DIAM ke HP yang sudah pasang rilis
+        #   Shorebird versi yang SAMA. Gagal kalau belum pernah ada
+        #   "release" untuk versi itu.
+        # Kedua perintah Shorebird itu perlu SHOREBIRD_TOKEN (dari
+        # secret repo) supaya jalan non-interaktif di CI.
+        run: |
+          MODE="${{ github.event.inputs.shorebird_mode }}"
+          if [ "$MODE" = "release" ]; then
+            echo "Mode: Shorebird RELEASE (baseline baru)"
+            shorebird release android --target-platform android-arm64
+          elif [ "$MODE" = "patch" ]; then
+            echo "Mode: Shorebird PATCH (update kode Dart, diam-diam ke pengguna)"
+            shorebird patch android --target-platform android-arm64
+          else
+            echo "Mode: build APK biasa (bukan Shorebird)"
+            flutter build apk --release --target-platform android-arm64 --obfuscate --split-debug-info=build/symbols
+          fi
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
 
       - name: Upload APK sebagai artifact
+        # Dilewati kalau mode Shorebird "patch" -- patch tidak menghasilkan
+        # APK baru untuk diunggah (justru itu intinya: kode ter-update
+        # tanpa pengguna perlu unduh APK apa pun).
+        if: github.event.inputs.shorebird_mode != 'patch'
         uses: actions/upload-artifact@v4
         with:
           name: pencari-kecamatan-apk
@@ -679,6 +738,9 @@ jobs:
           retention-days: 30
 
       - name: Buat GitHub Release + lampirkan APK
+        # Dilewati juga untuk mode "patch" -- lihat catatan di langkah
+        # "Upload APK sebagai artifact" di atas.
+        if: github.event.inputs.shorebird_mode != 'patch'
         # Dipakai fitur "cek update" di dalam aplikasi (lib/services/
         # update_checker_service.dart) -- aplikasi membandingkan versi
         # terpasang dengan tag rilis TERBARU di sini lewat GitHub API,
