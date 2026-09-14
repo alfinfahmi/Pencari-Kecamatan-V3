@@ -91,6 +91,7 @@ flutter:
     - assets/data/web/
     - assets/data/web/provinsi/
     - assets/images/
+    - shorebird.yaml
 
 # Konfigurasi ikon aplikasi. Jalankan setelah pub get:
 #   flutter pub run flutter_launcher_icons
