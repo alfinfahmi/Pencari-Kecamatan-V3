@@ -725,10 +725,10 @@ jobs:
           MODE="${{ github.event.inputs.shorebird_mode }}"
           if [ "$MODE" = "release" ]; then
             echo "Mode: Shorebird RELEASE (baseline baru)"
-            shorebird release android --target-platform android-arm64
+            shorebird release android --artifact apk --target-platform android-arm64
           elif [ "$MODE" = "patch" ]; then
             echo "Mode: Shorebird PATCH (update kode Dart, diam-diam ke pengguna)"
-            shorebird patch android --target-platform android-arm64
+            shorebird patch android --artifact apk --target-platform android-arm64
           else
             echo "Mode: build APK biasa (bukan Shorebird)"
             flutter build apk --release --target-platform android-arm64 --obfuscate --split-debug-info=build/symbols
@@ -737,12 +737,15 @@ jobs:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
 
       - name: Cari file APK yang dihasilkan (diagnostik)
-        # `shorebird release` TERNYATA menghasilkan APK dengan nama/lokasi
-        # yang beda dari `flutter build apk` biasa (ketahuan dari run yang
-        # gagal sebelumnya: path lama "app-release.apk" tidak ditemukan).
-        # Langkah ini menampilkan SEMUA file .apk yang ada di build/ ke log
-        # -- baik untuk pola wildcard di bawah bekerja, maupun untuk
-        # diagnosis kalau suatu saat masih meleset lagi.
+        # `shorebird release`/`shorebird patch` TANPA flag `--artifact apk`
+        # ternyata defaultnya menghasilkan App Bundle (.aab), BUKAN .apk --
+        # ketahuan dari run yang gagal sebelumnya ("Built .../app-release.aab
+        # (28.0MB)" muncul di log, bukan .apk). Sudah ditambahkan flag
+        # `--artifact apk` di langkah build di atas supaya konsisten
+        # menghasilkan .apk seperti `flutter build apk` biasa. Langkah ini
+        # tetap dipertahankan sebagai jaring pengaman diagnostik -- kalau
+        # suatu saat nama/lokasi filenya berubah lagi, log ini langsung
+        # menunjukkan apa yang sebenarnya dihasilkan.
         if: github.event.inputs.shorebird_mode != 'patch'
         run: find build -iname "*.apk" -exec ls -lh {} \;
 
