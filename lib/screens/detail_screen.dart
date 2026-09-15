@@ -201,6 +201,11 @@ class _DetailScreenState extends State<DetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        // Panah kembali dihilangkan -- Home button di actions sudah cukup
+        // untuk navigasi, tidak perlu 2 cara berbeda ke arah "keluar" dari
+        // layar ini sekaligus.
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: Text(switch (widget.initialSection) {
           DetailSection.geografis => 'Rincian Geografis',
           DetailSection.kiblat => 'Kompas Kiblat',
