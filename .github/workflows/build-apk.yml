@@ -729,8 +729,17 @@ jobs:
             echo "Mode: Shorebird RELEASE (baseline baru)"
             shorebird release android --artifact apk --target-platform android-arm64
           elif [ "$MODE" = "patch" ]; then
+            # PENTING (perbaikan bug nyata): sebelumnya pakai flag yang SAMA
+            # dengan "release" (--artifact apk --target-platform ...) --
+            # ternyata `shorebird patch` TIDAK mengenal flag-flag itu sama
+            # sekali (dokumentasi resmi menunjukkan `shorebird patch android`
+            # polos tanpa flag tambahan apa pun sebagai contoh paling umum --
+            # patch otomatis mewarisi arsitektur & jenis artifact dari
+            # release yang sudah ada, tidak perlu dipilih ulang). Memaksakan
+            # flag yang tidak dikenal membuat CLI mencetak teks bantuan
+            # (exit code 64) alih-alih menjalankan patch.
             echo "Mode: Shorebird PATCH (update kode Dart, diam-diam ke pengguna)"
-            shorebird patch android --artifact apk --target-platform android-arm64
+            shorebird patch android
           else
             echo "Mode: build APK biasa (bukan Shorebird)"
             flutter build apk --release --target-platform android-arm64 --obfuscate --split-debug-info=build/symbols
