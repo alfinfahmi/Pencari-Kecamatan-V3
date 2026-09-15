@@ -19,6 +19,8 @@ class CompassFullscreenScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.emeraldDark,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text('Kompas Kiblat'),

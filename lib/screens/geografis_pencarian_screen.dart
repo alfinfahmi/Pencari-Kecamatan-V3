@@ -164,6 +164,8 @@ class _GeografisPencarianScreenState extends State<GeografisPencarianScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Text('Data Geografis'),
         actions: [HomeButton()],
       ),

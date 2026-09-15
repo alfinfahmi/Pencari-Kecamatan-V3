@@ -292,6 +292,8 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         backgroundColor: Colors.black87,
         foregroundColor: _modeMalam ? _merahMalam : Colors.white,
         title: Text('Kamera Rukyat', style: TextStyle(color: _modeMalam ? _merahMalam : Colors.white)),

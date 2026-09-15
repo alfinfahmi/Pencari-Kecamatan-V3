@@ -33,6 +33,8 @@ class _KalkulatorScreenState extends State<KalkulatorScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Text('Kalkulator'),
         actions: [HomeButton()],
         bottom: TabBar(

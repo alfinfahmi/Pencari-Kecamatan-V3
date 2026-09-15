@@ -87,6 +87,8 @@ class _ModerationPanelScreenState extends State<ModerationPanelScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Text('Panel Moderasi'),
         actions: [HomeButton(), IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _muat)],
       ),

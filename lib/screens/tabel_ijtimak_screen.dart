@@ -201,6 +201,8 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Text('Tabel Ijtimak'),
         actions: [
           IconButton(

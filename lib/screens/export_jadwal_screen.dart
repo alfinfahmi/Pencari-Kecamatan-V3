@@ -390,7 +390,7 @@ class _ExportJadwalScreenState extends State<ExportJadwalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ekspor Jadwal Shalat'), actions: [HomeButton()]),
+      appBar: AppBar(automaticallyImplyLeading: false, centerTitle: true, title: const Text('Ekspor Jadwal Shalat'), actions: [HomeButton()]),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),

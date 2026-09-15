@@ -142,6 +142,8 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     return Scaffold(
       backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppColors.backgroundDark : const Color(0xFFF6F8F7),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         backgroundColor: AppColors.emerald,
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),

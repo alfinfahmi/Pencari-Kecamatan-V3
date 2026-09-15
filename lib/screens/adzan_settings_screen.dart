@@ -66,7 +66,7 @@ class _AdzanSettingsScreenState extends State<AdzanSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifikasi Adzan'), actions: [HomeButton()]),
+      appBar: AppBar(automaticallyImplyLeading: false, centerTitle: true, title: const Text('Notifikasi Adzan'), actions: [HomeButton()]),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(

@@ -116,6 +116,8 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Text('Kalender Hijriah & Masehi'),
         actions: [
           IconButton(
