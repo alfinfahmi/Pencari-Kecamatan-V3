@@ -213,7 +213,7 @@ class _DetailScreenState extends State<DetailScreen> {
             icon: const Icon(Icons.copy_rounded),
             tooltip: 'Salin Semua Data',
             onPressed: () {
-              Clipboard.setData(ClipboardData(text: data.toClipboardText()));
+              Clipboard.setData(ClipboardData(text: (widget.initialSection == DetailSection.waktuShalat ? _lokasiWaktuShalat : data).toClipboardText()));
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Data disalin ke clipboard')),
               );
@@ -229,9 +229,17 @@ class _DetailScreenState extends State<DetailScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   // === Judul halaman (nama lokasi) ===
-                  Text(data.kecamatan, style: AppTypography.headlineLg(
-                    color: isDark ? AppColors.textDark : AppColors.textLight,
-                  )),
+                  // Khusus halaman Waktu Shalat: judul ikut mengikuti
+                  // _lokasiWaktuShalat (bukan widget.data yang tetap) --
+                  // supaya kalau pengguna ganti lokasi lewat "Ganti Lokasi"
+                  // di kartu Waktu Shalat, judul besar di atas ikut berubah
+                  // juga. Sebelumnya judul TIDAK ikut berubah, sehingga bisa
+                  // disalahpahami sebagai "waktu shalat Mojoroto" padahal
+                  // sebenarnya sudah diganti ke lokasi lain sepenuhnya.
+                  Text(
+                    widget.initialSection == DetailSection.waktuShalat ? _lokasiWaktuShalat.kecamatan : data.kecamatan,
+                    style: AppTypography.headlineLg(color: isDark ? AppColors.textDark : AppColors.textLight),
+                  ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -239,7 +247,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          [data.kabupaten, data.provinsi, 'Indonesia'].where((e) => e != null).join(', '),
+                          widget.initialSection == DetailSection.waktuShalat
+                              ? [_lokasiWaktuShalat.kabupaten, _lokasiWaktuShalat.provinsi, 'Indonesia'].where((e) => e != null).join(', ')
+                              : [data.kabupaten, data.provinsi, 'Indonesia'].where((e) => e != null).join(', '),
                           style: AppTypography.bodyMd(color: Colors.grey.shade600),
                         ),
                       ),
