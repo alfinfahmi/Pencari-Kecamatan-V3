@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:gal/gal.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../models/kecamatan_model.dart';
 import '../services/kamera_rukyat_service.dart';
@@ -181,14 +180,24 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
     if (controller == null || !controller.value.isInitialized) return;
     try {
       final file = await controller.takePicture();
-      final dir = await getApplicationDocumentsDirectory();
-      final namaFile = 'rukyat_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      await File(file.path).copy('${dir.path}/$namaFile');
+      // PENTING (perbaikan bug nyata dilaporkan pengguna): sebelumnya foto
+      // disimpan ke getApplicationDocumentsDirectory() -- folder PRIVAT
+      // milik aplikasi yang TIDAK PERNAH terlihat di Galeri HP sama sekali,
+      // meski pesan "Foto tersimpan" tetap muncul (jadi terkesan berhasil
+      // padahal pengguna tidak akan pernah menemukannya). Sekarang pakai
+      // `gal`, yang menyimpan ke galeri PUBLIK sungguhan (album terpisah
+      // "Aplikasi Falak" supaya gampang ditemukan, tidak campur dengan
+      // foto kamera biasa).
+      await Gal.putImage(file.path, album: 'Aplikasi Falak');
       HapticFeedback.mediumImpact();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Foto tersimpan: $namaFile')),
+          const SnackBar(content: Text('Foto tersimpan ke galeri (album "Aplikasi Falak")')),
         );
+      }
+    } on GalException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal menyimpan foto: ${e.type.message}')));
       }
     } catch (e) {
       if (mounted) {
@@ -536,10 +545,28 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
               Icon(Icons.location_on_outlined, size: 13, color: Colors.grey.shade300),
               const SizedBox(width: 4),
               Expanded(
-                child: Text(
-                  lokasi?.kecamatan ?? 'Lokasi belum tersedia',
-                  style: const TextStyle(color: Colors.white, fontSize: 11.5),
-                  overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lokasi?.kecamatan ?? 'Lokasi belum tersedia',
+                      style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (lokasi != null) ...[
+                      Text(
+                        [lokasi.kabupaten, lokasi.provinsi].where((e) => e != null).join(', '),
+                        style: TextStyle(color: Colors.grey.shade300, fontSize: 10),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        '${lokasi.lat.toStringAsFixed(4)}, ${lokasi.lng.toStringAsFixed(4)}'
+                        '${lokasi.elevasiM != null ? '  \u2022  ${lokasi.elevasiM} mdpl' : ''}',
+                        style: TextStyle(color: Colors.grey.shade400, fontSize: 9.5),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
                 ),
               ),
               TextButton(

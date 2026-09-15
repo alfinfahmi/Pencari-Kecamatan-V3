@@ -241,23 +241,31 @@ class _DetailScreenState extends State<DetailScreen> {
                   // juga. Sebelumnya judul TIDAK ikut berubah, sehingga bisa
                   // disalahpahami sebagai "waktu shalat Mojoroto" padahal
                   // sebenarnya sudah diganti ke lokasi lain sepenuhnya.
-                  Text(
-                    widget.initialSection == DetailSection.waktuShalat ? _lokasiWaktuShalat.kecamatan : data.kecamatan,
-                    style: AppTypography.headlineLg(color: isDark ? AppColors.textDark : AppColors.textLight),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
+                  // === Judul halaman (nama lokasi), gaya "kop" -- rata
+                  // tengah, nama kecamatan besar di atas, kabupaten/
+                  // provinsi di bawahnya, dipisah garis tipis seperti kop
+                  // surat resmi. Khusus halaman Waktu Shalat: mengikuti
+                  // _lokasiWaktuShalat (bukan widget.data yang tetap) --
+                  // supaya kalau pengguna ganti lokasi lewat "Ganti Lokasi"
+                  // di kartu Waktu Shalat, judul ikut berubah juga.
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Icon(Icons.location_on_outlined, size: 15, color: Colors.grey.shade500),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          widget.initialSection == DetailSection.waktuShalat
-                              ? [_lokasiWaktuShalat.kabupaten, _lokasiWaktuShalat.provinsi, 'Indonesia'].where((e) => e != null).join(', ')
-                              : [data.kabupaten, data.provinsi, 'Indonesia'].where((e) => e != null).join(', '),
-                          style: AppTypography.bodyMd(color: Colors.grey.shade600),
-                        ),
+                      Text(
+                        widget.initialSection == DetailSection.waktuShalat ? _lokasiWaktuShalat.kecamatan : data.kecamatan,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.headlineLg(color: isDark ? AppColors.textDark : AppColors.textLight),
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.initialSection == DetailSection.waktuShalat
+                            ? [_lokasiWaktuShalat.kabupaten, _lokasiWaktuShalat.provinsi, 'Indonesia'].where((e) => e != null).join(', ')
+                            : [data.kabupaten, data.provinsi, 'Indonesia'].where((e) => e != null).join(', '),
+                        textAlign: TextAlign.center,
+                        style: AppTypography.bodyMd(color: Colors.grey.shade600),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(height: 1.5, width: 72, color: AppColors.emerald.withOpacity(0.5)),
                     ],
                   ),
                   const SizedBox(height: 20),

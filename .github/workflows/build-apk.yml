@@ -104,7 +104,7 @@ jobs:
               print("PERINGATAN: AndroidManifest.xml tidak ditemukan!")
           PYEOF
 
-      - name: Tambahkan izin Lokasi & Internet (Android) -- WAJIB untuk GPS & Shorebird
+      - name: Tambahkan izin Lokasi, Internet & Install APK (Android)
         # BUG BESAR yang baru ketahuan: `flutter create` TIDAK menyertakan izin
         # lokasi secara default -- sama seperti kamera, tapi ini LUPUT
         # ditambahkan sejak awal proyek. Tanpa ini, package `geolocator`
@@ -138,6 +138,8 @@ jobs:
                   tambahan += '    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n'
               if 'android.permission.INTERNET' not in text:
                   tambahan += '    <uses-permission android:name="android.permission.INTERNET" />\n'
+              if 'android.permission.REQUEST_INSTALL_PACKAGES' not in text:
+                  tambahan += '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n'
               if tambahan:
                   text = re.sub(r'(<manifest[^>]*>)', r'\1\n' + tambahan, text, count=1)
                   p.write_text(text)
