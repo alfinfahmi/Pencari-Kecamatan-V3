@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:sentry_flutter/sentry_flutter.dart';
 import '../models/kecamatan_model.dart';
 
 /// Versi lazy-load khusus Web dari DataRepository.
@@ -54,17 +55,35 @@ class WebDataRepository {
   }
 
   /// Memuat satu file provinsi (idempotent — tidak reload jika sudah ada).
+  ///
+  /// PENTING (ditemukan lewat crash nyata di Sentry, FLUTTER-7): sebelumnya
+  /// TIDAK ADA try-catch di sini -- kalau satu file provinsi gagal dimuat
+  /// (mis. cache browser PWA yang tidak sinkron antara manifest.json versi
+  /// baru dengan file provinsi versi lama, atau gangguan jaringan sesaat),
+  /// exception-nya tidak tertangkap dan membuat SELURUH aplikasi crash --
+  /// padahal cuma SATU provinsi yang bermasalah, provinsi lain baik-baik
+  /// saja. Sekarang: kalau gagal, kembalikan daftar KOSONG untuk provinsi
+  /// itu saja (pencarian di provinsi itu sementara tidak lengkap, tapi
+  /// aplikasi tetap jalan normal untuk semua provinsi lain) + laporkan ke
+  /// Sentry sebagai non-fatal supaya tetap ada visibilitas kalau ini
+  /// sering terjadi.
   Future<List<KecamatanModel>> _loadProvinsi(String slug, String filePath) async {
     if (_loadedProvinsi.containsKey(slug)) return _loadedProvinsi[slug]!;
 
-    final raw = await rootBundle.loadString('$_basePath/$filePath');
-    final decoded = json.decode(raw) as Map<String, dynamic>;
-    final list = (decoded['kecamatan'] as List)
-        .map((e) => KecamatanModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      final raw = await rootBundle.loadString('$_basePath/$filePath');
+      final decoded = json.decode(raw) as Map<String, dynamic>;
+      final list = (decoded['kecamatan'] as List)
+          .map((e) => KecamatanModel.fromJson(e as Map<String, dynamic>))
+          .toList();
 
-    _loadedProvinsi[slug] = list;
-    return list;
+      _loadedProvinsi[slug] = list;
+      return list;
+    } catch (e, st) {
+      Sentry.captureException(e, stackTrace: st, hint: Hint.withMap({'provinsi_slug': slug, 'file_path': filePath}));
+      _loadedProvinsi[slug] = const [];
+      return const [];
+    }
   }
 
   /// Memuat seluruh provinsi secara bertahap di background (opsional),
