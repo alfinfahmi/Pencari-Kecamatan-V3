@@ -7,6 +7,7 @@ import '../services/hijri_service.dart';
 import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
 import '../services/meeus_presisi_tinggi_service.dart';
+import '../services/tashilul_amtsilah_adapter.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
@@ -41,6 +42,7 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
 
   KecamatanModel? _lokasi;
   bool _memuatLokasi = false;
+  bool _tashilulSiap = false;
 
   static const _namaBulanHijriah = {
     1: 'Muharram', 2: 'Safar', 3: 'Rabiul Awwal', 4: 'Rabiul Akhir',
@@ -59,6 +61,18 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     super.initState();
     _muat();
     _muatLokasiDariGps();
+    _muatTashilul();
+  }
+
+  Future<void> _muatTashilul() async {
+    try {
+      await TashilulAmtsilahAdapter.muatData();
+    } catch (_) {
+      // Diamkan -- kalau gagal, kolom Tashilul cuma tidak muncul, 3 metode
+      // lain tetap jalan normal.
+    } finally {
+      if (mounted) setState(() => _tashilulSiap = true);
+    }
   }
 
   Future<void> _muat() async {
@@ -416,9 +430,11 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalMeeus;
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalAsSyahru;
     ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalPresisiTinggi;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalTashilul;
     DateTime? ijtimakMeeusUtc;
     DateTime? ijtimakAsSyahruUtc;
     DateTime? ijtimakPresisiTinggiUtc;
+    DateTime? ijtimakTashilulUtc;
     if (lokasi != null && lokasi.utcOffset != null) {
       // Ketiga metode pakai waktu ijtimak HASIL PERHITUNGANNYA SENDIRI
       // (bukan waktu bersama dari tabel/kolom kiri) -- bisa beda
@@ -459,6 +475,34 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
         elongasi: hasilPresisiTinggi.elongasi,
         usiaHilalJam: hasilPresisiTinggi.lamaHilalJam,
       );
+
+      // Tashilul Amtsilah -- dibungkus try-catch krn sistem tabel zij ini
+      // masih lebih baru & blm sekuat 3 metode lain scr uji-coba lapangan
+      // (lihat dokumentasi_hisab/TASHILUL_AMTSILAH_CATATAN.md utk status
+      // akurasi & batasannya).
+      if (_tashilulSiap) {
+        try {
+          ijtimakTashilulUtc = TashilulAmtsilahAdapter.cariIjtimakUtc(
+            tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH,
+            lat: lokasi.lat, lng: lokasi.lng, elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
+            utcOffset: lokasi.utcOffset!,
+          );
+          final hasilTashilul = TashilulAmtsilahAdapter.hitung(
+            ijtimakUtc: ijtimakTashilulUtc, lat: lokasi.lat, lng: lokasi.lng,
+            elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
+          );
+          final ijtimakJamLokal = ijtimakTashilulUtc.add(Duration(hours: lokasi.utcOffset!));
+          final ijtimakJamDesimal = ijtimakJamLokal.hour + ijtimakJamLokal.minute / 60;
+          hilalTashilul = (
+            memenuhi: hasilTashilul.memenuhiMabims2021,
+            tinggiHilal: hasilTashilul.tinggiHilalMari,
+            elongasi: hasilTashilul.elongasi,
+            usiaHilalJam: hasilTashilul.ghurubMatahariJam - ijtimakJamDesimal,
+          );
+        } catch (_) {
+          // Kolom Tashilul cuma tidak muncul utk baris ini kalau gagal.
+        }
+      }
     }
 
 
@@ -489,6 +533,8 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
                   SizedBox(width: 150, child: _barisMetode('Jean Meeus', hilalMeeus, ijtimakBerbeda: ijtimakMeeusUtc?.add(const Duration(hours: 7)))),
                   SizedBox(width: 150, child: _barisMetode('As-Syahru', hilalAsSyahru, ijtimakBerbeda: ijtimakAsSyahruUtc?.add(const Duration(hours: 7)))),
                   SizedBox(width: 150, child: _barisMetode('Meeus Presisi Tinggi', hilalPresisiTinggi, ijtimakBerbeda: ijtimakPresisiTinggiUtc?.add(const Duration(hours: 7)))),
+                  if (hilalTashilul != null)
+                    SizedBox(width: 150, child: _barisMetode('Tashilul Amtsilah', hilalTashilul, ijtimakBerbeda: ijtimakTashilulUtc?.add(const Duration(hours: 7)))),
                 ],
               ),
             ],

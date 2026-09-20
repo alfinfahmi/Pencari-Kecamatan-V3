@@ -5,6 +5,7 @@ import '../services/hijri_service.dart';
 import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
 import '../services/meeus_presisi_tinggi_service.dart';
+import '../services/tashilul_amtsilah_adapter.dart';
 import '../services/hisab_detail.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
@@ -31,6 +32,7 @@ class HisabAwalBulanScreen extends StatefulWidget {
 class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with SingleTickerProviderStateMixin {
   KecamatanModel? _lokasi;
   bool _memuatLokasi = false;
+  bool _tashilulSiap = false;
   final _tahunHController = TextEditingController(text: '1448');
   int _bulanHDipilih = 4;
   late TabController _tabController;
@@ -61,6 +63,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     ('As-Syahru', AsSyahruService.hitung, AsSyahruService.cariIjtimakUtc),
     ('Jean Meeus', MeeusHisabService.hitung, MeeusHisabService.cariIjtimakUtc),
     ('Meeus Presisi Tinggi', MeeusPresisiTinggiService.hitung, MeeusPresisiTinggiService.cariIjtimakUtc),
+    ('Tashilul Amtsilah', TashilulAmtsilahAdapter.hitung, null),
   ];
 
   static const _namaBulanHijriah = {
@@ -79,6 +82,18 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     super.initState();
     _tabController = TabController(length: _metodeList.length, vsync: this);
     _muatLokasiDariGps();
+    _muatTashilul();
+  }
+
+  Future<void> _muatTashilul() async {
+    try {
+      await TashilulAmtsilahAdapter.muatData();
+    } catch (_) {
+      // Diamkan -- kalau gagal, tab Tashilul akan gagal render dgn pesan
+      // error Flutter standar saat dicoba, tapi 3 metode lain tetap jalan.
+    } finally {
+      if (mounted) setState(() => _tashilulSiap = true);
+    }
   }
 
   @override
@@ -170,11 +185,13 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                         style: TextStyle(color: Colors.grey.shade500),
                       ),
                     )
-                  : (int.tryParse(_tahunHController.text) == null)
+                  : !_tashilulSiap
+                      ? const Center(child: CircularProgressIndicator())
+                      : (int.tryParse(_tahunHController.text) == null)
                       ? Center(child: Text('Isi Tahun H yang valid.', style: TextStyle(color: Colors.grey.shade500)))
                       : TabBarView(
                           controller: _tabController,
-                          children: _metodeList.map((m) => _buildIsiMetode(m.$2, m.$3)).toList(),
+                          children: _metodeList.map((m) => _buildIsiMetode(m.$2, m.$3, namaMetode: m.$1)).toList(),
                         ),
             ),
           ],
@@ -265,8 +282,9 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
       required double elevasiM,
       required int utcOffset,
     }) fungsiHitung,
-    DateTime Function({required int tahunH, required int bulanH})? cariIjtimakSendiri,
-  ) {
+    DateTime Function({required int tahunH, required int bulanH})? cariIjtimakSendiri, {
+    required String namaMetode,
+  }) {
     final lokasi = _lokasi!;
     final tahunH = int.parse(_tahunHController.text);
     final bulanH = _bulanHDipilih;
@@ -304,6 +322,31 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (namaMetode == 'Tashilul Amtsilah')
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.withOpacity(0.4)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.science_outlined, size: 18, color: Colors.amber),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Metode ini masih dalam tahap pengujian (hasil sudah dekat dengan '
+                      'rujukan kitab, tapi belum divalidasi seluas 3 metode lain). '
+                      'Gunakan sebagai pembanding, bukan sumber utama.',
+                      style: TextStyle(fontSize: 11.5, color: Colors.amber.shade800),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           _tabelKesimpulan(hasil, bulanH, tahunH, tanggal1),
           const SizedBox(height: 12),
           _tabelSeksi(

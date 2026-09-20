@@ -1,7 +1,7 @@
 name: pencari_kecamatan
 description: "Aplikasi Falak — LF Ma'had 'Aly Lirboyo & MHM Kediri"
 publish_to: "none"
-version: 1.0.16+17
+version: 1.0.17+18
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -92,6 +92,7 @@ flutter:
     - assets/data/
     - assets/data/web/
     - assets/data/web/provinsi/
+    - assets/data/tashilul/
     - assets/images/
     - shorebird.yaml
 

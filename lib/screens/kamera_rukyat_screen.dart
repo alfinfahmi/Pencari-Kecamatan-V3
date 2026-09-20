@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/rendering.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -50,6 +52,11 @@ class KameraRukyatScreen extends StatefulWidget {
 class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBindingObserver {
   CameraController? _cameraController;
   String? _errorKamera;
+
+  // Dipakai untuk "screenshot" gabungan kamera+overlay+data (fitur "foto
+  // dengan data") -- membungkus SEMUA tampilan visual KECUALI tombol
+  // kontrol bawah, supaya tombol tidak ikut kefoto.
+  final GlobalKey _repaintKey = GlobalKey();
 
   StreamSubscription<CompassEvent>? _compassSub;
   StreamSubscription<AccelerometerEvent>? _accelSub;
@@ -175,9 +182,52 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
     }
   }
 
+  /// Tanya dulu ke pengguna: foto polos atau ikut sertakan data lokasi &
+  /// hisab yang tampil di layar (panel info, HUD, marker hilal/matahari).
   Future<void> _jepret() async {
     final controller = _cameraController;
     if (controller == null || !controller.value.isInitialized) return;
+
+    final pilihan = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.grey.shade900,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: Text('Simpan foto sebagai', style: TextStyle(color: Colors.white70, fontSize: 12)),
+            ),
+            ListTile(
+              leading: const Icon(Icons.image_outlined, color: Colors.white),
+              title: const Text('Hanya gambar', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Foto polos dari kamera, tanpa overlay apa pun', style: TextStyle(color: Colors.white54, fontSize: 11.5)),
+              onTap: () => Navigator.of(context).pop('polos'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.layers_outlined, color: Colors.white),
+              title: const Text('Dengan data lokasi & hisab', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('Termasuk marker hilal/matahari, koordinat, dan panel data yang tampil di layar', style: TextStyle(color: Colors.white54, fontSize: 11.5)),
+              onTap: () => Navigator.of(context).pop('data'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (pilihan == 'polos') {
+      await _jepretPolos(controller);
+    } else if (pilihan == 'data') {
+      await _jepretDenganData();
+    }
+  }
+
+  /// Foto polos langsung dari sensor kamera (perilaku asli, sebelum fitur
+  /// "dengan data" ditambahkan) -- tidak ada overlay Flutter yang ikut
+  /// termuat, murni citra kamera.
+  Future<void> _jepretPolos(CameraController controller) async {
     try {
       final file = await controller.takePicture();
       // PENTING (perbaikan bug nyata dilaporkan pengguna): sebelumnya foto
@@ -193,6 +243,45 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Foto tersimpan ke galeri (album "Aplikasi Falak")')),
+        );
+      }
+    } on GalException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal menyimpan foto: ${e.type.message}')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal menyimpan foto: $e')));
+      }
+    }
+  }
+
+  /// Foto "screenshot" dari tampilan Flutter itu sendiri (kamera + overlay
+  /// hilal/matahari + HUD + panel data) lewat RepaintBoundary yang
+  /// membungkus Stack utama -- BUKAN dari sensor kamera langsung.
+  ///
+  /// CATATAN JUJUR soal batasan: karena ini screenshot tampilan (bukan
+  /// capture sensor), resolusinya mengikuti resolusi LAYAR perangkat
+  /// (biasanya lebih rendah dari resolusi sensor kamera sungguhan), dan
+  /// preview kamera Flutter kadang punya rasio aspek yang sedikit berbeda
+  /// dari citra sensor penuh -- wajar untuk teknik ini, bukan bug.
+  Future<void> _jepretDenganData() async {
+    try {
+      final boundary = _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) {
+        throw Exception('Tampilan belum siap untuk difoto, coba lagi sesaat lagi.');
+      }
+      // pixelRatio 3.0 -- kompromi resolusi cukup tajam untuk disimpan/
+      // dibagikan tanpa file jadi terlalu besar.
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) throw Exception('Gagal mengonversi gambar.');
+
+      await Gal.putImageBytes(byteData.buffer.asUint8List(), album: 'Aplikasi Falak', name: 'rukyat_data_${DateTime.now().millisecondsSinceEpoch}');
+      HapticFeedback.mediumImpact();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Foto (dengan data) tersimpan ke galeri (album "Aplikasi Falak")')),
         );
       }
     } on GalException catch (e) {
@@ -378,73 +467,88 @@ class _KameraRukyatScreenState extends State<KameraRukyatScreen> with WidgetsBin
     return Stack(
       fit: StackFit.expand,
       children: [
-        preview,
-        LayoutBuilder(
-          builder: (context, constraints) {
-            return CustomPaint(
-              size: Size(constraints.maxWidth, constraints.maxHeight),
-              painter: _OverlayPainter(
-                headingDerajat: _headingDerajat,
-                pitchDerajat: _pitchTerkoreksi,
-                posisiHilal: posisiHilal,
-                posisiMatahari: posisiMatahari,
-                warnaAksen: warnaAksen,
-                modeMalam: _modeMalam,
+        // Dibungkus RepaintBoundary -- membolehkan tampilan ini (kamera +
+        // overlay hilal/matahari + HUD + panel data) di-"screenshot"
+        // sebagai satu gambar untuk fitur "foto dengan data". Kontrol
+        // bawah SENGAJA di luar boundary ini (lihat akhir Stack), supaya
+        // tombol tidak ikut termuat di foto.
+        RepaintBoundary(
+          key: _repaintKey,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              preview,
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return CustomPaint(
+                    size: Size(constraints.maxWidth, constraints.maxHeight),
+                    painter: _OverlayPainter(
+                      headingDerajat: _headingDerajat,
+                      pitchDerajat: _pitchTerkoreksi,
+                      posisiHilal: posisiHilal,
+                      posisiMatahari: posisiMatahari,
+                      warnaAksen: warnaAksen,
+                      modeMalam: _modeMalam,
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-        // --- HUD atas: koordinat, arah kompas, jam presisi, status sensor ---
-        Positioned(
-          left: 10, right: 10, top: 6,
-          child: _hudAtas(lokasi, warnaAksen),
-        ),
-        if (!_sensorTersedia)
-          Positioned(
-            top: 60, left: 0, right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: Colors.red.shade900.withOpacity(0.85), borderRadius: BorderRadius.circular(8)),
-                child: const Text('Sensor kompas/kemiringan tidak tersedia -- overlay tidak akurat', style: TextStyle(color: Colors.white, fontSize: 11)),
+              // --- HUD atas: koordinat, arah kompas, jam presisi, status sensor ---
+              Positioned(
+                left: 10, right: 10, top: 6,
+                child: _hudAtas(lokasi, warnaAksen),
               ),
-            ),
-          )
-        else if (_akurasiKompas >= 0 && _akurasiKompas > 15)
-          // CATATAN JUJUR: skala pasti nilai `accuracy` dari flutter_compass
-          // (derajat kontinu, atau level diskrit 0-3) belum saya pastikan
-          // tanpa uji di device sungguhan -- ambang "15" di sini asumsi
-          // "derajat", bisa jadi perlu disesuaikan (mis. jadi ambang ">1"
-          // kalau ternyata levelnya diskrit). Peringatan ini aman diabaikan
-          // kalau ternyata salah ambang -- tidak memengaruhi akurasi
-          // overlay itu sendiri, cuma teks bantuan.
-          Positioned(
-            top: 60, left: 0, right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: Colors.orange.shade900.withOpacity(0.85), borderRadius: BorderRadius.circular(8)),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.explore_off_outlined, color: Colors.white, size: 14),
-                    SizedBox(width: 6),
-                    Text('Kompas kurang akurat -- gerakkan HP pola angka 8 untuk kalibrasi ulang', style: TextStyle(color: Colors.white, fontSize: 10.5)),
-                  ],
+              if (!_sensorTersedia)
+                Positioned(
+                  top: 60, left: 0, right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(color: Colors.red.shade900.withOpacity(0.85), borderRadius: BorderRadius.circular(8)),
+                      child: const Text('Sensor kompas/kemiringan tidak tersedia -- overlay tidak akurat', style: TextStyle(color: Colors.white, fontSize: 11)),
+                    ),
+                  ),
+                )
+              else if (_akurasiKompas >= 0 && _akurasiKompas > 15)
+                // CATATAN JUJUR: skala pasti nilai `accuracy` dari flutter_compass
+                // (derajat kontinu, atau level diskrit 0-3) belum saya pastikan
+                // tanpa uji di device sungguhan -- ambang "15" di sini asumsi
+                // "derajat", bisa jadi perlu disesuaikan (mis. jadi ambang ">1"
+                // kalau ternyata levelnya diskrit). Peringatan ini aman diabaikan
+                // kalau ternyata salah ambang -- tidak memengaruhi akurasi
+                // overlay itu sendiri, cuma teks bantuan.
+                Positioned(
+                  top: 60, left: 0, right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(color: Colors.orange.shade900.withOpacity(0.85), borderRadius: BorderRadius.circular(8)),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.explore_off_outlined, color: Colors.white, size: 14),
+                          SizedBox(width: 6),
+                          Text('Kompas kurang akurat -- gerakkan HP pola angka 8 untuk kalibrasi ulang', style: TextStyle(color: Colors.white, fontSize: 10.5)),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
+              // --- Waterpass digital (kiri atas, di bawah HUD) ---
+              Positioned(
+                left: 10, top: 78,
+                child: _waterpass(warnaAksen),
               ),
-            ),
+              Positioned(
+                left: 10, right: 10, bottom: 96,
+                child: _panelInfo(lokasi, posisiHilal, posisiMatahari, elongasi, umurBulanJam, ghurubMatahari, ghurubBulan, lagMenit, warnaAksen),
+              ),
+            ],
           ),
-        // --- Waterpass digital (kiri atas, di bawah HUD) ---
-        Positioned(
-          left: 10, top: 78,
-          child: _waterpass(warnaAksen),
-        ),
-        Positioned(
-          left: 10, right: 10, bottom: 96,
-          child: _panelInfo(lokasi, posisiHilal, posisiMatahari, elongasi, umurBulanJam, ghurubMatahari, ghurubBulan, lagMenit, warnaAksen),
         ),
         // --- Kontrol thumb-zone: semua di area bawah, mudah dijangkau satu tangan ---
+        // SENGAJA di luar RepaintBoundary di atas -- tombol tidak boleh
+        // ikut termuat saat fitur "foto dengan data" dipakai.
         Positioned(
           left: 10, right: 10, bottom: 8,
           child: _kontrolBawah(warnaAksen),
