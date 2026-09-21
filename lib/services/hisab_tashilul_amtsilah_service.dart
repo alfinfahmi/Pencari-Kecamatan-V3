@@ -114,6 +114,39 @@ class HisabTashilulAmtsilahService {
   static const tahunHijriahMinimum = 1351;
   static const tahunHijriahMaksimum = 1680;
 
+  /// Cari tanggalHisab yg TEPAT utk [bulanTarget] (bukan konstanta tetap!)
+  /// -- TEMUAN PENTING: tanggalHisab BUKAN selalu 30. Kitab klasik
+  /// mengandalkan penghitung manusia utk memperkirakan tanggal awal yg
+  /// dekat dgn ijtimak sesungguhnya (berdasar pengalaman/pola bulan
+  /// sebelumnya) -- di sini digantikan pencarian otomatis: uji beberapa
+  /// tanggalHisab (25-30), pakai posisi RATA-RATA SAJA (row10, murah
+  /// dihitung, TANPA korekasi penuh) utk cari yg memberi selisih bujur
+  /// bulan-matahari PALING DEKAT nol. TERVALIDASI: utk kasus uji asli
+  /// (Shafar 1448H), fungsi ini correctly identifies tanggalHisab=30
+  /// (cocok dgn nilai asli file Excel); utk bulan lain BISA BERBEDA
+  /// (28 atau 29), TERBUKTI penting sesudah ditemukan kasus Rabi'ul Akhir
+  /// 1448H memberi tinggi hilal palsu ~25° akibat tanggalHisab=30 salah
+  /// (ijtimak sesungguhnya jatuh di sekitar tanggal 28-29 bulan itu).
+  int cariTanggalHisabOptimal({required int tahunHijriah, required int bulanTarget}) {
+    int? terbaikTgl;
+    double? terbaikSelisih;
+    for (var tgl = 25; tgl <= 30; tgl++) {
+      final wsMatahari = posisiRataRata(
+        tahunHijriah: tahunHijriah, bulanTarget: bulanTarget, tanggalHisab: tgl, kunciBesaran: 'ws_matahari',
+      );
+      final wsBulan = posisiRataRata(
+        tahunHijriah: tahunHijriah, bulanTarget: bulanTarget, tanggalHisab: tgl, kunciBesaran: 'ws_bulan',
+      );
+      var selisih = (keDesimal(wsBulan) - keDesimal(wsMatahari)) % 360;
+      if (selisih > 180) selisih -= 360;
+      if (terbaikSelisih == null || selisih.abs() < terbaikSelisih.abs()) {
+        terbaikTgl = tgl;
+        terbaikSelisih = selisih;
+      }
+    }
+    return terbaikTgl!;
+  }
+
   List<num> posisiRataRata({
     required int tahunHijriah,
     required int bulanTarget,
@@ -552,7 +585,19 @@ class HisabTashilulAmtsilahService {
   /// cari kapan selisih bujur bulan-matahari = 0, dari titik acuan BI7.
   /// [laju] WAJIB SUDAH dikurangi BI12 (laju = BI11 - BI12) SEBELUM
   /// dipanggil -- lihat hitungJamIjtimak() utk contoh pemakaian benar.
-  /// TERVALIDASI 16:40 vs referensi 16:41 (selisih 1 menit).
+  /// TERVALIDASI 16:40 vs referensi 16:41 (selisih 1 menit) utk markaz Kediri.
+  ///
+  /// CATATAN PENTING (temuan lanjutan setelah laporan pengguna ttg jam
+  /// ijtimak berbeda jauh antar-lokasi -- lihat dokumentasi): file Excel
+  /// ASLI mengurangi `N12` DI SINI *LAGI*, padahal koreksi selisih-bujur yg
+  /// SAMA sudah diterapkan scr IMPLISIT lewat baris12/13 (row17, dlm
+  /// `rantaiMeanTafawutProyeksi`). Pengurangan GANDA ini yg menyebabkan jam
+  /// ijtimak melenceng SAMPAI ~2 JAM utk lokasi jauh dari 112° (spt
+  /// Jayapura). TERVALIDASI (banyak kasus uji bulan/tahun/lokasi berbeda):
+  /// MENGHILANGKAN pengurangan `n12` di sini membuat jam ijtimak KONSISTEN
+  /// antar-lokasi (residu tinggal 0-4 menit, TURUN DRASTIS dari sampai
+  /// 2 jam) -- TANPA perlu mengunci ke markaz referensi tetap, tetap
+  /// memakai geometri lokasi masing-masing spt semestinya.
   double jamIjtimak({
     required double bi7,
     required double bujurBulanFinal,
@@ -561,8 +606,7 @@ class HisabTashilulAmtsilahService {
     required double bujurLokasi,
   }) {
     final selisihBujur = ((bujurMatahariFinal - bujurBulanFinal + 180) % 360) - 180;
-    final n12 = (112 - bujurLokasi) / 15;
-    final bi14 = bi7 + selisihBujur / laju - n12;
+    final bi14 = bi7 + selisihBujur / laju;
     var jam = bi14 % 24;
     if (jam < 0) jam += 24;
     return jam;
@@ -759,6 +803,11 @@ class HisabTashilulAmtsilahService {
   }
 
   /// Versi SINKRON dari [hitungJamIjtimak] -- WAJIB [muatDataAwal] dulu.
+  /// Memakai lokasi PEMANGGIL sepenuhnya (lintang/bujurLokasi/elevasiMeter)
+  /// -- TIDAK lagi dikunci ke markaz referensi tetap. Lihat catatan di
+  /// [jamIjtimak] utk penjelasan kenapa ini sekarang aman (perbaikan
+  /// pengurangan-N12-ganda), TERVALIDASI konsisten antar-lokasi (residu
+  /// 0-4 menit, bukan sampai 2 jam spt sebelum perbaikan).
   double hitungJamIjtimakSync({
     required int tahunHijriah,
     required int bulanTarget,
@@ -784,7 +833,8 @@ class HisabTashilulAmtsilahService {
     final acuan = jamAcuanBI7(
       row17WsMatahariDecimal: keDesimal(row17['ws_matahari']!),
       bujurMatahariFinal: bujurMatahari, deklinasiFinal: _deklinasiDariBujur(bujurMatahari),
-      lintang: lintang, bujurLokasi: bujurLokasi, zonaWaktuJam: zonaWaktuJam, elevasiMeter: elevasiMeter,
+      lintang: lintang, bujurLokasi: bujurLokasi, zonaWaktuJam: zonaWaktuJam,
+      elevasiMeter: elevasiMeter,
     );
     return jamIjtimak(
       bi7: acuan.bi7, bujurBulanFinal: rantaiBulan.bujurBulanFinal,

@@ -7,17 +7,21 @@ import 'hisab_tashilul_amtsilah_service.dart';
 /// & tabel_ijtimak_screen.dart (berbasis `ijtimakUtc`, konsisten dgn
 /// As-Syahru/Meeus).
 ///
-/// Konversi Hijriah<->Masehi SEPENUHNYA MANDIRI (kalender tabular, lihat
-/// `jdnDariHijriah`/`hijriahDariJdn`/dst di HisabTashilulAmtsilahService)
-/// -- TIDAK lagi menumpang HijriService/metode lain sbg jangkar tanggal.
-/// Tervalidasi round-trip & thd kasus uji (selisih 1-2 hari dari kalender
-/// tabular murni vs hisab sesungguhnya, wajar & diterima).
+/// CATATAN PENTING (2 bug ditemukan & diperbaiki setelah laporan pengguna
+/// ttg tinggi hilal ~24-32° yg tidak masuk akal):
+/// 1. `tanggalHisab` BUKAN konstanta 30 -- bervariasi per bulan (kitab
+///    klasik mengandalkan penghitung manusia memperkirakan tanggal awal
+///    yg dekat ijtimak sesungguhnya). Diperbaiki via
+///    `cariTanggalHisabOptimal()` (cari otomatis, bukan asumsi tetap).
+/// 2. Konversi kalender tabular MANDIRI (jdnDariHijriah/hijriahDariJdn)
+///    py drift beberapa hari dari hisab sesungguhnya -- BISA menyeberang
+///    batas bulan scr keliru (bulan salah total, bukan cuma tanggal).
+///    Diperbaiki via verifikasi: cek 3 bulan kandidat (tabular-1, tabular,
+///    tabular+1), pilih yg jam-ijtimak-hasil-Tashilul-nya PALING DEKAT ke
+///    [ijtimakUtc] yg diberikan (bukan percaya konversi tabular begitu saja).
 class TashilulAmtsilahAdapter {
   TashilulAmtsilahAdapter._();
 
-  /// WAJIB dipanggil (await) sekali sebelum [hitung]/[hitungJamIjtimakSaja]/
-  /// [cariIjtimakUtc] dipakai -- lihat pemanggilan di initState
-  /// hisab_awal_bulan_screen.dart & tabel_ijtimak_screen.dart.
   static Future<void> muatData() => HisabTashilulAmtsilahService.instance.muatDataAwal();
 
   static bool get sudahSiap => HisabTashilulAmtsilahService.instance.sudahSiap;
@@ -32,25 +36,67 @@ class TashilulAmtsilahAdapter {
     required double elevasiM,
     required int utcOffset,
   }) {
-    // Cari tahun & bulan Hijriah dari ijtimakUtc via konversi kalender
-    // tabular MANDIRI (bukan lagi lewat HijriService). Ijtimak yg diberikan
-    // adalah AWAL bulan target -- konversi tanggal beberapa jam setelahnya
-    // supaya pasti sudah masuk bulan target, bukan akhir bulan sebelumnya.
-    final tanggalSetelahIjtimak = ijtimakUtc.add(Duration(hours: utcOffset + 6));
-    final jdn = HisabTashilulAmtsilahService.masehiKeJdn(tanggalSetelahIjtimak);
-    final hijri = HisabTashilulAmtsilahService.hijriahDariJdn(jdn);
-
-    return HisabTashilulAmtsilahService.instance.hitungLengkapSync(
-      tahunHijriah: hijri.tahunH,
-      bulanTarget: hijri.bulanH,
-      tanggalHisab: 30, // konvensi: hisab dari tanggal 30 bulan sebelumnya
+    final (tahunH, bulanH) = _cariBulanTerbaik(
+      ijtimakUtc: ijtimakUtc, lat: lat, lng: lng, elevasiM: elevasiM, utcOffset: utcOffset,
+    );
+    final layanan = HisabTashilulAmtsilahService.instance;
+    final tanggalHisab = layanan.cariTanggalHisabOptimal(tahunHijriah: tahunH, bulanTarget: bulanH);
+    return layanan.hitungLengkapSync(
+      tahunHijriah: tahunH, bulanTarget: bulanH, tanggalHisab: tanggalHisab,
       lintang: lat, bujurLokasi: lng, zonaWaktuJam: utcOffset.toDouble(), elevasiMeter: elevasiM,
     );
   }
 
+  /// Cari (tahunH,bulanH) yg PALING SESUAI dgn [ijtimakUtc] -- tebakan awal
+  /// dari konversi tabular, lalu diverifikasi (& dikoreksi kalau perlu)
+  /// dgn membandingkan jam-ijtimak-hasil-Tashilul thd 3 kandidat bulan
+  /// (tabular-1, tabular, tabular+1), pilih yg SELISIHNYA PALING KECIL.
+  static (int, int) _cariBulanTerbaik({
+    required DateTime ijtimakUtc,
+    required double lat,
+    required double lng,
+    required double elevasiM,
+    required int utcOffset,
+  }) {
+    final tanggalSetelahIjtimak = ijtimakUtc.add(Duration(hours: utcOffset + 6));
+    final jdn = HisabTashilulAmtsilahService.masehiKeJdn(tanggalSetelahIjtimak);
+    final tebakan = HisabTashilulAmtsilahService.hijriahDariJdn(jdn);
+
+    (int, int) geserBulan(int tahunH, int bulanH, int geser) {
+      var b = bulanH + geser;
+      var t = tahunH;
+      if (b < 1) { b += 12; t -= 1; }
+      if (b > 12) { b -= 12; t += 1; }
+      return (t, b);
+    }
+
+    (int, int)? terbaik;
+    Duration? selisihTerbaik;
+    for (final geser in [-1, 0, 1]) {
+      final (t, b) = geserBulan(tebakan.tahunH, tebakan.bulanH, geser);
+      if (t < HisabTashilulAmtsilahService.tahunHijriahMinimum ||
+          t > HisabTashilulAmtsilahService.tahunHijriahMaksimum) {
+        continue;
+      }
+      try {
+        final ijtimakKandidat = cariIjtimakUtc(
+          tahunH: t, bulanH: b, lat: lat, lng: lng, elevasiM: elevasiM, utcOffset: utcOffset,
+        );
+        final selisih = ijtimakKandidat.difference(ijtimakUtc).abs();
+        if (selisihTerbaik == null || selisih < selisihTerbaik) {
+          terbaik = (t, b);
+          selisihTerbaik = selisih;
+        }
+      } catch (_) {
+        // Kandidat ini gagal (mis. di luar rentang tabel) -- lewati.
+      }
+    }
+    return terbaik ?? (tebakan.tahunH, tebakan.bulanH);
+  }
+
   /// Jam ijtimak (desimal, zona lokal [utcOffset]) MURNI hasil Tashilul
-  /// Amtsilah sendiri -- dipakai layar Tabel Ijtimak (kolom perbandingan),
-  /// TERPISAH dari [hitung] di atas.
+  /// Amtsilah sendiri -- dipakai layar Tabel Ijtimak (kolom perbandingan)
+  /// & pencarian bulan terbaik di atas. TERPISAH dari [hitung].
   static double hitungJamIjtimakSaja({
     required int tahunH,
     required int bulanH,
@@ -59,8 +105,10 @@ class TashilulAmtsilahAdapter {
     required double elevasiM,
     required int utcOffset,
   }) {
-    return HisabTashilulAmtsilahService.instance.hitungJamIjtimakSync(
-      tahunHijriah: tahunH, bulanTarget: bulanH, tanggalHisab: 30,
+    final layanan = HisabTashilulAmtsilahService.instance;
+    final tanggalHisab = layanan.cariTanggalHisabOptimal(tahunHijriah: tahunH, bulanTarget: bulanH);
+    return layanan.hitungJamIjtimakSync(
+      tahunHijriah: tahunH, bulanTarget: bulanH, tanggalHisab: tanggalHisab,
       lintang: lat, bujurLokasi: lng, zonaWaktuJam: utcOffset.toDouble(), elevasiMeter: elevasiM,
     );
   }
@@ -68,8 +116,7 @@ class TashilulAmtsilahAdapter {
   /// Ijtimak sbg DateTime UTC penuh, SEPENUHNYA MANDIRI hasil Tashilul
   /// Amtsilah sendiri -- tanggal dari konversi kalender tabular sendiri
   /// (`jdnDariHijriah`), jam dari [hitungJamIjtimakSaja]. Dipakai layar
-  /// Tabel Ijtimak (SAMA pola dgn cariIjtimakUtc 3 metode lain, masing2
-  /// py cara sendiri cari tanggal+jam independen).
+  /// Tabel Ijtimak & pencarian bulan terbaik di atas.
   static DateTime cariIjtimakUtc({
     required int tahunH,
     required int bulanH,
@@ -78,8 +125,6 @@ class TashilulAmtsilahAdapter {
     required double elevasiM,
     required int utcOffset,
   }) {
-    // Tanggal Masehi utk "awal bulan bulanH" -- via kalender tabular
-    // mandiri, hari ke-1 bulan itu.
     final jdnAwalBulanIni = HisabTashilulAmtsilahService.jdnDariHijriah(
       tahunH: tahunH, bulanH: bulanH, tanggalH: 1,
     );
@@ -90,8 +135,6 @@ class TashilulAmtsilahAdapter {
     );
     final jamBulat = jamLokal.floor();
     final menit = ((jamLokal - jamBulat) * 60).round();
-    // Jam ijtimak yg dihitung mengacu ke maghrib SEBELUM tanggal 1 bulan
-    // ini (akhir bulan sebelumnya) -- mundur 1 hari dari tanggalMasehi.
     final tanggalIjtimak = tanggalMasehi.subtract(const Duration(days: 1));
     final ijtimakLokal = DateTime(tanggalIjtimak.year, tanggalIjtimak.month, tanggalIjtimak.day, jamBulat, menit);
     return ijtimakLokal.subtract(Duration(hours: utcOffset));

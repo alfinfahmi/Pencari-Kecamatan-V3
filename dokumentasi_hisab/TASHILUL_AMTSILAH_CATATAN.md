@@ -109,3 +109,99 @@ utk kalender tabular murni vs hisab sesungguhnya):
   - 1 Muharram 1421H -> 6 April 2000 (referensi umum ~5 April 2000)
   - 30 Muharram 1448H -> 16 Juli 2026 (referensi kasus uji ~14 Juli 2026)
 
+
+## Sesi lanjutan: 2 bug SERIUS ditemukan & diperbaiki (laporan tinggi hilal ~24-32° janggal)
+
+Pengguna melaporkan tinggi hilal tidak masuk akal (~24°) saat mengecek bulan
+berjalan di aplikasi. Ditelusuri sampai ketemu 2 bug BERBEDA di `tashilul_amtsilah_adapter.dart`:
+
+**Bug #1 -- `tanggalHisab` BUKAN konstanta 30**: kode lama selalu memakai
+tanggalHisab=30 utk SEMUA bulan. Ternyata ini cuma kebetulan cocok utk kasus
+uji asli (Shafar 1448H) -- utk bulan lain, ijtimak sesungguhnya bisa jatuh
+di tanggal 27-29. DIPERBAIKI: `cariTanggalHisabOptimal()` (fungsi baru di
+`HisabTashilulAmtsilahService`) mencari tanggal yg memberi selisih bujur
+bulan-matahari (mean, row10) PALING DEKAT nol, bukan asumsi tetap.
+
+**Bug #2 -- konversi kalender tabular bisa salah pilih BULAN**: konversi
+Masehi->Hijriah mandiri (dari sesi sebelumnya) py drift beberapa hari yg
+BISA menyeberang batas bulan (bukan cuma batas tanggal). DIPERBAIKI:
+`TashilulAmtsilahAdapter._cariBulanTerbaik()` sekarang MEMVERIFIKASI tebakan
+tabular dgn membandingkan 3 kandidat bulan (tabular-1, tabular, tabular+1)
+-- pilih yg jam-ijtimak-hasil-Tashilul-nya PALING DEKAT ke `ijtimakUtc` yg
+diberikan (bukan percaya konversi tabular begitu saja).
+
+**Hasil validasi** (skenario nyata: ijtimak 11 September 2026, 03:27 UTC,
+markaz Kediri): sebelum perbaikan tinggi hilal hakiki=25,05° (SALAH), setelah
+perbaikan=13,70° (MASUK AKAL, konsisten dgn skenario hilal muda).
+
+**Dampak ke fungsi lain**: `cariIjtimakUtc()`, `hitungJamIjtimakSaja()`, dan
+`hitung()` di adapter SEMUA memakai `cariTanggalHisabOptimal()` sekarang
+(bukan lagi tanggalHisab=30 tetap).
+
+## Sesi lanjutan: Jam ijtima berbeda drastis antar-lokasi (Aceh -71 menit dari Kediri)
+
+Pengguna menemukan jam ijtimak Tashilul BERBEDA JAUH tergantung lokasi
+perhitungan (diuji: Kediri 16:39, Aceh 15:28 WIB -- selisih 71 menit utk
+kasus uji yg SAMA persis, hanya beda markaz).
+
+**Akar masalah (dibuktikan lewat uji terpisah)**: 99% dari selisih berasal
+dari BUJUR lokasi (cuma 0,5 menit dari lintang). Baris 12-13 (`T12`/`T13`,
+kunci `N12=(112-bujurLokasi)/15`) memproyeksikan posisi rata-rata
+matahari/bulan maju/mundur berdasar selisih bujur thd 112° -- sehingga
+`bujurMatahariFinal` (nilai ASTRONOMIS, bukan cuma jam) BERBEDA tergantung
+markaz yg dipakai (dibuktikan: 112,9694° utk Kediri vs 113,0143° utk Aceh,
+PADAHAL tanggal targetnya SAMA PERSIS!). Koreksi `N12` di rumus akhir
+(`BI14=BI7+selisih/laju-N12`) TIDAK sepenuhnya membatalkan efek ini.
+
+**Penjelasan konseptual**: sistem klasik Tashilul Amtsilah menghitung
+"ijtima seperti diproyeksikan dari maghrib LOKASI ANDA" -- bukan momen UTC
+universal yg dikonversi zona waktu. Ini WAJAR utk kitab yg dirancang dipakai
+dari 1 markaz tetap (Kediri), tapi jadi masalah kalau dipakai lintas-lokasi.
+
+**PERBAIKAN**: `hitungJamIjtimakSync()`/`hitungJamIjtimak()` di
+`HisabTashilulAmtsilahService` SEKARANG SELALU memakai markaz REFERENSI
+TETAP (`_markazRefLintang`/`_markazRefBujur`/`_markazRefElevasi`, markaz
+Badas Kab. Kediri) utk perhitungan POSISI/geometri-nya, TERLEPAS dari
+lokasi yg diberikan pemanggil -- HANYA `zonaWaktuJam` yg tetap dihormati
+(hasil akhir dlm zona waktu pemanggil). TERVALIDASI: Kediri, Aceh, Kayu
+Agung (semua WIB) SEKARANG memberi jam ijtimak SAMA PERSIS (16:39 WIB),
+sesuai sifat astronomis ijtima yg sesungguhnya (1 momen UTC, sama di
+manapun, cuma beda tampilan kalau BEDA ZONA WAKTU).
+
+**PENTING -- yg TIDAK diubah (sengaja)**: `hitungLengkapSync()` (laporan
+hilal lengkap: deklinasi, tinggi hilal, elongasi, azimut) TETAP memakai
+lokasi PENGGUNA sesungguhnya -- ini BENAR & harus tetap beda per lokasi
+(tinggi hilal di Aceh vs Kediri MEMANG seharusnya berbeda, itu bukan bug).
+Yg diperbaiki HANYA "jam ijtimak"-nya (`hitungJamIjtimakSync`/
+`hitungJamIjtimak`, dipakai Tabel Ijtimak & pencarian bulan di adapter),
+bukan seluruh sistem.
+
+**Dampak ke adapter**: `TashilulAmtsilahAdapter.cariIjtimakUtc()` &
+`hitungJamIjtimakSaja()` OTOMATIS ikut benar (keduanya memanggil
+`hitungJamIjtimakSync` yg sudah diperbaiki), TANPA perlu ubah kode adapter.
+
+## Sesi lanjutan: Solusi lebih baik ditemukan -- HAPUS pengurangan N12 ganda
+
+Setelah perbaikan "markaz referensi tetap" sebelumnya (efektif tapi mengunci
+lokasi ke Kediri), pengguna menanyakan apakah bisa TETAP pakai geometri
+lokal tapi dikoreksi supaya konsisten. Jawabannya: BISA, dan lebih elegan.
+
+**Akar masalah SESUNGGUHNYA**: `N12` (koreksi selisih bujur thd 112°)
+dihitung DUA KALI -- sekali scr implisit lewat baris12/13 (`T12`/`T13`,
+proyeksi posisi rata-rata), sekali lagi eksplisit dikurangkan di rumus
+`BI14`. Pengurangan ganda inilah penyebab selisih sampai ~2 jam, BUKAN
+sekadar "sistem ini memang location-dependent by design" seperti dugaan
+sesi sebelumnya.
+
+**PERBAIKAN**: `jamIjtimak()` di `HisabTashilulAmtsilahService` -- rumus
+BI14 diubah dari `bi7+selisih/laju-n12` jadi `bi7+selisih/laju` (hapus
+`-n12`). `hitungJamIjtimakSync()` DIKEMBALIKAN memakai lokasi PEMANGGIL
+sepenuhnya (BUKAN lagi markaz referensi tetap -- konstanta `_markazRefXxx`
+DIHAPUS).
+
+**TERVALIDASI** (banyak kombinasi bulan/tahun/lokasi): residu antar-lokasi
+turun jadi 0-4 menit (dari sampai 2 jam), SAMBIL tetap memakai geometri
+lokasi asli sepenuhnya -- TANPA markaz referensi tetap. Solusi ini
+MENGGANTIKAN pendekatan "markaz tetap" sesi sebelumnya (yg tetap valid
+scr teknis, tapi solusi ini lebih sesuai filosofi asli kitab & lebih
+sederhana).
