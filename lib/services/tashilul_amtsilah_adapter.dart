@@ -26,6 +26,41 @@ class TashilulAmtsilahAdapter {
 
   static bool get sudahSiap => HisabTashilulAmtsilahService.instance.sudahSiap;
 
+  /// Selisih hari (offset) antara [tanggalHisabManual] yg dipilih dgn
+  /// tanggal-hisab OTOMATIS ([cariTanggalHisabOptimal]) utk bulan/tahun
+  /// yg sama -- dipakai `hisab_awal_bulan_screen.dart` utk MENGGESER
+  /// tanggal baseline ("hariIjtimakSaja") sesuai malam yg SESUNGGUHNYA
+  /// dievaluasi tanggalHisab tsb.
+  ///
+  /// PENTING (bug ditemukan lewat laporan pengguna: kenapa tanggalHisab
+  /// 28 vs 29/30 bisa beda hasil "Awal Bulan" drastis?): tanggalHisab
+  /// TIDAK sekadar "variasi presisi kecil dari malam yg SAMA" -- ia
+  /// memilih MALAM YG BERBEDA (berjarak persis 1 hari kalender per unit
+  /// tanggalHisab). SEBELUM perbaikan ini, layar selalu memakai tanggal
+  /// baseline dari ijtimak BERSAMA (HijriService, TIDAK ikut geser sesuai
+  /// tanggalHisab Tashilul) -- membuat SEMUA pilihan tanggalHisab
+  /// dibandingkan thd baseline yg SAMA, padahal semestinya baseline-nya
+  /// SENDIRI harus ikut geser.
+  ///
+  /// Kalau [tanggalHisabManual] null (mode Otomatis), fungsi ini
+  /// mengembalikan 0 (tanpa geseran, krn sudah otomatis benar).
+  static int offsetHariTanggalHisab({
+    required DateTime ijtimakUtc,
+    required double lat,
+    required double lng,
+    required double elevasiM,
+    required int utcOffset,
+    int? tanggalHisabManual,
+  }) {
+    if (tanggalHisabManual == null) return 0;
+    final (tahunH, bulanH) = _cariBulanTerbaik(
+      ijtimakUtc: ijtimakUtc, lat: lat, lng: lng, elevasiM: elevasiM, utcOffset: utcOffset,
+    );
+    final layanan = HisabTashilulAmtsilahService.instance;
+    final otomatis = layanan.cariTanggalHisabOptimal(tahunHijriah: tahunH, bulanTarget: bulanH);
+    return tanggalHisabManual - otomatis;
+  }
+
   /// Cocok dgn tipe `HasilHisabDetail Function({required DateTime ijtimakUtc,
   /// required double lat, required double lng, required double elevasiM,
   /// required int utcOffset})` yg dipakai `_metodeList`.

@@ -286,3 +286,66 @@ Berguna KHUSUS utk kasus spt Jumadil Ula 1448H, di mana selisih posisi
 rata-rata (mean position) menyarankan 1 tanggal, tapi selisih PASCA-KOREKSI
 bisa jauh berbeda -- membiarkan pengguna (ahli falak) membandingkan 28/29/30
 scr manual & memakai penilaian sendiri, PERSIS spt tradisi kitab asli.
+
+## Sesi lanjutan: Z,A (input rumus ijtima) dikunci ke markaz Kediri -- residu 0-4 menit jadi NOL
+
+Setelah perbaikan pengurangan-N12-ganda (rumus BI14 sendiri sudah benar:
+C+(Z-A)/(F-W), sesuai konfirmasi notasi asli kitab dari pengguna), masih
+ada residu 0-4 menit antar lokasi. Ditelusuri: Z (bujur matahari) & A
+(bujur bulan) -- INPUT ke rumus itu sendiri -- masih sedikit bergeser
+antar lokasi (sampai 0,91 derajat), krn `rantaiMeanTafawutProyeksi`
+(baris 10-17) MEMANG dirancang memproyeksikan posisi mendekati "momen
+maghrib LOKASI tsb" (lewat T12/T13 berbasis bujur & T14/T15 berbasis
+lintang). Proyeksi ini BENAR & perlu utk laporan hilal (tinggi hilal
+MEMANG harus dekat maghrib lokal Anda), tapi jadi sumber residu kalau
+dipakai jg utk mencari ijtima (1 momen astronomis yg semestinya sama di
+manapun dihitung).
+
+**PERBAIKAN**: `hitungJamIjtimakSync()` SEKARANG mengunci lintang/
+bujurLokasi/elevasiMeter ke markaz referensi TETAP (`_markazRefLintang`=
+-7,7130861, `_markazRefBujur`=112,205775, `_markazRefElevasi`=111 --
+markaz Badas, Kab. Kediri, markaz asli kitab) utk SELURUH rantai Z,A,C,F,W
+-- `zonaWaktuJam` TETAP dihormati (hasil akhir dlm zona waktu pemanggil).
+
+**PENTING -- TIDAK diubah**: `hitungLengkapSync()` (laporan hilal
+lengkap) TETAP memakai lokasi pemanggil sepenuhnya -- SENGAJA, krn
+tinggi hilal/deklinasi/elongasi/azimut MEMANG harus mencerminkan lokasi
+pengamat sesungguhnya, bukan markaz Kediri.
+
+TERVALIDASI (Python replikasi rumus): Kediri, Aceh, Jayapura (markaz
+BEDA jauh) SEKARANG memberi jam ijtima IDENTIK (0,00 detik selisih,
+bukan lagi 0-4 menit) setelah dikonversi ke zona waktu yg sama. File
+Excel jg diperbarui dgn pendekatan setara (sheet "Hisab Ijtimak (Acuan
+Kediri)" + "Data (Acuan Kediri)").
+
+## Sesi lanjutan: Bug baseline tanggal tdk ikut geser sesuai tanggalHisab manual
+
+Pengguna melaporkan kejanggalan: pilih tanggalHisab=28 -> "Awal Rabiul Akhir"
+= Ahad, tapi 29/30 -> Sabtu (SATU HARI LEBIH AWAL dari 28, padahal 29/30
+adalah malam yg LEBIH BELAKANGAN). Ditelusuri: BUKAN krn jam ijtimak (semua
+kandidat sama2 pagi, dekat), tapi krn kriteria MABIMS: tanggalHisab=28
+(tinggi ~2 derajat) -> TIDAK memenuhi -> istikmal (+2 hari dari baseline).
+tanggalHisab=29/30 (tinggi 13-25 derajat) -> MEMENUHI -> +1 hari dari
+baseline. MASALAHNYA: baseline ("hariIjtimakSaja" di
+hisab_awal_bulan_screen.dart) SELALU dari ijtimak BERSAMA (HijriService),
+TIDAK IKUT GESER sesuai tanggalHisab yg dipilih -- padahal tanggalHisab
+28/29/30 SESUNGGUHNYA mengevaluasi 3 MALAM YG BERBEDA (berjarak 1 hari
+kalender persis per unit tanggalHisab, BUKAN variasi presisi kecil dari
+malam yg sama).
+
+**PERBAIKAN**: `TashilulAmtsilahAdapter.offsetHariTanggalHisab()` (baru)
+menghitung selisih hari antara tanggalHisab yg dipilih dgn tanggalHisab
+OTOMATIS ([cariTanggalHisabOptimal]) utk bulan yg sama. `hisab_awal_bulan_
+screen.dart` memakai offset ini utk MENGGESER `hariIjtimakSaja` (baseline)
+KHUSUS utk Tashilul, sebelum menghitung +1/+2 hari.
+
+TERVALIDASI (kasus Rabiul Akhir 1448H, tanggalHisab otomatis=28):
+- tanggalHisab=28 (istikmal, offset=0): tanggal1 = Ahad, 13 Sept 2026
+- tanggalHisab=29 (visible, offset=+1): tanggal1 = Ahad, 13 Sept 2026 (SAMA!)
+- tanggalHisab=30 (visible, offset=+2): tanggal1 = Senin, 14 Sept 2026
+
+28 & 29 SEKARANG KONVERGEN ke tanggal yg SAMA -- ini justru sifat yg
+BENAR/diharapkan: 2 malam berurutan (istikmal lalu visible) semestinya
+SEPAKAT soal tanggal 1 bulan baru, bukan berkontradiksi spt sebelumnya.
+30 bergeser 1 hari lebih lambat krn scr definisi sudah "terlambat" --
+bulan baru sesungguhnya sudah ditentukan mulai sebelum malam ke-30 tiba.

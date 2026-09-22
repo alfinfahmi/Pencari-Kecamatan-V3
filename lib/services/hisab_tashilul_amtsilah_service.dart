@@ -802,6 +802,14 @@ class HisabTashilulAmtsilahService {
     );
   }
 
+  /// Markaz REFERENSI TETAP (Badas, Kab. Kediri -- markaz asli kitab
+  /// Tashilul Amtsilah). Dipakai KHUSUS oleh [hitungJamIjtimakSync] utk
+  /// mengunci Z (bujur matahari), A (bujur bulan), C (jam acuan/BI7), F,W
+  /// (laju) ke SATU acuan tetap -- lihat catatan lengkap di fungsi tsb.
+  static const double _markazRefLintang = -7.7130861;
+  static const double _markazRefBujur = 112.205775;
+  static const double _markazRefElevasi = 111;
+
   /// Fungsi ringkas KHUSUS jam ijtimak saja (tanpa laporan hilal lengkap)
   /// -- dipakai layar Tabel Ijtimak (perbandingan 3 metode + Tashilul).
   Future<double> hitungJamIjtimak({
@@ -821,11 +829,28 @@ class HisabTashilulAmtsilahService {
   }
 
   /// Versi SINKRON dari [hitungJamIjtimak] -- WAJIB [muatDataAwal] dulu.
-  /// Memakai lokasi PEMANGGIL sepenuhnya (lintang/bujurLokasi/elevasiMeter)
-  /// -- TIDAK lagi dikunci ke markaz referensi tetap. Lihat catatan di
-  /// [jamIjtimak] utk penjelasan kenapa ini sekarang aman (perbaikan
-  /// pengurangan-N12-ganda), TERVALIDASI konsisten antar-lokasi (residu
-  /// 0-4 menit, bukan sampai 2 jam spt sebelum perbaikan).
+  ///
+  /// CATATAN PENTING (temuan lanjutan, sesi setelah perbaikan pengurangan-
+  /// N12-ganda): meski rumus BI14 sendiri sudah benar (C+(Z-A)/(F-W),
+  /// tanpa N12 tambahan), Z (bujur matahari) & A (bujur bulan) -- input ke
+  /// rumus itu -- SENDIRI masih sedikit bergeser antar lokasi. Sebabnya:
+  /// Z,A dihitung lewat `rantaiMeanTafawutProyeksi` (baris 10-17), yg
+  /// MEMANG dirancang memproyeksikan posisi mendekati "momen maghrib
+  /// LOKASI tsb" (lewat T12/T13 berbasis bujur & T14/T15 berbasis
+  /// lintang) -- proyeksi ini BENAR & perlu utk laporan hilal (tinggi
+  /// hilal MEMANG harus dihitung dekat maghrib lokal Anda), tapi
+  /// menyisakan residu ~0-4 menit kalau dipakai jg utk mencari ijtima
+  /// (yg semestinya 1 momen sama di manapun dihitung).
+  ///
+  /// FUNGSI INI SEKARANG mengunci [lintang]/[bujurLokasi]/[elevasiMeter]
+  /// ke markaz referensi TETAP ([_markazRefLintang] dst, markaz asli
+  /// kitab) utk SELURUH rantai Z,A,C,F,W -- menghilangkan residu tsb
+  /// SEPENUHNYA (tervalidasi: 0,00 detik selisih antar lokasi, vs 0-4
+  /// menit sebelumnya). [zonaWaktuJam] TETAP dihormati (hasil akhir dlm
+  /// zona waktu PEMANGGIL) -- HANYA geometri/posisinya yg dikunci.
+  /// [hitungLengkapSync] (laporan hilal lengkap) TIDAK diubah & TETAP
+  /// memakai lokasi pemanggil sepenuhnya -- SENGAJA, krn tinggi hilal
+  /// memang harus mencerminkan lokasi pengamat sesungguhnya.
   double hitungJamIjtimakSync({
     required int tahunHijriah,
     required int bulanTarget,
@@ -838,7 +863,7 @@ class HisabTashilulAmtsilahService {
     assert(_dimuat, 'Panggil muatDataAwal() (await) dulu sebelum hitungJamIjtimakSync().');
     final row17 = rantaiMeanTafawutProyeksi(
       tahunHijriah: tahunHijriah, bulanTarget: bulanTarget, tanggalHisab: tanggalHisab,
-      lintang: lintang, bujurLokasi: bujurLokasi,
+      lintang: _markazRefLintang, bujurLokasi: _markazRefBujur,
     );
     final bujurMatahari = bujurMatahariFinal(row17);
     final rantaiBulan = rantaiBulanLengkap(row17: row17, bujurMatahariFinal: bujurMatahari);
@@ -851,12 +876,12 @@ class HisabTashilulAmtsilahService {
     final acuan = jamAcuanBI7(
       row17WsMatahariDecimal: keDesimal(row17['ws_matahari']!),
       bujurMatahariFinal: bujurMatahari, deklinasiFinal: _deklinasiDariBujur(bujurMatahari),
-      lintang: lintang, bujurLokasi: bujurLokasi, zonaWaktuJam: zonaWaktuJam,
-      elevasiMeter: elevasiMeter,
+      lintang: _markazRefLintang, bujurLokasi: _markazRefBujur, zonaWaktuJam: zonaWaktuJam,
+      elevasiMeter: _markazRefElevasi,
     );
     return jamIjtimak(
       bi7: acuan.bi7, bujurBulanFinal: rantaiBulan.bujurBulanFinal,
-      bujurMatahariFinal: bujurMatahari, laju: laju - bi12, bujurLokasi: bujurLokasi,
+      bujurMatahariFinal: bujurMatahari, laju: laju - bi12, bujurLokasi: _markazRefBujur,
     );
   }
 

@@ -317,7 +317,21 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           );
 
     final bulanSebelumnyaH = bulanH == 1 ? 12 : bulanH - 1;
-    final hariIjtimakSaja = DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day);
+    // Tashilul Amtsilah + tanggalHisab manual: geser baseline sesuai malam
+    // yg SESUNGGUHNYA dievaluasi tanggalHisab tsb (lihat catatan di
+    // TashilulAmtsilahAdapter.offsetHariTanggalHisab) -- SEBELUM perbaikan
+    // ini, baseline SELALU dari ijtimak bersama, tdk ikut geser sesuai
+    // tanggalHisab, membuat hasil "Awal Bulan" antar pilihan 28/29/30
+    // tampak melompat tdk konsisten.
+    final offsetHari = namaMetode == 'Tashilul Amtsilah'
+        ? TashilulAmtsilahAdapter.offsetHariTanggalHisab(
+            ijtimakUtc: ijtimakUtc, lat: lokasi.lat, lng: lokasi.lng,
+            elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
+            tanggalHisabManual: _tashilulTanggalHisabManual,
+          )
+        : 0;
+    final hariIjtimakSaja =
+        DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day).add(Duration(days: offsetHari));
     final tanggal1 = hasil.memenuhiMabims2021
         ? hariIjtimakSaja.add(const Duration(days: 1))
         : hariIjtimakSaja.add(const Duration(days: 2));
