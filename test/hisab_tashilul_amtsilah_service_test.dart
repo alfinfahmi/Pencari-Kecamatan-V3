@@ -71,14 +71,16 @@ void main() {
       expect(hasil.deklinasiMatahari, closeTo(21.4936, 0.001));
     });
 
-    test('azimut matahari & bulan dekat referensi (konvensi standar)', () async {
+    test('azimut matahari & bulan dekat referensi (konvensi Barat-Utara/BU)', () async {
       final hasil = await layanan.hitungLengkap(
         tahunHijriah: 1448, bulanTarget: 2, tanggalHisab: 30,
         lintang: lintang, bujurLokasi: bujurLokasi, zonaWaktuJam: zonaWaktu, elevasiMeter: elevasi,
       );
-      // Referensi file (konvensi Barat-ke-Utara) + 270 = konvensi standar
-      expect(hasil.azimutMatahari, closeTo(291.5366, 0.01));
-      expect(hasil.azimutBulan, closeTo(293.2267, 0.01));
+      // Referensi file asli (konvensi Barat-ke-Utara, BUKAN lagi
+      // dikonversi +270 ke standar -- diseragamkan dgn Meeus/As-Syahru/MPT
+      // setelah perbaikan bug tanda azimut, lihat TASHILUL_AMTSILAH_CATATAN.md).
+      expect(hasil.azimutMatahari, closeTo(21.5366, 0.01));
+      expect(hasil.azimutBulan, closeTo(23.2267, 0.01));
     });
   });
 
