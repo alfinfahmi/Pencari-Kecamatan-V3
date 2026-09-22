@@ -627,7 +627,17 @@ class HisabTashilulAmtsilahService {
     final cd7 = math.asin(math.sin(argLintangF * math.pi / 180) * math.sin(maksInklinasi * math.pi / 180)) * 180 / math.pi;
 
     const obliquity = 23.45;
-    final cd9 = math.atan(math.cos(obliquity * math.pi / 180) * math.tan(bujurMatahariFinal * math.pi / 180)) * 180 / math.pi;
+    // TERVERIFIKASI PENTING: pakai atan2 (bukan atan polos) supaya kuadran
+    // BENAR utk SEMUA posisi bujur -- atan polos (versi lama) bisa meleset
+    // 180° utk kombinasi tertentu (ditemukan lewat uji 12 lokasi: markaz
+    // Kupang, 1447H Rajab, memberi elongasi 128° yg salah -- seharusnya
+    // ~6°). atan2(y,x) di Dart mengikuti konvensi matematika standar.
+    final cd9 = math.atan2(
+          math.cos(obliquity * math.pi / 180) * math.sin(bujurMatahariFinal * math.pi / 180),
+          math.cos(bujurMatahariFinal * math.pi / 180),
+        ) *
+        180 /
+        math.pi;
     final ho = _hoStandar(elevasiMeter);
     final lat = lintang * math.pi / 180;
     final dek = deklinasiMatahariFinal * math.pi / 180;
@@ -635,10 +645,10 @@ class HisabTashilulAmtsilahService {
     final cosH = -math.tan(lat) * math.tan(dek) + math.sin(dep) / math.cos(lat) / math.cos(dek);
     final cd18 = math.acos(cosH.clamp(-1.0, 1.0)) * 180 / math.pi;
 
-    final cd12 = math.atan(
-          (math.sin(bujurBulanFinal * math.pi / 180) * math.cos(obliquity * math.pi / 180) -
-              math.tan(cd7 * math.pi / 180) * math.sin(obliquity * math.pi / 180)) /
-              math.cos(bujurBulanFinal * math.pi / 180),
+    final cd12 = math.atan2(
+          math.sin(bujurBulanFinal * math.pi / 180) * math.cos(obliquity * math.pi / 180) -
+              math.tan(cd7 * math.pi / 180) * math.sin(obliquity * math.pi / 180),
+          math.cos(bujurBulanFinal * math.pi / 180),
         ) *
         180 /
         math.pi;
@@ -755,8 +765,16 @@ class HisabTashilulAmtsilahService {
       return r;
     }
 
-    final azimutMatahari = mod360(270 + azimutMatahariMentah);
-    final azimutBulan = mod360(270 + azimutBulanMentah);
+    // PERBAIKAN KONSISTENSI (sinkron dgn Meeus/As-Syahru/MPT -- lihat
+    // catatan di service tsb): dulu dikonversi ke standar "dari Utara"
+    // (mod360(270+...)) tapi layar (hisab_awal_bulan_screen.dart) label-nya
+    // "BU"/"BS" (konvensi dari Barat, bertanda) -- SEKARANG dipakai
+    // LANGSUNG nilai mentahnya (sudah persis konvensi BU: + ke Utara,
+    // - ke Selatan), TANPA konversi 270+mod360, supaya konsisten dgn 3
+    // metode lain & label BU/BS di layar benar. jarakAzimut TIDAK berubah
+    // nilainya (pergeseran konstan 270 saling meniadakan saat dikurangkan).
+    final azimutMatahari = azimutMatahariMentah;
+    final azimutBulan = azimutBulanMentah;
     final jarakAzimut = azimutBulan - azimutMatahari;
     final lamaHilalJam = hilal.tinggiHilalMari / 15;
     final ghurubHilalJam = acuan.bi7 + lamaHilalJam;

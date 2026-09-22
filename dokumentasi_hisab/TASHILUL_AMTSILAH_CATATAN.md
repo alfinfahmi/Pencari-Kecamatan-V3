@@ -205,3 +205,84 @@ lokasi asli sepenuhnya -- TANPA markaz referensi tetap. Solusi ini
 MENGGANTIKAN pendekatan "markaz tetap" sesi sebelumnya (yg tetap valid
 scr teknis, tapi solusi ini lebih sesuai filosofi asli kitab & lebih
 sederhana).
+
+## Sesi lanjutan: Bug kuadran CD9/CD12 -- Elongasi/Tinggi Hilal bisa salah 180 derajat
+
+Ditemukan lewat uji 12 kombinasi bulan/lokasi/tahun: `hilalLengkap()` memakai
+`atan()` polos (bukan `atan2`) utk asensiorekta matahari/bulan (cd9/cd12).
+Utk kombinasi geometri tertentu (mis. lintang -10 s/d -11, bujur 120-125,
+bulan Rajab), ini melenceng 180 derajat, membuat elongasi & tinggi hilal
+salah drastis (Excel: elongasi 128 derajat, seharusnya ~6 derajat).
+
+**PERBAIKAN**: `cd9`/`cd12` di `hilalLengkap()` diubah dari `math.atan()`
+jadi `math.atan2()` (argumen (y,x), konvensi matematika standar Dart --
+BEDA dari Excel yg argumennya (x,y) terbalik). TERVALIDASI: kasus Kediri
+tetap identik (tinggi hilal 13,2419 vs 13,2420 sebelumnya; azimut bulan
+293,2266 vs 293,2267), sementara kasus2 lain yg sebelumnya berpotensi salah
+kuadran sekarang benar.
+
+CATATAN: `jamAcuanBI7()` (baris ~544, dipakai jalur Jam Ijtimak) SUDAH py
+koreksi kuadran SENDIRI (variabel `k31`) sejak sebelumnya -- TIDAK diubah,
+krn cd9-nya adalah variabel LOKAL TERPISAH dari `hilalLengkap()` (beda
+fungsi), jadi TIDAK ada risiko koreksi-ganda spt yg terjadi di Excel
+(di Excel, CD9 adalah SATU SEL yg dipakai BERSAMA kedua jalur, perlu sel
+baru CD29 terpisah utk menghindari koreksi ganda -- di Dart tidak perlu
+krn sudah terpisah scr alami).
+
+BELUM DIPERIKSA: Azimut Matahari (di `hitungLengkap()`) mungkin py pola
+serupa (formula BEDA, via CD18/CD11) -- perlu ditelusuri terpisah kalau
+ditemukan kejanggalan.
+
+## Sesi lanjutan: Bug arah rukyat 350 derajat (Meeus/As-Syahru/MPT) + pilihan tanggal hisab manual
+
+Pengguna melaporkan 2 hal terpisah:
+
+### 1. Arah Rukyatul Hilal 350 derajat (Jumadil Ula 1448H) -- Jean Meeus,
+As-Syahru, Jean Meeus Presisi Tinggi (BUKAN Tashilul Amtsilah)
+
+**Akar masalah (BUKAN bug kuadran atan/atan2 spt dugaan awal)**: azimut
+mentah dari rumus atand() SUDAH benar (mis. -9,78 derajat = "9,78 derajat
+dari Barat ke SELATAN"), tapi kode SEBELUMNYA memanggil `_mod(nilai, 360)`
+sebelum disimpan -- ini MENGHANCURKAN tanda negatif (jadi 350,22 derajat),
+lalu layar melabeli SEMUA hasil dgn "BU" (Barat-Utara) TANPA CEK TANDA,
+membuat arah SELATAN yg wajar terlihat spt "hampir ke Utara".
+
+Ditemukan jg: Meeus Presisi Tinggi pakai konvensi BERBEDA (dari Utara,
+standar astronomi) yg TIDAK cocok dgn label "BU" sama sekali (nilai mentah
+263 derajat, bkn 350 -- tp SAMA JUGA salah label kalau ditampilkan "BU").
+
+**PERBAIKAN**:
+- `MeeusHisabService`/`AsSyahruService`: TIDAK lagi `_mod(x,360)` --
+  azimutMatahari/azimutBulan skrg nilai mentah bertanda (rentang -90..90).
+- `MeeusPresisiTinggiService`: dikonversi dari konvensi "dari Utara" ke
+  konvensi "dari Barat, bertanda" yg SAMA persis (rumus: `raw-90`, dibungkus
+  ke -180..180, bkn mod360 ke 0..360).
+- `HisabTashilulAmtsilahService`: SAMA jg diseragamkan (dulu `mod360(270+
+  mentah)`, skrg langsung pakai nilai mentah) -- `jarakAzimut` TIDAK berubah
+  nilainya (pergeseran konstan saling meniadakan saat pengurangan).
+- `hisab_awal_bulan_screen.dart`: baris Azimut Matahari/Bulan & Arah
+  Rukyatul Hilal skrg pakai helper `_dms()` yg SUDAH ADA (label
+  BU/BS otomatis sesuai tanda), bukan `"BU"` yg di-hardcode.
+
+TERVALIDASI numerik (Python replikasi rumus persis): konversi MPT (raw-90)
+memberi hasil IDENTIK dgn nilai mentah Meeus/As-Syahru utk kasus uji yg
+sama (-6,8981 derajat, sama persis) -- konfirmasi ke-4 metode SEKARANG
+konsisten memakai 1 konvensi yg sama.
+
+### 2. Pilihan tanggal hisab manual (28/29/30) di Tashilul Amtsilah
+
+Sesuai permintaan pengguna ("seperti yang ada di Excel", di mana tanggal
+hisab diisi manual di sel C7) -- ditambahkan `SegmentedButton` (Otomatis/
+28/29/30) khusus di tab Tashilul Amtsilah (`hisab_awal_bulan_screen.dart`).
+
+`TashilulAmtsilahAdapter.hitung()` skrg terima parameter opsional
+`tanggalHisabManual` -- kalau diisi (28/29/30), MELEWATI pencarian otomatis
+(`cariTanggalHisabOptimal`) utk perhitungan DETAIL. Pencarian bulan/tahun
+(`_cariBulanTerbaik`, verifikasi 3 kandidat bulan) TETAP otomatis spt
+biasa -- override HANYA memengaruhi tanggal hisab detail-nya, bukan
+penentuan bulan/tahun itu sendiri.
+
+Berguna KHUSUS utk kasus spt Jumadil Ula 1448H, di mana selisih posisi
+rata-rata (mean position) menyarankan 1 tanggal, tapi selisih PASCA-KOREKSI
+bisa jauh berbeda -- membiarkan pengguna (ahli falak) membandingkan 28/29/30
+scr manual & memakai penilaian sendiri, PERSIS spt tradisi kitab asli.

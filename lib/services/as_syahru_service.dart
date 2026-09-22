@@ -227,8 +227,10 @@ class AsSyahruService {
       tinggiHilalHakiki: tinggiHilalHakiki,
       tinggiHilalMari: tinggiHilalMari,
       elongasi: elongasi,
-      azimutMatahari: _mod(azimutMatahari, 360),
-      azimutBulan: _mod(azimutBulan, 360),
+      // PERBAIKAN (sama spt MeeusHisabService -- lihat catatan di sana):
+      // TIDAK di-mod360 supaya tanda +/- (Utara/Selatan) tdk hilang.
+      azimutMatahari: azimutMatahari,
+      azimutBulan: azimutBulan,
       lamaHilalJam: lamaHilalJam,
       nurulHilal: nurulHilal,
       ghurubMatahariJam: ghurubMatahariJam,

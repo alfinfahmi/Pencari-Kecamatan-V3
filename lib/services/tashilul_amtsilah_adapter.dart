@@ -29,18 +29,27 @@ class TashilulAmtsilahAdapter {
   /// Cocok dgn tipe `HasilHisabDetail Function({required DateTime ijtimakUtc,
   /// required double lat, required double lng, required double elevasiM,
   /// required int utcOffset})` yg dipakai `_metodeList`.
+  ///
+  /// [tanggalHisabManual] OPSIONAL (28/29/30) -- kalau diisi, MELEWATI
+  /// pencarian otomatis ([cariTanggalHisabOptimal]) dan langsung memakai
+  /// tanggal tsb utk perhitungan detail (persis spt cara manual isi sel
+  /// C7 di file Excel sumbernya). Pencarian bulan/tahun (`_cariBulanTerbaik`)
+  /// TETAP otomatis spt biasa -- override ini HANYA memengaruhi tanggal
+  /// hisab yg dipakai utk detail perhitungan bulan yg SUDAH ditentukan.
+  /// Kalau null (bawaan), tetap pakai pencarian otomatis spt sebelumnya.
   static HasilHisabDetail hitung({
     required DateTime ijtimakUtc,
     required double lat,
     required double lng,
     required double elevasiM,
     required int utcOffset,
+    int? tanggalHisabManual,
   }) {
     final (tahunH, bulanH) = _cariBulanTerbaik(
       ijtimakUtc: ijtimakUtc, lat: lat, lng: lng, elevasiM: elevasiM, utcOffset: utcOffset,
     );
     final layanan = HisabTashilulAmtsilahService.instance;
-    final tanggalHisab = layanan.cariTanggalHisabOptimal(tahunHijriah: tahunH, bulanTarget: bulanH);
+    final tanggalHisab = tanggalHisabManual ?? layanan.cariTanggalHisabOptimal(tahunHijriah: tahunH, bulanTarget: bulanH);
     return layanan.hitungLengkapSync(
       tahunHijriah: tahunH, bulanTarget: bulanH, tanggalHisab: tanggalHisab,
       lintang: lat, bujurLokasi: lng, zonaWaktuJam: utcOffset.toDouble(), elevasiMeter: elevasiM,

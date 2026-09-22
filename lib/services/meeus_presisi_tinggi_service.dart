@@ -251,8 +251,21 @@ class MeeusPresisiTinggiService {
     final haM = _hourAngleFromRa(jd, raM, lng);
     final altM = _altitude(declM, lat, haM);
 
-    final azimutMatahari = _mod360(_atan2d(_sind(haS), _cosd(haS) * _sind(lat) - _tand(declS) * _cosd(lat)) + 180);
-    final azimutBulan = _mod360(_atan2d(_sind(haM), _cosd(haM) * _sind(lat) - _tand(declM) * _cosd(lat)) + 180);
+    // PERBAIKAN (konsistensi dgn Meeus/As-Syahru -- lihat catatan di sana):
+    // azimut sebelumnya pakai konvensi "dari Utara" (+180, mod360 ke
+    // 0..360) yg TIDAK cocok dgn label tampilan "BU" (Barat-Utara, rentang
+    // alami -90..90). Dikonversi ke konvensi yg SAMA persis dgn 3 metode
+    // lain: "derajat dari Barat, + ke Utara / - ke Selatan" (-90 lalu
+    // dibungkus ke -180..180, BUKAN mod360 ke 0..360 yg menghancurkan
+    // tanda). TERVALIDASI numerik: hasil konversi ini identik persis dgn
+    // versi Meeus/As-Syahru utk kasus uji yg sama.
+    double keKonvensiBU(double azimutDariSelatan) {
+      final r = _mod360(azimutDariSelatan - 90);
+      return r > 180 ? r - 360 : r;
+    }
+
+    final azimutMatahari = keKonvensiBU(_atan2d(_sind(haS), _cosd(haS) * _sind(lat) - _tand(declS) * _cosd(lat)));
+    final azimutBulan = keKonvensiBU(_atan2d(_sind(haM), _cosd(haM) * _sind(lat) - _tand(declM) * _cosd(lat)));
 
     final cosElong = (_sind(declS) * _sind(declM) + _cosd(declS) * _cosd(declM) * _cosd(raS - raM)).clamp(-1.0, 1.0);
     final elongasi = acos(cosElong) * 180 / pi;

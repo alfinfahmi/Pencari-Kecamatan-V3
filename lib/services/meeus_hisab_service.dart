@@ -272,8 +272,17 @@ class MeeusHisabService {
       tinggiHilalHakiki: altM,
       tinggiHilalMari: tinggiHilalMari,
       elongasi: elongasi,
-      azimutMatahari: _mod(azimutMatahari, 360),
-      azimutBulan: _mod(azimutBulan, 360),
+      // PERBAIKAN (temuan pengguna: Jumadil Ula 1448H arah rukyat 350
+      // derajat -- janggal, hampir ke Utara): azimutMatahari/azimutBulan
+      // di sini SENGAJA TIDAK di-mod360 -- nilai atand() aslinya sudah
+      // berupa "derajat dari Barat, + ke Utara / - ke Selatan" (rentang
+      // alami -90..90), PERSIS konvensi "BU"/"BS" yg dipakai layar. Mod360
+      // sebelumnya MENGHANCURKAN tanda negatif (arah Selatan berubah jadi
+      // angka besar spt 350 derajat yg terlihat spt ke Utara, padahal
+      // aslinya cuma ~9,8 derajat ke Selatan). Layar (hisab_awal_bulan_
+      // screen.dart) HARUS pakai label BU/BS sesuai tanda, bukan "BU" tetap.
+      azimutMatahari: azimutMatahari,
+      azimutBulan: azimutBulan,
       lamaHilalJam: lamaHilalJam,
       nurulHilal: nurulHilal,
       ghurubMatahariJam: ghurubMatahariJam,

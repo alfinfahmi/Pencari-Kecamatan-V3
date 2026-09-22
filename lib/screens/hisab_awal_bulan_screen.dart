@@ -33,6 +33,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
   KecamatanModel? _lokasi;
   bool _memuatLokasi = false;
   bool _tashilulSiap = false;
+  int? _tashilulTanggalHisabManual; // null = otomatis (cariTanggalHisabOptimal)
   final _tahunHController = TextEditingController(text: '1448');
   int _bulanHDipilih = 4;
   late TabController _tabController;
@@ -301,10 +302,19 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
         ? cariIjtimakSendiri(tahunH: tahunH, bulanH: bulanH)
         : awal.ijtimak.subtract(Duration(hours: lokasi.utcOffset!));
     final ijtimakLokal = ijtimakUtc.add(Duration(hours: lokasi.utcOffset!));
-    final hasil = fungsiHitung(
-      ijtimakUtc: ijtimakUtc, lat: lokasi.lat, lng: lokasi.lng,
-      elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
-    );
+    // Tashilul Amtsilah: kalau pengguna pilih tanggal hisab manual (bukan
+    // "Otomatis"), pakai jalur adapter langsung dgn override -- fungsiHitung
+    // generik tdk punya parameter ini (dipakai bersama 4 metode).
+    final hasil = namaMetode == 'Tashilul Amtsilah'
+        ? TashilulAmtsilahAdapter.hitung(
+            ijtimakUtc: ijtimakUtc, lat: lokasi.lat, lng: lokasi.lng,
+            elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
+            tanggalHisabManual: _tashilulTanggalHisabManual,
+          )
+        : fungsiHitung(
+            ijtimakUtc: ijtimakUtc, lat: lokasi.lat, lng: lokasi.lng,
+            elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
+          );
 
     final bulanSebelumnyaH = bulanH == 1 ? 12 : bulanH - 1;
     final hariIjtimakSaja = DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day);
@@ -347,6 +357,35 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                 ],
               ),
             ),
+          if (namaMetode == 'Tashilul Amtsilah')
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Text('Tanggal Hisab', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: SegmentedButton<int?>(
+                      showSelectedIcon: false,
+                      style: const ButtonStyle(visualDensity: VisualDensity.compact),
+                      segments: const [
+                        ButtonSegment(value: null, label: Text('Otomatis')),
+                        ButtonSegment(value: 28, label: Text('28')),
+                        ButtonSegment(value: 29, label: Text('29')),
+                        ButtonSegment(value: 30, label: Text('30')),
+                      ],
+                      selected: {_tashilulTanggalHisabManual},
+                      onSelectionChanged: (baru) => setState(() => _tashilulTanggalHisabManual = baru.first),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           _tabelKesimpulan(hasil, bulanH, tahunH, tanggal1),
           const SizedBox(height: 12),
           _tabelSeksi(
@@ -375,7 +414,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
               _baris('Bujur Astronomis', _dmsSudut(hasil.bujurMatahari)),
               _baris('Tinggi Saat Terbenam (Standar)', _dmsSudut(hasil.tinggiMatahariSaatTerbenam)),
               _baris('Ghurub (Maghrib)', '${_jamStr(hasil.ghurubMatahariJam)} ${lokasi.zonaWaktu ?? ''}', tebal: true),
-              _baris('Azimut', '${_dmsSudut(hasil.azimutMatahari)} BU'),
+              _baris('Azimut', _dms(hasil.azimutMatahari, 'BU', 'BS')),
             ],
           ),
           const SizedBox(height: 12),
@@ -388,14 +427,14 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
               _baris('Deklinasi', _dmsSudut(hasil.deklinasiBulan)),
               _baris('Sudut Waktu', _dmsSudut(hasil.sudutWaktuBulan)),
               _baris('Bujur Astronomis', _dmsSudut(hasil.bujurBulan)),
-              _baris('Azimut', '${_dmsSudut(hasil.azimutBulan)} BU'),
+              _baris('Azimut', _dms(hasil.azimutBulan, 'BU', 'BS')),
               _baris('Ghurub Hilal', '${_jamStr(hasil.ghurubHilalJam)} ${lokasi.zonaWaktu ?? ''}'),
               _baris('Lama Hilal (Muksu)', _lamaHilalStr(hasil.lamaHilalJam)),
               _baris('Nurul Hilal', hasil.nurulHilal.toStringAsFixed(3)),
               _baris('Jarak dgn Matahari',
                   '${_dmsSudut(hasil.jarakAzimutMatahariBulan.abs())} di ${hasil.jarakAzimutMatahariBulan >= 0 ? 'utara' : 'selatan'}'),
               _baris('Keadaan Hilal', hasil.keadaanHilalArah),
-              _baris('Arah Rukyatul Hilal', _dmsSudut(hasil.azimutBulan)),
+              _baris('Arah Rukyatul Hilal', _dms(hasil.azimutBulan, 'dari titik Barat ke Utara', 'dari titik Barat ke Selatan')),
             ],
           ),
           const SizedBox(height: 8),
