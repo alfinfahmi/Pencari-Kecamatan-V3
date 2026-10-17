@@ -26,25 +26,38 @@ class TashilulAmtsilahAdapter {
 
   static bool get sudahSiap => HisabTashilulAmtsilahService.instance.sudahSiap;
 
-  /// Selisih hari (offset) antara [tanggalHisabManual] yg dipilih dgn
-  /// tanggal-hisab OTOMATIS ([cariTanggalHisabOptimal]) utk bulan/tahun
-  /// yg sama -- dipakai `hisab_awal_bulan_screen.dart` utk MENGGESER
-  /// tanggal baseline ("hariIjtimakSaja") sesuai malam yg SESUNGGUHNYA
-  /// dievaluasi tanggalHisab tsb.
+  /// Tanggal Masehi (lokal, bagian HARI saja) utk "HARI IJTIMAK" -- dasar
+  /// penentuan Awal Bulan (+1 hari kalau kriteria terpenuhi hari itu,
+  /// +2/istikmal kalau belum, esok harinya dicoba lagi).
   ///
-  /// PENTING (bug ditemukan lewat laporan pengguna: kenapa tanggalHisab
-  /// 28 vs 29/30 bisa beda hasil "Awal Bulan" drastis?): tanggalHisab
-  /// TIDAK sekadar "variasi presisi kecil dari malam yg SAMA" -- ia
-  /// memilih MALAM YG BERBEDA (berjarak persis 1 hari kalender per unit
-  /// tanggalHisab). SEBELUM perbaikan ini, layar selalu memakai tanggal
-  /// baseline dari ijtimak BERSAMA (HijriService, TIDAK ikut geser sesuai
-  /// tanggalHisab Tashilul) -- membuat SEMUA pilihan tanggalHisab
-  /// dibandingkan thd baseline yg SAMA, padahal semestinya baseline-nya
-  /// SENDIRI harus ikut geser.
+  /// KOREKSI PEMAHAMAN (meralat sesi sebelumnya yg SALAH mengartikan
+  /// "selalu 29" sbg tanggal tabular TETAP terpisah dari tanggalHisab):
+  /// "selalu 29" yg dimaksud adalah tanggal-29-Hijriyah yg SUDAH
+  /// DITETAPKAN lewat rukyat/istikmal bulan SEBELUMNYA (urusan kalender
+  /// aplikasi scr umum, BUKAN sesuatu yg Tashilul hitung ulang sendiri).
+  /// Di METODE TASHIL sendiri: tanggalHisab (27/28/29/30) HANYALAH
+  /// tanggal-hisab tempat ijtimak JATUH menurut perhitungan itu -- yg
+  /// dihitung keadaan hilalnya adalah HARI IJTIMAK ITU SENDIRI (kalau
+  /// ijtimak terjadi SEBELUM maghrib, rukyat BISA dicoba sore itu juga)
+  /// dan, kalau belum memenuhi kriteria, keesokan harinya. Jadi baseline
+  /// ini HARUS ikut tanggalHisab yg dipakai (manual ATAU otomatis) --
+  /// BUKAN baseline tetap terpisah spt sesi sebelumnya.
   ///
-  /// Kalau [tanggalHisabManual] null (mode Otomatis), fungsi ini
-  /// mengembalikan 0 (tanpa geseran, krn sudah otomatis benar).
-  static int offsetHariTanggalHisab({
+  /// [ijtimakUtc] (BUKAN tahunH/bulanH mentah dari input pengguna) dipakai
+  /// sbg sumber (tahunH,bulanH) via [_cariBulanTerbaik] yg SAMA PERSIS dgn
+  /// [hitung] -- supaya baseline di sini TIDAK PERNAH beda bulan/tahun dari
+  /// detail hilal yg ditampilkan (keduanya lewat verifikasi yg sama).
+  ///
+  /// Tanggal Masehi utk baseline Awal Bulan = LANGSUNG tanggal Masehi
+  /// (konversi tabular murni, `jdnDariHijriah`) dari HARI KE-[tanggalHisab]
+  /// bulan Hijriyah yg SEDANG BERJALAN (bulan sblm [bulanH]/[tahunH]
+  /// target) -- BUKAN lewat jam ijtimak sama sekali. Ini PERSIS maksud
+  /// "tanggalHisab (27/28/29/30) hanyalah tanggal hisab TEMPAT IJTIMAK
+  /// JATUH": tanggalHisab=28 berarti ijtimak diuji seolah jatuh di hari
+  /// Hijriyah ke-28 bulan berjalan, dst -- SETIAP tanggalHisab mewakili
+  /// hari kalender Masehi yg BERBEDA (berurutan, 1 hari demi 1 hari),
+  /// BUKAN titik acuan tabel utk 1 malam yg sama.
+  static DateTime hariIjtimakLokal({
     required DateTime ijtimakUtc,
     required double lat,
     required double lng,
@@ -52,13 +65,18 @@ class TashilulAmtsilahAdapter {
     required int utcOffset,
     int? tanggalHisabManual,
   }) {
-    if (tanggalHisabManual == null) return 0;
     final (tahunH, bulanH) = _cariBulanTerbaik(
       ijtimakUtc: ijtimakUtc, lat: lat, lng: lng, elevasiM: elevasiM, utcOffset: utcOffset,
     );
     final layanan = HisabTashilulAmtsilahService.instance;
-    final otomatis = layanan.cariTanggalHisabOptimal(tahunHijriah: tahunH, bulanTarget: bulanH);
-    return tanggalHisabManual - otomatis;
+    final tanggalHisab =
+        tanggalHisabManual ?? layanan.cariTanggalHisabOptimal(tahunHijriah: tahunH, bulanTarget: bulanH);
+    final bulanBerjalan = bulanH == 1 ? 12 : bulanH - 1;
+    final tahunBerjalan = bulanH == 1 ? tahunH - 1 : tahunH;
+    final jdnHariIjtimak = HisabTashilulAmtsilahService.jdnDariHijriah(
+      tahunH: tahunBerjalan, bulanH: bulanBerjalan, tanggalH: tanggalHisab,
+    );
+    return HisabTashilulAmtsilahService.jdnKeMasehi(jdnHariIjtimak);
   }
 
   /// Cocok dgn tipe `HasilHisabDetail Function({required DateTime ijtimakUtc,

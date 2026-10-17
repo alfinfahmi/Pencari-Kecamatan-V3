@@ -349,3 +349,82 @@ BENAR/diharapkan: 2 malam berurutan (istikmal lalu visible) semestinya
 SEPAKAT soal tanggal 1 bulan baru, bukan berkontradiksi spt sebelumnya.
 30 bergeser 1 hari lebih lambat krn scr definisi sudah "terlambat" --
 bulan baru sesungguhnya sudah ditentukan mulai sebelum malam ke-30 tiba.
+
+## Sesi lanjutan: Tata ulang sesuai keputusan "malam rukyat tetap malam 29"
+
+Menggantikan pendekatan sesi sebelumnya (`offsetHariTanggalHisab`, baseline
+ikut geser sesuai tanggalHisab yg dipilih) dgn pendekatan yg disepakati:
+**malam rukyat SELALU malam ke-29** (tanggal Hijriyah menurut kalender
+TABULAR kitab, bukan ijtimak astronomis), TERLEPAS dari tanggalHisab
+(27-30) yg dipilih utk perhitungan detail.
+
+**Perubahan model mental**: tanggalHisab 27/28/29/30 BUKAN memilih MALAM
+YG BERBEDA -- ia cuma TITIK ACUAN TABEL (entry point) berbeda utk
+MENGHITUNG keadaan hilal PADA malam ke-29 yg SAMA (tetap). Semakin dekat
+titik acuan ke 29/30, umumnya makin presisi hasilnya; titik acuan yg lebih
+jauh (mis. 27/28) bisa memberi estimasi yg KURANG akurat (bukan "malam
+lain").
+
+**PERBAIKAN**:
+- `TashilulAmtsilahAdapter.malamRukyatMasehi()` (baru, menggantikan
+  `offsetHariTanggalHisab` yg DIHAPUS) -- menghitung tanggal Masehi utk
+  "malam 29" via konversi tabular MANDIRI (`jdnDariHijriah`+`jdnKeMasehi`),
+  independen dari tanggalHisab yg dipilih MAUPUN dari ijtimak astronomis
+  bersama (HijriService).
+- `hisab_awal_bulan_screen.dart`: utk Tashilul Amtsilah, baseline
+  ("hariIjtimakSaja") skrg SELALU dari `malamRukyatMasehi()`, bukan lagi
+  dari ijtimak bersama. Metode lain (As-Syahru/Meeus/MPT) TIDAK berubah,
+  tetap pakai ijtimak bersama (tdk py konsep tanggalHisab ini).
+- Selector "Tanggal Hisab" skrg 27/28/29/30 (bukan 28-30 saja) -- sesuai
+  tabel hari kitab yg memuat 27-30.
+
+**CATATAN PENTING -- dampak nyata**: krn sumber baseline berubah (dari
+ijtimak astronomis REAL ke kalender TABULAR kitab yg bisa beda ±1 hari
+dari astronomi sesungguhnya), tanggal keluaran BISA BERGESER drpd versi
+sebelumnya. Contoh (Rabiul Akhir 1448H): baseline lama (astronomis) =
+11 Sept (Jumat), baseline baru (tabular) = 12 Sept (Sabtu) -- SATU HARI
+LEBIH LAMBAT. Ini SESUAI keputusan (pakai kalender tabular kitab, bukan
+astronomi modern utk menentukan malam rukyat), tapi perlu diketahui krn
+mengubah tanggal akhir yg ditampilkan.
+
+**TERVALIDASI** (Python replikasi fungsi tabular):
+- Rabiul Akhir 1448H: malam rukyat=12 Sept (Sabtu). tanggalHisab 29&30
+  (sama2 "terpenuhi") KONVERGEN ke 13 Sept (Ahad); tanggalHisab 28
+  (istikmal, titik acuan kurang presisi) -> 14 Sept (Senin) -- SELISIH 1
+  hari ini SEKARANG benar2 mencerminkan AKURASI titik acuan, bukan "malam
+  berbeda".
+- Jumadil Ula 1448H: malam rukyat=12 Okt (Senin). tanggalHisab 28/29/30
+  SEMUA "terpenuhi" & KONVERGEN sempurna ke 13 Okt (Selasa).
+
+## Sesi lanjutan: KOREKSI pemahaman "malam rukyat" -- tanggalHisab = hari Hijriyah sesungguhnya
+
+MERALAT sesi sebelumnya yg KELIRU memahami "selalu 29" sbg "hitung SELALU
+utk 1 malam tetap (malam ke-29 tabular), tanggalHisab cuma titik acuan
+tabel berbeda". Pemahaman yg BENAR: "selalu 29" merujuk ke tanggal-29-
+Hijriyah yg SUDAH DITETAPKAN lewat rukyat/istikmal bulan SEBELUMNYA
+(urusan kalender aplikasi scr umum) -- BUKAN sesuatu yg Tashilul hitung
+ulang scr terpisah. Di METODE TASHIL sendiri: tanggalHisab (27/28/29/30)
+ADALAH hari Hijriyah (bulan yg sedang berjalan) TEMPAT IJTIMAK DIUJI
+JATUH -- masing2 MEWAKILI HARI KALENDER MASEHI YG BERBEDA (berurutan,
+1 hari demi 1 hari), BUKAN titik-acuan-tabel utk malam yg sama.
+
+**PERBAIKAN (menggantikan `malamRukyatMasehi` sesi sebelumnya)**:
+`TashilulAmtsilahAdapter.hariIjtimakLokal()` -- baseline Awal Bulan
+dihitung LANGSUNG via konversi tabular murni (`jdnDariHijriah`) dari HARI
+KE-[tanggalHisab] bulan Hijriyah yg sedang berjalan (bulan sblm target),
+TANPA melibatkan jam ijtimak sama sekali. tanggalHisab yg dipakai SAMA
+dgn yg dipakai detail hilal ([hitung]) -- baseline & detail SELALU
+konsisten.
+
+**TERVALIDASI** (Python replikasi fungsi tabular):
+- Rabiul Akhir 1448H: tanggalHisab=28(istikmal)->11 Sept(Jumat)+2=Ahad 13
+  Sept; tanggalHisab=29(terpenuhi)->12 Sept(Sabtu)+1=Ahad 13 Sept (SAMA
+  dgn 28!); tanggalHisab=30(terpenuhi)->13 Sept(Ahad)+1=Senin 14 Sept.
+  Pola 28&29 konvergen ke Ahad INI JUGA konsisten dgn laporan pengguna
+  PALING AWAL (tanggalHisab 28 -> Ahad) sebelum sesi perbaikan2 ini dimulai.
+- Jumadil Ula 1448H: tanggalHisab=28->baseline Ahad 11 Okt+1=Senin 12
+  Okt; tanggalHisab=29->baseline Senin 12 Okt+1=Selasa 13 Okt;
+  tanggalHisab=30->baseline Selasa 13 Okt+1=Rabu 14 Okt -- progresi
+  BERURUTAN (1 hari demi 1 hari per tanggalHisab), BUKAN konvergen, krn
+  semua "terpenuhi" (tdk ada titik istikmal yg menyilangkan ambang
+  kriteria di bulan ini).

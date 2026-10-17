@@ -317,21 +317,20 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           );
 
     final bulanSebelumnyaH = bulanH == 1 ? 12 : bulanH - 1;
-    // Tashilul Amtsilah + tanggalHisab manual: geser baseline sesuai malam
-    // yg SESUNGGUHNYA dievaluasi tanggalHisab tsb (lihat catatan di
-    // TashilulAmtsilahAdapter.offsetHariTanggalHisab) -- SEBELUM perbaikan
-    // ini, baseline SELALU dari ijtimak bersama, tdk ikut geser sesuai
-    // tanggalHisab, membuat hasil "Awal Bulan" antar pilihan 28/29/30
-    // tampak melompat tdk konsisten.
-    final offsetHari = namaMetode == 'Tashilul Amtsilah'
-        ? TashilulAmtsilahAdapter.offsetHariTanggalHisab(
+    // Tashilul Amtsilah: baseline ("hari ijtimak") dihitung memakai
+    // tanggalHisab YG SAMA dgn yg dipakai detail hilal di atas (manual
+    // ATAU otomatis) -- lihat catatan lengkap di
+    // TashilulAmtsilahAdapter.hariIjtimakLokal (meralat pemahaman "malam
+    // 29 tetap" sesi sebelumnya yg KELIRU). Metode LAIN (As-Syahru, Jean
+    // Meeus, dst) tetap pakai ijtimak bersama spt sebelumnya, krn tdk py
+    // konsep "tanggalHisab" ini sama sekali.
+    final hariIjtimakSaja = namaMetode == 'Tashilul Amtsilah'
+        ? TashilulAmtsilahAdapter.hariIjtimakLokal(
             ijtimakUtc: ijtimakUtc, lat: lokasi.lat, lng: lokasi.lng,
             elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
             tanggalHisabManual: _tashilulTanggalHisabManual,
           )
-        : 0;
-    final hariIjtimakSaja =
-        DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day).add(Duration(days: offsetHari));
+        : DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day);
     final tanggal1 = hasil.memenuhiMabims2021
         ? hariIjtimakSaja.add(const Duration(days: 1))
         : hariIjtimakSaja.add(const Duration(days: 2));
@@ -389,6 +388,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                       style: const ButtonStyle(visualDensity: VisualDensity.compact),
                       segments: const [
                         ButtonSegment(value: null, label: Text('Otomatis')),
+                        ButtonSegment(value: 27, label: Text('27')),
                         ButtonSegment(value: 28, label: Text('28')),
                         ButtonSegment(value: 29, label: Text('29')),
                         ButtonSegment(value: 30, label: Text('30')),
