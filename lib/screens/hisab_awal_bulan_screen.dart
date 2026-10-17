@@ -335,6 +335,23 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
         ? hariIjtimakSaja.add(const Duration(days: 1))
         : hariIjtimakSaja.add(const Duration(days: 2));
 
+    // Tashilul Amtsilah: kalau ghurub di tanggal hisab yg dipilih terjadi
+    // SEBELUM ijtimak, aturan +1/+2 (istikmal) TIDAK berlaku -- hilal yg
+    // diukur masih bulan lama. Dibandingkan lewat jam dinding lokal (field
+    // tahun/bulan/hari/jam) supaya tidak terpengaruh flag isUtc/zona device.
+    // Cek bujur (_tashilulSebelumIjtima) tetap dipakai sbg cadangan.
+    final ghurubHariHisab = DateTime.utc(hariIjtimakSaja.year, hariIjtimakSaja.month, hariIjtimakSaja.day)
+        .add(Duration(seconds: (hasil.ghurubMatahariJam * 3600).round()));
+    final ijtimakJamDinding = DateTime.utc(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day,
+        ijtimakLokal.hour, ijtimakLokal.minute, ijtimakLokal.second);
+    final belumIjtimak = namaMetode == 'Tashilul Amtsilah' &&
+        (ghurubHariHisab.isBefore(ijtimakJamDinding) || _tashilulSebelumIjtima(hasil));
+    final status = belumIjtimak
+        ? _StatusHisab.belumIjtimak
+        : hasil.memenuhiMabims2021
+            ? _StatusHisab.terpenuhi
+            : _StatusHisab.istikmal;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(14),
       child: Center(
@@ -400,7 +417,34 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                 ],
               ),
             ),
-          _tabelKesimpulan(hasil, bulanH, tahunH, tanggal1),
+          if (status == _StatusHisab.belumIjtimak)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.withOpacity(0.4)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.warning_amber_rounded, size: 18, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Ijtima belum terjadi pada tanggal hisab ini -- bujur bulan masih di '
+                      'belakang bujur matahari. Hasil di bawah ini mengukur BULAN LAMA (sisa '
+                      'siklus sebelumnya), BUKAN hilal awal bulan. Coba tanggal hisab yang '
+                      'lebih besar (lebih dekat/setelah ijtima).',
+                      style: TextStyle(fontSize: 11.5, color: Colors.red.shade800),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          _tabelKesimpulan(hasil, bulanH, tahunH, tanggal1,
+              status: status, hariHisab: hariIjtimakSaja, bulanSebelumnyaH: bulanSebelumnyaH),
           const SizedBox(height: 12),
           _tabelSeksi(
             judul: 'Markaz & Ijtimak',
@@ -467,8 +511,25 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     );
   }
 
-  Widget _tabelKesimpulan(HasilHisabDetail hasil, int bulanH, int tahunH, DateTime tanggal1) {
-    final warna = hasil.memenuhiMabims2021 ? AppColors.emerald : Colors.deepOrange.shade700;
+  Widget _tabelKesimpulan(
+    HasilHisabDetail hasil,
+    int bulanH,
+    int tahunH,
+    DateTime tanggal1, {
+    required _StatusHisab status,
+    required DateTime hariHisab,
+    required int bulanSebelumnyaH,
+  }) {
+    final (Color warna, IconData ikon, String judul) = switch (status) {
+      _StatusHisab.terpenuhi => (AppColors.emerald, Icons.check_circle_rounded, 'Kriteria Imkan Rukyat Terpenuhi'),
+      _StatusHisab.istikmal => (Colors.deepOrange.shade700, Icons.info_rounded, 'Istikmal (Kriteria Belum Terpenuhi)'),
+      _StatusHisab.belumIjtimak => (Colors.blueGrey.shade700, Icons.warning_amber_rounded, 'Ijtimak Belum Terjadi'),
+    };
+    String tglStr(DateTime t) =>
+        '${_namaHariLengkap[t.weekday]}, ${t.day} ${_namaBulanMasehi[t.month]} ${t.year}';
+    final tahunHisabH = bulanH == 1 ? tahunH - 1 : tahunH;
+    final barisHisab = 'Hisab akhir ${_namaBulanHijriah[bulanSebelumnyaH]} $tahunHisabH H: ${tglStr(hariHisab)}';
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [warna, warna.withOpacity(0.75)], begin: Alignment.topLeft, end: Alignment.bottomRight),
@@ -481,21 +542,27 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
         children: [
           Row(
             children: [
-              Icon(hasil.memenuhiMabims2021 ? Icons.check_circle_rounded : Icons.info_rounded, color: Colors.white, size: 18),
+              Icon(ikon, color: Colors.white, size: 18),
               const SizedBox(width: 6),
-              Text(
-                hasil.memenuhiMabims2021 ? 'Kriteria Imkan Rukyat Terpenuhi' : 'Istikmal (Kriteria Belum Terpenuhi)',
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
-              ),
+              Text(judul, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 10),
-          Text('Awal ${_namaBulanHijriah[bulanH]} $tahunH H',
-              style: const TextStyle(color: Colors.white70, fontSize: 13)),
-          Text(
-            '${_namaHariLengkap[tanggal1.weekday]}, ${tanggal1.day} ${_namaBulanMasehi[tanggal1.month]} ${tanggal1.year}',
-            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-          ),
+          if (status == _StatusHisab.belumIjtimak) ...[
+            // Tidak ada tanggal awal bulan: ghurub tanggal hisab ini masih
+            // sebelum ijtimak, jadi istikmal (+2) belum bisa diterapkan.
+            Text(barisHisab, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            const Text('Tanggal hisab terlalu awal -- coba tanggal hisab berikutnya.',
+                style: TextStyle(color: Colors.white70, fontSize: 12.5)),
+          ] else ...[
+            Text('Awal ${_namaBulanHijriah[bulanH]} $tahunH H',
+                style: const TextStyle(color: Colors.white70, fontSize: 13)),
+            Text(tglStr(tanggal1),
+                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 2),
+            Text(barisHisab, style: const TextStyle(color: Colors.white70, fontSize: 11.5)),
+          ],
           const SizedBox(height: 12),
           Row(
             children: [
@@ -611,6 +678,18 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     );
   }
 
+  /// Khusus Tashilul Amtsilah: TRUE kalau bujur bulan MASIH DI BELAKANG
+  /// bujur matahari pd tanggalHisab yg diuji -- artinya ijtima BELUM
+  /// terjadi (sedang menguji sisa bulan tua dari siklus sebelumnya, BUKAN
+  /// hilal awal bulan baru). Dipakai utk peringatan di UI (lihat laporan
+  /// pengguna: tanggalHisab 27/28 di suatu bulan memberi Elongasi yg
+  /// turun-naik janggal, krn ijtima baru terjadi di antara tanggalHisab
+  /// 28 & 29 bulan itu).
+  bool _tashilulSebelumIjtima(HasilHisabDetail hasil) {
+    final selisih = ((hasil.bujurBulan - hasil.bujurMatahari + 180) % 360) - 180;
+    return selisih < 0;
+  }
+
   String _dmsSudut(double derajat) {
     final neg = derajat < 0;
     final abs = derajat.abs();
@@ -647,3 +726,10 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     return '${j}j ${m}m ${s}d';
   }
 }
+
+/// Status kartu kesimpulan hisab awal bulan.
+/// - terpenuhi    : sudah ijtimak & memenuhi MABIMS -> awal bulan = hari hisab + 1
+/// - istikmal     : sudah ijtimak tapi belum memenuhi -> awal bulan = hari hisab + 2
+/// - belumIjtimak : (khusus Tashilul) ghurub hari hisab masih sebelum ijtimak ->
+///                  tidak ada tanggal awal bulan, tanggal hisab terlalu awal
+enum _StatusHisab { terpenuhi, istikmal, belumIjtimak }

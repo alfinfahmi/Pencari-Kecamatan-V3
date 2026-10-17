@@ -428,3 +428,62 @@ konsisten.
   BERURUTAN (1 hari demi 1 hari per tanggalHisab), BUKAN konvergen, krn
   semua "terpenuhi" (tdk ada titik istikmal yg menyilangkan ambang
   kriteria di bulan ini).
+
+## Sesi lanjutan: Peringatan "ijtima belum terjadi" utk tanggalHisab yg terlalu dini
+
+Ditemukan lewat laporan pengguna (3 tangkapan layar, Sya'ban 1448H markaz
+Mojoroto): tanggalHisab 27 & 28 memberi Elongasi yg janggal (turun dulu
+15,47->5,27 derajat baru naik lagi ke 7,02 derajat di tanggalHisab 29).
+
+**Akar penyebab**: ijtima sesungguhnya (bulan 1448H ini) jatuh DI ANTARA
+tanggalHisab 28 & 29. Artinya tanggalHisab 27 & 28 BUKAN menguji hilal
+baru sama sekali -- keduanya menguji posisi BULAN TUA (sisa siklus
+SEBELUMNYA, bujur bulan msh di belakang bujur matahari), bukan hilal awal
+bulan Sya'ban yg baru. Angka yg ditampilkan scr teknis benar hasil
+hitungannya, tapi TIDAK BERMAKNA sbg indikator hilal awal bulan.
+
+**PERBAIKAN**: `hisab_awal_bulan_screen.dart` -- method baru
+`_tashilulSebelumIjtima(hasil)` mengecek tanda selisih bujur (bulan -
+matahari, dibungkus ke -180..180): NEGATIF berarti bujur bulan msh di
+belakang matahari (ijtima belum terjadi). Kalau TRUE & metode = Tashilul
+Amtsilah, tampil banner merah "Ijtima belum terjadi pada tanggal hisab
+ini..." di atas kartu hasil, memperingatkan pengguna bhw tanggalHisab yg
+dipilih terlalu dini.
+
+TERVALIDASI (Python replikasi): tanggalHisab 27 & 28 (Sya'ban 1448H,
+markaz Mojoroto) -> selisih negatif -> peringatan TAMPIL; tanggalHisab 29
+& 30 -> selisih positif -> peringatan TIDAK tampil (hasil valid).
+
+Tidak ada perubahan pd `HasilHisabDetail` (field bersama 4 metode) --
+perhitungan flag murni dari `bujurMatahari`/`bujurBulan` yg sudah tersedia,
+jadi 3 metode lain (As-Syahru/Meeus/MPT) sama sekali tdk terpengaruh.
+
+## Sesi lanjutan: Kartu kesimpulan 3 status (+ status "Ijtimak Belum Terjadi")
+
+**Laporan pengguna** (Sya'ban 1448H, markaz Mojoroto): utk tanggalHisab 27
+& 28 kartu menulis "Istikmal -- Awal Sya'ban Jumat 8 Jan / Sabtu 9 Jan".
+Menyesatkan: ghurub yg dihitung (Rabu 6 Jan / Kamis 7 Jan) masih SEBELUM
+ijtimak, jadi aturan istikmal (+2) belum boleh diterapkan sama sekali.
+Usulan awal pengguna (ganti label jadi "Hisab akhir Rajab Jumat 8 Jan")
+tdk dipakai krn tanggal hisab 27 sebenarnya Rabu 6 Jan, bukan 8 Jan.
+
+**PERBAIKAN** (`hisab_awal_bulan_screen.dart`, UI saja -- service/adapter
+& `HasilHisabDetail` tdk berubah, unit test tdk terpengaruh):
+- enum baru `_StatusHisab { terpenuhi, istikmal, belumIjtimak }`.
+- `belumIjtimak` (KHUSUS Tashilul) = ghurub hari hisab (`hariIjtimakLokal`
+  + `ghurubMatahariJam`) < waktu ijtimak (dibandingkan sbg jam dinding
+  lokal), ATAU `_tashilulSebelumIjtima(hasil)` (cek bujur, cadangan).
+  Metode lain tdk memakai status ini (ijtimak setelah maghrib di metode
+  lain memang benar istikmal).
+- Kartu kesimpulan: hijau (terpenuhi, +1), oranye (istikmal, +2), abu-abu
+  "Ijtimak Belum Terjadi" -- TANPA tanggal awal bulan, hanya baris
+  "Hisab akhir <bulan> <tahun> H: <hari, tanggal>" + "Tanggal hisab
+  terlalu awal". Kartu hijau/oranye juga menampilkan baris hisab tsb
+  (kecil, di bawah tanggal awal bulan).
+- Banner merah lama sekarang memakai kondisi `status == belumIjtimak`.
+
+**Belum dikerjakan**: status "tanggal hisab terlalu lambat" (mis.
+tanggalHisab 30 Sya'ban 1448H: hilal ~38 jam, tinggi 14,77 derajat) &
+mode Otomatis yg memilih ghurub pertama setelah ijtimak.
+**Belum dikompilasi** (tidak ada Flutter di lingkungan sesi ini) --
+jalankan `flutter analyze` sebelum build.
