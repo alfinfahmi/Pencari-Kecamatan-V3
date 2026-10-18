@@ -472,11 +472,15 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
         elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
         utcOffset: lokasi.utcOffset!,
       );
+      // Kriteria mengikuti pengaturan aplikasi (HijriService.kriteriaAktif),
+      // sama spt kolom Jean Meeus & As-Syahru -- bukan dipatok MABIMS.
+      final usiaPresisiTinggi = hasilPresisiTinggi.usiaHilalJam(
+          ijtimakUtc: ijtimakPresisiTinggiUtc, utcOffset: lokasi.utcOffset!);
       hilalPresisiTinggi = (
-        memenuhi: hasilPresisiTinggi.memenuhiMabims2021,
+        memenuhi: hasilPresisiTinggi.memenuhiKriteria(HijriService.kriteriaAktif, usiaHilalJam: usiaPresisiTinggi),
         tinggiHilal: hasilPresisiTinggi.tinggiHilalMari,
         elongasi: hasilPresisiTinggi.elongasi,
-        usiaHilalJam: hasilPresisiTinggi.lamaHilalJam,
+        usiaHilalJam: usiaPresisiTinggi,
       );
 
       // Tashilul Amtsilah -- dibungkus try-catch krn sistem tabel zij ini
@@ -497,7 +501,8 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
           final ijtimakJamLokal = ijtimakTashilulUtc.add(Duration(hours: lokasi.utcOffset!));
           final ijtimakJamDesimal = ijtimakJamLokal.hour + ijtimakJamLokal.minute / 60;
           hilalTashilul = (
-            memenuhi: hasilTashilul.memenuhiMabims2021,
+            memenuhi: hasilTashilul.memenuhiKriteria(HijriService.kriteriaAktif,
+                usiaHilalJam: hasilTashilul.ghurubMatahariJam - ijtimakJamDesimal),
             tinggiHilal: hasilTashilul.tinggiHilalMari,
             elongasi: hasilTashilul.elongasi,
             usiaHilalJam: hasilTashilul.ghurubMatahariJam - ijtimakJamDesimal,
@@ -528,7 +533,9 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
             );
             final ijtimakLokal = ijtimakEphemerisUtc.add(Duration(hours: lokasi.utcOffset!));
             hilalEphemeris = (
-              memenuhi: hasilEphemeris.memenuhiMabims2021,
+              memenuhi: hasilEphemeris.memenuhiKriteria(HijriService.kriteriaAktif,
+                  usiaHilalJam: hasilEphemeris.usiaHilalJam(
+                      ijtimakUtc: ijtimakEphemerisUtc, utcOffset: lokasi.utcOffset!)),
               tinggiHilal: hasilEphemeris.tinggiHilalMari,
               elongasi: hasilEphemeris.elongasi,
               usiaHilalJam: hasilEphemeris.ghurubMatahariJam -

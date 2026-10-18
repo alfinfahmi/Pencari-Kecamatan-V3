@@ -37,6 +37,10 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
   int? _tashilulTanggalHisabManual; // null = otomatis (cariTanggalHisabOptimal)
   final _tahunHController = TextEditingController(text: '1448');
   int _bulanHDipilih = 4;
+  /// Kriteria imkan rukyat utk layar ini. Awalnya = pengaturan aplikasi
+  /// (HijriService.kriteriaAktif); mengubahnya di sini HANYA berlaku di
+  /// layar Hisab (utk membandingkan), tidak mengubah pengaturan global.
+  KriteriaImkanRukyat _kriteria = HijriService.kriteriaAktif;
   late TabController _tabController;
 
   /// Daftar metode yang tersedia -- tambahkan entri baru di sini kalau
@@ -277,6 +281,25 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
               ),
             ],
           ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<KriteriaImkanRukyat>(
+            initialValue: _kriteria,
+            isExpanded: true,
+            dropdownColor: AppColors.primaryLight,
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+            decoration: const InputDecoration(
+              labelText: 'Kriteria Imkan Rukyat',
+              labelStyle: TextStyle(color: Colors.white70, fontSize: 11),
+              floatingLabelStyle: TextStyle(color: Colors.white, fontSize: 11),
+              isDense: true,
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white38)),
+              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.gold)),
+            ),
+            items: KriteriaImkanRukyat.values
+                .map((k) => DropdownMenuItem(value: k, child: Text(k.label, overflow: TextOverflow.ellipsis)))
+                .toList(),
+            onChanged: (v) => setState(() => _kriteria = v ?? _kriteria),
+          ),
         ],
       ),
     );
@@ -364,9 +387,6 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
             tanggalHisabManual: _tashilulTanggalHisabManual,
           )
         : DateTime(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day);
-    final tanggal1 = hasil.memenuhiMabims2021
-        ? hariIjtimakSaja.add(const Duration(days: 1))
-        : hariIjtimakSaja.add(const Duration(days: 2));
 
     // Tashilul Amtsilah: kalau ghurub di tanggal hisab yg dipilih terjadi
     // SEBELUM ijtimak, aturan +1/+2 (istikmal) TIDAK berlaku -- hilal yg
@@ -377,11 +397,20 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
         .add(Duration(seconds: (hasil.ghurubMatahariJam * 3600).round()));
     final ijtimakJamDinding = DateTime.utc(ijtimakLokal.year, ijtimakLokal.month, ijtimakLokal.day,
         ijtimakLokal.hour, ijtimakLokal.minute, ijtimakLokal.second);
+    // Usia hilal = ghurub hari hisab - ijtimak (jam dinding lokal). Utk
+    // Tashilul, hari hisab bisa beda dgn hari ijtimak (tanggal hisab
+    // manual), makanya dihitung lintas hari di sini, bukan dari
+    // HasilHisabDetail.usiaHilalJam (yg mengandaikan hari yg sama).
+    final usiaHilal = ghurubHariHisab.difference(ijtimakJamDinding).inSeconds / 3600;
+    final memenuhi = hasil.memenuhiKriteria(_kriteria, usiaHilalJam: usiaHilal);
+    final tanggal1 = memenuhi
+        ? hariIjtimakSaja.add(const Duration(days: 1))
+        : hariIjtimakSaja.add(const Duration(days: 2));
     final belumIjtimak = namaMetode == 'Tashilul Amtsilah' &&
         (ghurubHariHisab.isBefore(ijtimakJamDinding) || _tashilulSebelumIjtima(hasil));
     final status = belumIjtimak
         ? _StatusHisab.belumIjtimak
-        : hasil.memenuhiMabims2021
+        : memenuhi
             ? _StatusHisab.terpenuhi
             : _StatusHisab.istikmal;
 
@@ -559,7 +588,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
             ],
           ),
           const SizedBox(height: 12),
-          _tabelHilal(hasil),
+          _tabelHilal(hasil, memenuhi: memenuhi, usiaHilalJam: usiaHilal),
           const SizedBox(height: 12),
           _tabelSeksi(
             judul: 'Data Bulan',
@@ -580,8 +609,8 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           ),
           const SizedBox(height: 8),
           Text(
-            'Dihitung oleh LF Ma\'had \'Aly Lirboyo -- MHM Kediri. Kriteria: MABIMS 2021 '
-            '(irtifa \u2265 3\u00b0, elongasi \u2265 6.4\u00b0). Penetapan resmi Ramadhan/Syawal/Dzulhijjah '
+            'Dihitung oleh LF Ma\'had \'Aly Lirboyo -- MHM Kediri. Kriteria: ${_kriteria.label}. '
+            'Penetapan resmi Ramadhan/Syawal/Dzulhijjah '
             'tetap menunggu sidang isbat.',
             style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600, height: 1.5),
           ),
@@ -719,8 +748,8 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     );
   }
 
-  Widget _tabelHilal(HasilHisabDetail hasil) {
-    final warna = hasil.memenuhiMabims2021 ? AppColors.emerald : Colors.deepOrange.shade700;
+  Widget _tabelHilal(HasilHisabDetail hasil, {required bool memenuhi, required double usiaHilalJam}) {
+    final warna = memenuhi ? AppColors.emerald : Colors.deepOrange.shade700;
     return Container(
       decoration: BoxDecoration(
         color: warna.withOpacity(0.06),
@@ -747,6 +776,12 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
               const SizedBox(width: 10),
               Expanded(child: _statHilal('Elongasi', hasil.elongasi, warna)),
             ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Usia hilal saat ghurub: ${usiaHilalJam < 0 ? '-' : ''}${_jamStr(usiaHilalJam.abs())} '
+            '\u2022 Kriteria: ${_kriteria.label}',
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
           ),
         ],
       ),
@@ -855,7 +890,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
 }
 
 /// Status kartu kesimpulan hisab awal bulan.
-/// - terpenuhi    : sudah ijtimak & memenuhi MABIMS -> awal bulan = hari hisab + 1
+/// - terpenuhi    : sudah ijtimak & memenuhi kriteria terpilih -> awal bulan = hari hisab + 1
 /// - istikmal     : sudah ijtimak tapi belum memenuhi -> awal bulan = hari hisab + 2
 /// - belumIjtimak : (khusus Tashilul) ghurub hari hisab masih sebelum ijtimak ->
 ///                  tidak ada tanggal awal bulan, tanggal hisab terlalu awal

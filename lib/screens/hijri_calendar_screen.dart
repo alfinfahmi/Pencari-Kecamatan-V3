@@ -433,11 +433,14 @@ class _HijriCalendarScreenState extends State<HijriCalendarScreen> {
         elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
         utcOffset: lokasi.utcOffset!,
       );
+      // Kriteria mengikuti pengaturan aplikasi (HijriService.kriteriaAktif).
+      final usiaPresisiTinggi = hasilPresisiTinggi.usiaHilalJam(
+          ijtimakUtc: ijtimakPresisiTinggiUtc, utcOffset: lokasi.utcOffset!);
       hilalPresisiTinggi = (
-        memenuhi: hasilPresisiTinggi.memenuhiMabims2021,
+        memenuhi: hasilPresisiTinggi.memenuhiKriteria(HijriService.kriteriaAktif, usiaHilalJam: usiaPresisiTinggi),
         tinggiHilal: hasilPresisiTinggi.tinggiHilalMari,
         elongasi: hasilPresisiTinggi.elongasi,
-        usiaHilalJam: hasilPresisiTinggi.lamaHilalJam,
+        usiaHilalJam: usiaPresisiTinggi,
       );
     }
 

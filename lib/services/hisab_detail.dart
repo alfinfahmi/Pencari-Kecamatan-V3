@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'hijri_service.dart' show KriteriaImkanRukyat;
+
 /// Hasil lengkap satu perhitungan keadaan hilal dari SATU metode hisab --
 /// bentuk data ini SENGAJA dibuat generik (bukan spesifik As-Syahru atau
 /// Meeus) supaya metode hisab lain yang mungkin ditambahkan ke depannya
@@ -53,6 +55,25 @@ class HasilHisabDetail {
   /// hakiki) -- ini yang secara metodologis benar untuk kriteria imkan
   /// rukyat, karena MAR'I adalah tinggi yang sungguhan teramati mata.
   bool get memenuhiMabims2021 => tinggiHilalMari >= 3.0 && elongasi >= 6.4;
+
+  /// Usia hilal (jam) saat ghurub = jam ghurub - jam ijtimak, keduanya jam
+  /// dinding lokal pada hari ijtimak lokal. Negatif kalau ghurub mendahului
+  /// ijtimak.
+  double usiaHilalJam({required DateTime ijtimakUtc, required int utcOffset}) {
+    final l = ijtimakUtc.add(Duration(hours: utcOffset));
+    return ghurubMatahariJam - (l.hour + l.minute / 60 + l.second / 3600);
+  }
+
+  /// Evaluasi kriteria imkan rukyat PILIHAN (bukan hanya MABIMS 2021).
+  /// Ambang sama persis dgn HijriService._hilalMemenuhiMabims; tinggi yg
+  /// dipakai tetap tinggi MAR'I.
+  bool memenuhiKriteria(KriteriaImkanRukyat kriteria, {required double usiaHilalJam}) =>
+      switch (kriteria) {
+        KriteriaImkanRukyat.mabims2021 => tinggiHilalMari >= 3.0 && elongasi >= 6.4,
+        KriteriaImkanRukyat.irtifa2UsiaHilal6Jam => tinggiHilalMari >= 2.0 && usiaHilalJam >= 6.0,
+        KriteriaImkanRukyat.irtifa2UsiaHilal8Jam => tinggiHilalMari >= 2.0 && usiaHilalJam >= 8.0,
+        KriteriaImkanRukyat.irtifa2Saja => tinggiHilalMari >= 2.0,
+      };
 
   /// "Miring ke Utara" kalau bulan lebih utara dari matahari (selisih
   /// azimut positif), "Miring ke Selatan" kalau sebaliknya.
