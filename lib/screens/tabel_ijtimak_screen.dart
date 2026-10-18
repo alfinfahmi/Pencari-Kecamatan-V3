@@ -8,6 +8,7 @@ import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
 import '../services/meeus_presisi_tinggi_service.dart';
 import '../services/tashilul_amtsilah_adapter.dart';
+import '../services/hisab_ephemeris_service.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
 import '../widgets/watermark_footer.dart';
@@ -435,6 +436,8 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
     DateTime? ijtimakAsSyahruUtc;
     DateTime? ijtimakPresisiTinggiUtc;
     DateTime? ijtimakTashilulUtc;
+    ({bool memenuhi, double tinggiHilal, double elongasi, double usiaHilalJam})? hilalEphemeris;
+    DateTime? ijtimakEphemerisUtc;
     if (lokasi != null && lokasi.utcOffset != null) {
       // Ketiga metode pakai waktu ijtimak HASIL PERHITUNGANNYA SENDIRI
       // (bukan waktu bersama dari tabel/kolom kiri) -- bisa beda
@@ -503,6 +506,38 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
           // Kolom Tashilul cuma tidak muncul utk baris ini kalau gagal.
         }
       }
+
+      // Ephemeris (data JPL DE421 format Ephemeris, 2020-2050). Data per
+      // tahun dimuat saat baris dibangun; selama memuat / di luar rentang,
+      // kolom ini cuma tidak muncul (4 metode lain tetap tampil).
+      switch (HisabEphemerisService.statusData(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH)) {
+        case StatusDataEphemeris.memuat:
+          HisabEphemerisService.muatUntukBulan(tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH)
+              .then((_) {
+            if (mounted) setState(() {});
+          });
+        case StatusDataEphemeris.tidakTersedia:
+          break;
+        case StatusDataEphemeris.siap:
+          try {
+            ijtimakEphemerisUtc = HisabEphemerisService.cariIjtimakUtc(
+                tahunH: tahunUntukBulanBerikutnya, bulanH: bulanBerikutnyaH);
+            final hasilEphemeris = HisabEphemerisService.hitung(
+              ijtimakUtc: ijtimakEphemerisUtc, lat: lokasi.lat, lng: lokasi.lng,
+              elevasiM: (lokasi.elevasiM ?? 0).toDouble(), utcOffset: lokasi.utcOffset!,
+            );
+            final ijtimakLokal = ijtimakEphemerisUtc.add(Duration(hours: lokasi.utcOffset!));
+            hilalEphemeris = (
+              memenuhi: hasilEphemeris.memenuhiMabims2021,
+              tinggiHilal: hasilEphemeris.tinggiHilalMari,
+              elongasi: hasilEphemeris.elongasi,
+              usiaHilalJam: hasilEphemeris.ghurubMatahariJam -
+                  (ijtimakLokal.hour + ijtimakLokal.minute / 60 + ijtimakLokal.second / 3600),
+            );
+          } catch (_) {
+            // Kolom Ephemeris cuma tidak muncul utk baris ini kalau gagal.
+          }
+      }
     }
 
 
@@ -535,6 +570,8 @@ class _TabelIjtimakScreenState extends State<TabelIjtimakScreen> {
                   SizedBox(width: 150, child: _barisMetode('Meeus Presisi Tinggi', hilalPresisiTinggi, ijtimakBerbeda: ijtimakPresisiTinggiUtc?.add(const Duration(hours: 7)))),
                   if (hilalTashilul != null)
                     SizedBox(width: 150, child: _barisMetode('Tashilul Amtsilah', hilalTashilul, ijtimakBerbeda: ijtimakTashilulUtc?.add(const Duration(hours: 7)))),
+                  if (hilalEphemeris != null)
+                    SizedBox(width: 150, child: _barisMetode('Ephemeris', hilalEphemeris, ijtimakBerbeda: ijtimakEphemerisUtc?.add(const Duration(hours: 7)))),
                 ],
               ),
             ],

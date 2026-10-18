@@ -502,3 +502,9 @@ jalankan `flutter analyze` sebelum build.
   belum terjadi) -> kartu hasil hisab. Selector dipindah lewat parameter
   `sisipanSebelumKartuHisab` di `_tabelKesimpulan`. Metode lain: sisipan
   kosong, urutan tetap kartu Awal Bulan -> kartu hasil hisab.
+- Perbaikan tampilan: label "Otomatis" di selector Tanggal Hisab terpotong
+  bingkai di layar HP. Selector diubah: judul "Tanggal Hisab" pindah ke ATAS
+  (Column), SegmentedButton lebar penuh, padding segmen horizontal 4, label
+  1 baris dlm FittedBox(scaleDown).
+
+## Catatan: metode ke-5 "Ephemeris" ditambahkan -- lihat `EPHEMERIS_CATATAN.md`.

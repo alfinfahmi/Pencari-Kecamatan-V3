@@ -93,6 +93,7 @@ flutter:
     - assets/data/web/
     - assets/data/web/provinsi/
     - assets/data/tashilul/
+    - assets/data/ephemeris/
     - assets/images/
     - shorebird.yaml
 

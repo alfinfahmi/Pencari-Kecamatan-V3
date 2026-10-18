@@ -6,6 +6,7 @@ import '../services/as_syahru_service.dart';
 import '../services/meeus_hisab_service.dart';
 import '../services/meeus_presisi_tinggi_service.dart';
 import '../services/tashilul_amtsilah_adapter.dart';
+import '../services/hisab_ephemeris_service.dart';
 import '../services/hisab_detail.dart';
 import '../services/reverse_geocode_helper.dart';
 import '../theme/app_theme.dart';
@@ -65,6 +66,9 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     ('Jean Meeus', MeeusHisabService.hitung, MeeusHisabService.cariIjtimakUtc),
     ('Meeus Presisi Tinggi', MeeusPresisiTinggiService.hitung, MeeusPresisiTinggiService.cariIjtimakUtc),
     ('Tashilul Amtsilah', TashilulAmtsilahAdapter.hitung, null),
+    // Prosedur Ephemeris Hisab Rukyat di atas tabel per jam format Ephemeris
+    // (data JPL DE421, 2020-2050) -- lihat HisabEphemerisService.
+    ('Ephemeris', HisabEphemerisService.hitung, HisabEphemerisService.cariIjtimakUtc),
   ];
 
   static const _namaBulanHijriah = {
@@ -171,6 +175,9 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           indicatorColor: AppColors.gold,
+          // 5 metode -- digulir supaya nama tab tidak terpotong di HP.
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           tabs: _metodeList.map((m) => Tab(text: m.$1)).toList(),
         ),
       ),
@@ -290,6 +297,32 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     final tahunH = int.parse(_tahunHController.text);
     final bulanH = _bulanHDipilih;
 
+    // Ephemeris: data per jam dimuat per tahun (aset ~100 KB/tahun) saat
+    // tab ini dibuka. Selama memuat -> spinner; di luar 2020-2050 -> pesan.
+    if (namaMetode == 'Ephemeris') {
+      switch (HisabEphemerisService.statusData(tahunH: tahunH, bulanH: bulanH)) {
+        case StatusDataEphemeris.memuat:
+          HisabEphemerisService.muatUntukBulan(tahunH: tahunH, bulanH: bulanH).then((_) {
+            if (mounted) setState(() {});
+          });
+          return const Center(child: CircularProgressIndicator());
+        case StatusDataEphemeris.tidakTersedia:
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'Data Ephemeris hanya tersedia untuk ijtimak tahun '
+                '${HisabEphemerisService.tahunAwal}\u2013${HisabEphemerisService.tahunAkhir} M.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey.shade500),
+              ),
+            ),
+          );
+        case StatusDataEphemeris.siap:
+          break;
+      }
+    }
+
     final awal = HijriService.tentukanAwalBulan(
       tahunH: tahunH, bulanH: bulanH, lat: lokasi.lat, lng: lokasi.lng,
       utcOffset: lokasi.utcOffset!, elevasiM: (lokasi.elevasiM ?? 0).toDouble(),
@@ -362,6 +395,31 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (namaMetode == 'Ephemeris')
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.withOpacity(0.35)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 18, color: Colors.blue.shade400),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Prosedur Ephemeris Hisab Rukyat, dengan data per jam dari JPL DE421 '
+                      '(NASA) yang disusun dalam format tabel Ephemeris -- bukan salinan '
+                      'buku Ephemeris Kemenag.',
+                      style: TextStyle(fontSize: 11.5, color: Colors.blue.shade400),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           if (namaMetode == 'Tashilul Amtsilah')
             Container(
               margin: const EdgeInsets.only(bottom: 12),
@@ -403,20 +461,38 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Row(
+              // Label di ATAS (bukan di samping) supaya SegmentedButton dapat
+              // lebar penuh; tiap label 1 baris & mengecil sendiri (FittedBox)
+              // agar "Otomatis" tidak terpotong bingkai di layar sempit.
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text('Tanggal Hisab', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
-                  const SizedBox(width: 10),
-                  Expanded(
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: double.infinity,
                     child: SegmentedButton<int?>(
                       showSelectedIcon: false,
-                      style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                      segments: const [
-                        ButtonSegment(value: null, label: Text('Otomatis')),
-                        ButtonSegment(value: 27, label: Text('27')),
-                        ButtonSegment(value: 28, label: Text('28')),
-                        ButtonSegment(value: 29, label: Text('29')),
-                        ButtonSegment(value: 30, label: Text('30')),
+                      style: const ButtonStyle(
+                        visualDensity: VisualDensity.compact,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 4)),
+                      ),
+                      segments: [
+                        for (final (nilai, teks) in const [
+                          (null, 'Otomatis'),
+                          (27, '27'),
+                          (28, '28'),
+                          (29, '29'),
+                          (30, '30'),
+                        ])
+                          ButtonSegment<int?>(
+                            value: nilai,
+                            label: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(teks, maxLines: 1, softWrap: false),
+                            ),
+                          ),
                       ],
                       selected: {_tashilulTanggalHisabManual},
                       onSelectionChanged: (baru) => setState(() => _tashilulTanggalHisabManual = baru.first),
