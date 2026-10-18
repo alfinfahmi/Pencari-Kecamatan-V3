@@ -497,3 +497,8 @@ jalankan `flutter analyze` sebelum build.
   "Hisab akhir <bulan sebelumnya> <tahun> H" + hari/tanggal hisab, Tinggi
   Mar'i & Elongasi. Utk `belumIjtimak` ditambah keterangan "tanggal hisab
   terlalu awal".
+- Urutan tampilan Tashilul (permintaan pengguna): banner pengujian ->
+  kartu Awal Bulan -> selector "Tanggal Hisab" (+ banner merah kalau ijtimak
+  belum terjadi) -> kartu hasil hisab. Selector dipindah lewat parameter
+  `sisipanSebelumKartuHisab` di `_tabelKesimpulan`. Metode lain: sisipan
+  kosong, urutan tetap kartu Awal Bulan -> kartu hasil hisab.

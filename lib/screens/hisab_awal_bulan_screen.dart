@@ -387,6 +387,14 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                 ],
               ),
             ),
+          _tabelKesimpulan(hasil, bulanH, tahunH, tanggal1,
+              status: status,
+              hariHisab: hariIjtimakSaja,
+              bulanSebelumnyaH: bulanSebelumnyaH,
+              // Tashilul: selector "Tanggal Hisab" (+ banner merah ijtimak
+              // belum terjadi) diletakkan DI ANTARA kartu Awal Bulan dan
+              // kartu hasil hisab, tepat di atas kartu yg dikendalikannya.
+              sisipanSebelumKartuHisab: [
           if (namaMetode == 'Tashilul Amtsilah')
             Container(
               margin: const EdgeInsets.only(bottom: 12),
@@ -443,8 +451,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
                 ],
               ),
             ),
-          _tabelKesimpulan(hasil, bulanH, tahunH, tanggal1,
-              status: status, hariHisab: hariIjtimakSaja, bulanSebelumnyaH: bulanSebelumnyaH),
+              ]),
           const SizedBox(height: 12),
           _tabelSeksi(
             judul: 'Markaz & Ijtimak',
@@ -519,6 +526,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     required _StatusHisab status,
     required DateTime hariHisab,
     required int bulanSebelumnyaH,
+    List<Widget> sisipanSebelumKartuHisab = const [],
   }) {
     final (Color warna, IconData ikon, String judul) = switch (status) {
       _StatusHisab.terpenuhi => (AppColors.emerald, Icons.check_circle_rounded, 'Kriteria Imkan Rukyat Terpenuhi'),
@@ -613,6 +621,7 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (kartuAwalBulan != null) ...[kartuAwalBulan, const SizedBox(height: 12)],
+        ...sisipanSebelumKartuHisab,
         kartuHisab,
       ],
     );
