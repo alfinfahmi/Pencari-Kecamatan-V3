@@ -487,3 +487,13 @@ tanggalHisab 30 Sya'ban 1448H: hilal ~38 jam, tinggi 14,77 derajat) &
 mode Otomatis yg memilih ghurub pertama setelah ijtimak.
 **Belum dikompilasi** (tidak ada Flutter di lingkungan sesi ini) --
 jalankan `flutter analyze` sebelum build.
+
+### Lanjutan: kartu kesimpulan dipecah jadi 2 kartu (permintaan pengguna)
+- **Kartu "Awal <bulan> <tahun> H"** (atas): latar netral (surfaceContainerHighest)
+  dgn border warna status; tanggal awal bulan + keterangan singkat
+  ("esok harinya" utk terpenuhi / "lusa" utk istikmal). TIDAK tampil utk
+  status `belumIjtimak`.
+- **Kartu hasil hisab** (bawah, gradien warna status): judul status,
+  "Hisab akhir <bulan sebelumnya> <tahun> H" + hari/tanggal hisab, Tinggi
+  Mar'i & Elongasi. Utk `belumIjtimak` ditambah keterangan "tanggal hisab
+  terlalu awal".

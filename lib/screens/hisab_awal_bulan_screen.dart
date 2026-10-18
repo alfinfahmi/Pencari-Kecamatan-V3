@@ -528,9 +528,11 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
     String tglStr(DateTime t) =>
         '${_namaHariLengkap[t.weekday]}, ${t.day} ${_namaBulanMasehi[t.month]} ${t.year}';
     final tahunHisabH = bulanH == 1 ? tahunH - 1 : tahunH;
-    final barisHisab = 'Hisab akhir ${_namaBulanHijriah[bulanSebelumnyaH]} $tahunHisabH H: ${tglStr(hariHisab)}';
 
-    return Container(
+    final skema = Theme.of(context).colorScheme;
+
+    // KARTU 1 -- Hasil hisab (status + hari hisab + keadaan hilal).
+    final kartuHisab = Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [warna, warna.withOpacity(0.75)], begin: Alignment.topLeft, end: Alignment.bottomRight),
         borderRadius: BorderRadius.circular(16),
@@ -544,24 +546,20 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
             children: [
               Icon(ikon, color: Colors.white, size: 18),
               const SizedBox(width: 6),
-              Text(judul, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+              Expanded(
+                child: Text(judul, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+              ),
             ],
           ),
           const SizedBox(height: 10),
+          Text('Hisab akhir ${_namaBulanHijriah[bulanSebelumnyaH]} $tahunHisabH H',
+              style: const TextStyle(color: Colors.white70, fontSize: 13)),
+          Text(tglStr(hariHisab),
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
           if (status == _StatusHisab.belumIjtimak) ...[
-            // Tidak ada tanggal awal bulan: ghurub tanggal hisab ini masih
-            // sebelum ijtimak, jadi istikmal (+2) belum bisa diterapkan.
-            Text(barisHisab, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            const Text('Tanggal hisab terlalu awal -- coba tanggal hisab berikutnya.',
+            const Text('Ghurub masih sebelum ijtimak -- tanggal hisab terlalu awal, coba tanggal hisab berikutnya.',
                 style: TextStyle(color: Colors.white70, fontSize: 12.5)),
-          ] else ...[
-            Text('Awal ${_namaBulanHijriah[bulanH]} $tahunH H',
-                style: const TextStyle(color: Colors.white70, fontSize: 13)),
-            Text(tglStr(tanggal1),
-                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 2),
-            Text(barisHisab, style: const TextStyle(color: Colors.white70, fontSize: 11.5)),
           ],
           const SizedBox(height: 12),
           Row(
@@ -573,6 +571,50 @@ class _HisabAwalBulanScreenState extends State<HisabAwalBulanScreen> with Single
           ),
         ],
       ),
+    );
+
+    // KARTU 2 -- Kesimpulan Awal Bulan (TIDAK ditampilkan kalau ijtimak
+    // belum terjadi: istikmal +2 belum berlaku di kasus itu).
+    final kartuAwalBulan = status == _StatusHisab.belumIjtimak
+        ? null
+        : Container(
+            decoration: BoxDecoration(
+              color: skema.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: warna.withOpacity(0.6), width: 1.5),
+            ),
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.event_available_rounded, color: warna, size: 18),
+                    const SizedBox(width: 6),
+                    Text('Awal ${_namaBulanHijriah[bulanH]} $tahunH H',
+                        style: TextStyle(color: skema.onSurface, fontSize: 13, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(tglStr(tanggal1),
+                    style: TextStyle(color: skema.onSurface, fontSize: 22, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(
+                  status == _StatusHisab.terpenuhi
+                      ? 'Hilal memenuhi kriteria pada ghurub hari hisab \u2192 esok harinya.'
+                      : 'Istikmal: hilal belum memenuhi kriteria pada ghurub hari hisab \u2192 lusa.',
+                  style: TextStyle(color: skema.onSurfaceVariant, fontSize: 11.5),
+                ),
+              ],
+            ),
+          );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (kartuAwalBulan != null) ...[kartuAwalBulan, const SizedBox(height: 12)],
+        kartuHisab,
+      ],
     );
   }
 
